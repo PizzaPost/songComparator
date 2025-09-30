@@ -46,12 +46,14 @@ def load_palette(filename="resources/themes/default.json"):
             f.close()
         except Exception:
             # creates default palette file
+            os.makedirs("resources/themes", exist_ok=True)
             with open(filename, "w", encoding="utf-8") as f:
                 json.dump(default, f, indent=4)
             f.close()
             palette = default
     else:
         # creates default palette file
+        os.makedirs("resources/themes", exist_ok=True)
         with open(filename, "w", encoding="utf-8") as f:
             json.dump(default, f, indent=4)
         f.close()
@@ -122,53 +124,53 @@ def set_color(widget):
     # configure ttk styles once
     style = tkinter.ttk.Style()
     try:
-        # prefer 'clam' for better control over progressbar colors, fallback silently if unavailable
-        style.theme_use('clam')
+        # prefer "clam" for better control over progressbar colors, fallback silently if unavailable
+        style.theme_use("clam")
     except Exception:
         pass
 
-    style.configure('Dark.TLabel', background=palette['card'], foreground=palette['text'])
-    style.configure('Dark.TFrame', background=palette['card'])
-    style.configure('Dark.TButton',
-                    background=palette['button_bg'],
-                    foreground=palette['button_fg'],
-                    relief='flat')
-    style.map('Dark.TButton',
-              background=[('active', palette['button_active_bg']), ('pressed', palette['button_active_bg'])],
-              foreground=[('active', palette['button_active_fg']), ('pressed', palette['button_active_fg'])])
+    style.configure("Dark.TLabel", background=palette["card"], foreground=palette["text"])
+    style.configure("Dark.TFrame", background=palette["card"])
+    style.configure("Dark.TButton",
+                    background=palette["button_bg"],
+                    foreground=palette["button_fg"],
+                    relief="flat")
+    style.map("Dark.TButton",
+              background=[("active", palette["button_active_bg"]), ("pressed", palette["button_active_bg"])],
+              foreground=[("active", palette["button_active_fg"]), ("pressed", palette["button_active_fg"])])
     # Progressbar style
-    style.configure('Custom.Horizontal.TProgressbar',
-                    troughcolor=palette['progress_trough'],
-                    background=palette['progress_bar'],
-                    bordercolor=palette['border'])
+    style.configure("Custom.Horizontal.TProgressbar",
+                    troughcolor=palette["progress_trough"],
+                    background=palette["progress_bar"],
+                    bordercolor=palette["border"])
 
     # Apply to tk / classic widgets
     cls = widget.__class__.__name__
 
     # Frame
-    if cls in ('Frame', 'LabelFrame'):
+    if cls in ("Frame", "LabelFrame"):
         try:
-            widget.configure(bg=palette['card'], bd=0, highlightthickness=0)
+            widget.configure(bg=palette["card"], bd=0, highlightthickness=0)
         except Exception:
             pass
 
     # Label
-    if cls == 'Label':
+    if cls == "Label":
         try:
-            widget.configure(bg=palette['card'], fg=palette['text'])
+            widget.configure(bg=palette["card"], fg=palette["text"])
         except Exception:
             pass
 
     # Button
-    if cls == 'Button':
+    if cls == "Button":
         try:
             widget.configure(
-                bg=palette['button_bg'],
-                fg=palette['button_fg'],
-                activebackground=palette['button_active_bg'],
-                activeforeground=palette['button_active_fg'],
+                bg=palette["button_bg"],
+                fg=palette["button_fg"],
+                activebackground=palette["button_active_bg"],
+                activeforeground=palette["button_active_fg"],
                 bd=0,
-                relief='flat',
+                relief="flat",
                 highlightthickness=0,
                 padx=8, pady=4
             )
@@ -176,34 +178,34 @@ def set_color(widget):
             pass
 
     # Entry
-    if cls in ('Entry', 'Text'):
+    if cls in ("Entry", "Text"):
         try:
-            widget.configure(bg=palette['card'], fg=palette['text'], insertbackground=palette['text'], bd=0)
+            widget.configure(bg=palette["card"], fg=palette["text"], insertbackground=palette["text"], bd=0)
         except Exception:
             pass
 
     # ttk widgets
     if isinstance(widget, tkinter.ttk.Progressbar):
         try:
-            widget.configure(style='Custom.Horizontal.TProgressbar', maximum=widget.cget("maximum"))
+            widget.configure(style="Custom.Horizontal.TProgressbar", maximum=widget.cget("maximum"))
         except Exception:
             pass
 
     if isinstance(widget, tkinter.ttk.Button):
         try:
-            widget.configure(style='Dark.TButton')
+            widget.configure(style="Dark.TButton")
         except Exception:
             pass
 
     if isinstance(widget, tkinter.ttk.Label):
         try:
-            widget.configure(style='Dark.TLabel')
+            widget.configure(style="Dark.TLabel")
         except Exception:
             pass
 
     if isinstance(widget, tkinter.ttk.Frame):
         try:
-            widget.configure(style='Dark.TFrame')
+            widget.configure(style="Dark.TFrame")
         except Exception:
             pass
 
@@ -220,7 +222,7 @@ def start_gui():
     tk.geometry(f"400x185+{tk.winfo_screenwidth() // 2 - 208}+{tk.winfo_screenheight() // 2 - 88}")
     tk.resizable(False, False)
     tk.overrideredirect = True
-    tk.configure(bg=palette['card'])
+    tk.configure(bg=palette["card"])
     installation_text1 = tkinter.Label(tk, text="Installing...")
     installation_text2 = tkinter.Label(tk, text=f"Finished Steps: {finished_steps}/14")
     loading_bar = tkinter.ttk.Progressbar(tk, maximum=14, length=360)
