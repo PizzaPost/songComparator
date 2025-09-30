@@ -89,7 +89,9 @@ def load_palette(filename="resources/themes/default.json"):
         "button_active_fg": "#ffffff",
         "border": "#232629",
         "progress_trough": "#151718",
-        "progress_bar": "#7C0008"
+        "progress_bar": "#7C0008",
+        "press_red": "#EA5660",
+        "hover_red": "#a33c43",
     }
 
     if os.path.exists(filename):
@@ -119,6 +121,7 @@ palette = load_palette()
 
 
 def bind_hover_classic_button(btn, palette):
+    """Adds a hover style for buttons"""
     if getattr(btn, "_hover_bound", False):
         return
     btn._hover_bound = True
@@ -127,18 +130,26 @@ def bind_hover_classic_button(btn, palette):
         btn._orig_fg = btn.cget("fg")
     except Exception:
         btn._orig_bg, btn._orig_fg = palette["button_bg"], palette["button_fg"]
+
     def on_enter(e):
         try:
-            btn.configure(bg=palette["light_red"], fg="#ffffff")
+            btn.configure(bg=palette["hover_red"], fg="#ffffff")
         except Exception:
             pass
+
     def on_leave(e):
         try:
             btn.configure(bg=btn._orig_bg, fg=btn._orig_fg)
         except Exception:
             pass
-    btn.bind("<Enter>", on_enter)
-    btn.bind("<Leave>", on_leave)
+
+    btn.bind("<Enter>", on_enter, add="+")
+    btn.bind("<Leave>", on_leave, add="+")
+    # ensure pressed color is used when the button is pressed
+    try:
+        btn.configure(activebackground=palette["press_red"], activeforeground="#ffffff")
+    except Exception:
+        pass
 
 
 def set_color(widget):
@@ -161,7 +172,7 @@ def set_color(widget):
                     relief="flat",
                     padding=(8,4))
     style.map("Aqua.Dark.TButton",
-              background=[("active", palette["light_red"]), ("pressed", palette["light_red"])],
+              background=[("active", palette["hover_red"]), ("pressed", palette["press_red"])],
               foreground=[("active", "#ffffff"), ("pressed", "#ffffff")])
     style.configure("Aqua.Horizontal.TProgressbar",
                     troughcolor=palette["progress_trough"],

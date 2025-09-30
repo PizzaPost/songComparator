@@ -11,5 +11,7 @@
     "button_active_fg": "#ffffff",
     "border": "#232629",
     "progress_trough": "#151718",
-    "progress_bar": "#7C0008"
+    "progress_bar": "#7C0008",
+    "press_red": "#EA5660",
+    "hover_red": "#a33c43"
 }
