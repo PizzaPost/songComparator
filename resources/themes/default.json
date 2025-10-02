@@ -1,0 +1,17 @@
+{
+    "background": "#0b0d0f",
+    "card": "#0f1113",
+    "text": "#e6e6e6",
+    "muted_text": "#b9bdc1",
+    "dark_red": "#7C0008",
+    "light_red": "#EA5660",
+    "button_bg": "#1a1c1e",
+    "button_fg": "#f3f4f5",
+    "button_active_bg": "#281213",
+    "button_active_fg": "#ffffff",
+    "border": "#232629",
+    "progress_trough": "#151718",
+    "progress_bar": "#7C0008",
+    "press_red": "#EA5660",
+    "hover_red": "#a33c43"
+}
