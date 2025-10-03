@@ -1,6 +1,159 @@
-import os, json, tkinter
+import json
+import os
+from tkinter import ttk
+
+
+def build_ctk_theme_from_palette(p):
+    return {
+        "CTk": {
+            "fg_color": [p["bg"], p["background"]]
+        },
+        "CTkToplevel": {
+            "fg_color": [p["bg"], p["background"]]
+        },
+        "CTkFrame": {
+            "corner_radius": 6,
+            "border_width": 0,
+            "fg_color": [p["button_bg"], p["bg"]],
+            "top_fg_color": [p["bg"], p["background"]],
+            "border_color": [p["border"], p["border"]]
+        },
+        "CTkButton": {
+            "corner_radius": 6,
+            "border_width": 0,
+            "fg_color": [p["button_bg"], p["button_active_bg"]],
+            "hover_color": [p["hover_red"], p["hover_red"]],
+            "border_color": [p["border"], p["border"]],
+            "text_color": [p["button_fg"], p["text"]],
+            "text_color_disabled": [p["text"], p["text"]]
+        },
+        "CTkLabel": {
+            "corner_radius": 0,
+            "fg_color": "transparent",
+            "text_color": [p["text"], p["button_fg"]]
+        },
+        "CTkEntry": {
+            "corner_radius": 6,
+            "border_width": 2,
+            "fg_color": [p["bg"], p["button_bg"]],
+            "border_color": [p["border"], p["border"]],
+            "text_color": [p["text"], p["button_fg"]],
+            "placeholder_text_color": [p["text"], p["text"]]
+        },
+        "CTkCheckBox": {
+            "corner_radius": 6,
+            "border_width": 3,
+            "fg_color": [p["button_bg"], p["button_active_bg"]],
+            "border_color": [p["border"], p["border"]],
+            "hover_color": [p["hover_red"], p["hover_red"]],
+            "checkmark_color": [p["button_fg"], p["text"]],
+            "text_color": [p["text"], p["button_fg"]],
+            "text_color_disabled": [p["text"], p["text"]]
+        },
+        "CTkSwitch": {
+            "corner_radius": 1000,
+            "border_width": 3,
+            "button_length": 0,
+            "fg_color": [p["border"], p["border"]],
+            "progress_color": [p["button_bg"], p["button_active_bg"]],
+            "button_color": [p["button_bg"], p["button_fg"]],
+            "button_hover_color": [p["hover_red"], p["hover_red"]],
+            "text_color": [p["text"], p["button_fg"]],
+            "text_color_disabled": [p["text"], p["text"]]
+        },
+        "CTkRadioButton": {
+            "corner_radius": 1000,
+            "border_width_checked": 6,
+            "border_width_unchecked": 3,
+            "fg_color": [p["button_bg"], p["button_active_bg"]],
+            "border_color": [p["border"], p["border"]],
+            "hover_color": [p["hover_red"], p["hover_red"]],
+            "text_color": [p["text"], p["button_fg"]],
+            "text_color_disabled": [p["text"], p["text"]]
+        },
+        "CTkProgressBar": {
+            "corner_radius": 1000,
+            "border_width": 0,
+            "fg_color": [p["progress_trough"], p["progress_trough"]],
+            "progress_color": [p["progress_bar"], p["progress_bar"]],
+            "border_color": [p["border"], p["border"]]
+        },
+        "CTkSlider": {
+            "corner_radius": 1000,
+            "button_corner_radius": 1000,
+            "border_width": 6,
+            "button_length": 0,
+            "fg_color": [p["progress_trough"], p["progress_trough"]],
+            "progress_color": [p["progress_bar"], p["progress_bar"]],
+            "button_color": [p["button_bg"], p["button_active_bg"]],
+            "button_hover_color": [p["hover_red"], p["hover_red"]]
+        },
+        "CTkOptionMenu": {
+            "corner_radius": 6,
+            "fg_color": [p["button_bg"], p["button_active_bg"]],
+            "button_color": [p["button_bg"], p["button_active_bg"]],
+            "button_hover_color": [p["hover_red"], p["hover_red"]],
+            "text_color": [p["button_fg"], p["text"]],
+            "text_color_disabled": [p["text"], p["text"]]
+        },
+        "CTkComboBox": {
+            "corner_radius": 6,
+            "border_width": 2,
+            "fg_color": [p["bg"], p["button_bg"]],
+            "border_color": [p["border"], p["border"]],
+            "button_color": [p["border"], p["border"]],
+            "button_hover_color": [p["hover_red"], p["hover_red"]],
+            "text_color": [p["text"], p["button_fg"]],
+            "text_color_disabled": [p["text"], p["text"]]
+        },
+        "CTkScrollbar": {
+            "corner_radius": 1000,
+            "border_spacing": 4,
+            "fg_color": "transparent",
+            "button_color": [p["border"], p["border"]],
+            "button_hover_color": [p["hover_red"], p["hover_red"]]
+        },
+        "CTkSegmentedButton": {
+            "corner_radius": 6,
+            "border_width": 2,
+            "fg_color": [p["border"], p["bg"]],
+            "selected_color": [p["button_bg"], p["button_active_bg"]],
+            "selected_hover_color": [p["hover_red"], p["hover_red"]],
+            "unselected_color": [p["border"], p["bg"]],
+            "unselected_hover_color": [p["hover_red"], p["hover_red"]],
+            "text_color": [p["button_fg"], p["text"]],
+            "text_color_disabled": [p["text"], p["text"]]
+        },
+        "CTkTextbox": {
+            "corner_radius": 6,
+            "border_width": 0,
+            "fg_color": [p["bg"], p["background"]],
+            "border_color": [p["border"], p["border"]],
+            "text_color": [p["text"], p["button_fg"]],
+            "scrollbar_button_color": [p["border"], p["border"]],
+            "scrollbar_button_hover_color": [p["hover_red"], p["hover_red"]]
+        },
+        "CTkScrollableFrame": {
+            "label_fg_color": [p["text"], p["button_fg"]]
+        },
+        "DropdownMenu": {
+            "fg_color": [p["bg"], p["background"]],
+            "hover_color": [p["button_bg"], p["button_active_bg"]],
+            "text_color": [p["text"], p["button_fg"]]
+        },
+        "CTkFont": {
+            "macOS": {"family": "SF Display", "size": 13, "weight": "normal"},
+            "Windows": {"family": "Roboto", "size": 13, "weight": "normal"},
+            "Linux": {"family": "Roboto", "size": 13, "weight": "normal"}
+        }
+    }
+
+
 def load_palette(filename="resources/themes/default.json"):
-    """Loads the palette from a JSON file."""
+    """Loads the palette from a JSON file.
+    Returns a flat palette dict for classic tkinter use.
+    Also ensures the file contains a customtkinter-compatible CTk theme.
+    """
     default = {
         "background": "#0b0d0f",
         "bg": "#0f1113",
@@ -16,64 +169,134 @@ def load_palette(filename="resources/themes/default.json"):
         "hover_red": "#a33c43",
     }
 
+    os.makedirs(os.path.dirname(filename), exist_ok=True)
+
     if os.path.exists(filename):
         try:
-            # loads existing palette
             with open(filename, "r", encoding="utf-8") as f:
-                palette = json.load(f)
-            f.close()
+                data = json.load(f)
         except Exception:
-            # creates default palette file
-            os.makedirs("resources/themes", exist_ok=True)
-            with open(filename, "w", encoding="utf-8") as f:
-                json.dump(default, f, indent=4)
-            f.close()
-            palette = default
+            data = None
     else:
-        # creates default palette file
-        os.makedirs("resources/themes", exist_ok=True)
+        data = None
+
+    if data is None:
+        # create file with both "palette" and CTk theme
+        ctk = build_ctk_theme_from_palette(default)
+        # store palette under "palette" key and also the CTk theme keys
+        out = {"palette": default}
+        out.update(ctk)
         with open(filename, "w", encoding="utf-8") as f:
-            json.dump(default, f, indent=4)
-        f.close()
-        palette = default
-    return palette
+            json.dump(out, f, indent=2)
+        return default
+
+    # if the file contains a "palette" key, use it.
+    if isinstance(data, dict) and "palette" in data and isinstance(data["palette"], dict):
+        palette = {**default, **data["palette"]}
+        # ensure file also contains CTk fields or adds them
+        missing_ctk = any(k.startswith("CTk") or k == "CTk" for k in data.keys())
+        if not missing_ctk:
+            ctk = build_ctk_theme_from_palette(palette)
+            data.update(ctk)
+            with open(filename, "w", encoding="utf-8") as f:
+                json.dump(data, f, indent=2)
+        return palette
+
+    # if the file looks like a CTk theme (top-level CTk keys), extract a palette
+    # we only extract colors that exist in the file; otherwise fall back to default.
+    if isinstance(data, dict):
+        try:
+            # helper to get the first color
+            def get(k, subk, idx=0):
+                "Get the first color from a CTk theme dictionary."
+                v = data.get(k, {}).get(subk)
+                if isinstance(v, list) and len(v) > idx:
+                    return v[idx]
+                if isinstance(v, str):
+                    return v
+                return None
+
+            palette = {
+                "background": get("CTk", "fg_color", 1) or get("CTkToplevel", "fg_color", 1) or default["background"],
+                "bg": get("CTk", "fg_color", 0) or get("CTkFrame", "fg_color", 0) or default["bg"],
+                "text": get("CTkLabel", "text_color", 0) or get("CTkButton", "text_color", 0) or default["text"],
+                "dark_red": default["dark_red"],
+                "light_red": default["light_red"],
+                "button_bg": get("CTkButton", "fg_color", 0) or default["button_bg"],
+                "button_fg": get("CTkButton", "text_color", 0) or get("CTkLabel", "text_color", 0) or default[
+                    "button_fg"],
+                "button_active_bg": get("CTkButton", "fg_color", 1) or default["button_active_bg"],
+                "border": get("CTkFrame", "border_color", 0) or default["border"],
+                "progress_trough": get("CTkProgressBar", "fg_color", 0) or default["progress_trough"],
+                "progress_bar": get("CTkProgressBar", "progress_color", 0) or default["progress_bar"],
+                "hover_red": get("CTkButton", "hover_color", 0) or default["hover_red"],
+            }
+            # fill any None with defaults
+            for k in default:
+                if not palette.get(k):
+                    palette[k] = default[k]
+            # ensure the file contains "palette" key so future reads are easier
+            if "palette" not in data:
+                data["palette"] = palette
+                with open(filename, "w", encoding="utf-8") as f:
+                    json.dump(data, f, indent=2)
+            return palette
+        except Exception:
+            return default
+
+    return default
+
 
 def bind_hover_classic_button(btn, palette):
-    """Adds a hover style for buttons"""
+    """Adds a hover style for classic tkinter Buttons."""
     if getattr(btn, "_hover_bound", False):
         return
     btn._hover_bound = True
     try:
         btn._orig_bg = btn.cget("bg")
         btn._orig_fg = btn.cget("fg")
+        btn._orig_active = btn.cget("activebackground")
     except Exception:
-        btn._orig_bg, btn._orig_fg = palette["button_bg"], palette["button_fg"]
+        btn._orig_bg, btn._orig_fg, btn._orig_active = palette["button_bg"], palette["button_fg"], palette[
+            "button_active_bg"]
 
     def on_enter(e):
         try:
-            btn.configure(bg=palette["hover_red"], fg="#ffffff")
+            btn.configure(bg=palette["hover_red"], fg=palette["button_fg"],
+                          activebackground=palette["button_active_bg"])
         except Exception:
             pass
 
     def on_leave(e):
         try:
-            btn.configure(bg=btn._orig_bg, fg=btn._orig_fg)
+            btn.configure(bg=btn._orig_bg, fg=btn._orig_fg,
+                          activebackground=btn._orig_active or palette["button_active_bg"])
         except Exception:
             pass
 
     btn.bind("<Enter>", on_enter, add="+")
     btn.bind("<Leave>", on_leave, add="+")
-    # ensure pressed color is used when the button is pressed
+
     try:
-        btn.configure(activebackground=palette["button_active_bg"], activeforeground="#ffffff")
+        btn.configure(
+            bg=palette["button_bg"],
+            fg=palette["button_fg"],
+            activebackground=palette["button_active_bg"],
+            activeforeground="#ffffff",
+            bd=0,
+            relief="flat",
+            highlightthickness=0,
+            padx=8,
+            pady=4,
+            disabledforeground=palette.get("text", "gray60")
+        )
     except Exception:
         pass
 
 
 def set_color(widget, palette):
-    """Apply an "aqua" themed dark mode."""
-    style = tkinter.ttk.Style()
-    # try to get a clean theme suitable for customizing
+    """Apply an "aqua" themed dark mode to classic tkinter widgets. (Sadly only works on macOS.)"""
+    style = ttk.Style()
     for theme_try in ("aqua", "arc", "breeze", "yaru", "default"):
         try:
             style.theme_use(theme_try)
@@ -81,14 +304,13 @@ def set_color(widget, palette):
         except Exception:
             continue
 
-    # TTK styles
     style.configure("Aqua.Dark.TFrame", background=palette["bg"])
     style.configure("Aqua.Dark.TLabel", background=palette["bg"], foreground=palette["text"])
     style.configure("Aqua.Dark.TButton",
                     background=palette["button_bg"],
                     foreground=palette["button_fg"],
                     relief="flat",
-                    padding=(8,4))
+                    padding=(8, 4))
     style.map("Aqua.Dark.TButton",
               background=[("active", palette["hover_red"]), ("pressed", palette["button_active_bg"])],
               foreground=[("active", "#ffffff"), ("pressed", "#ffffff")])
@@ -97,7 +319,6 @@ def set_color(widget, palette):
                     background=palette["progress_bar"],
                     bordercolor=palette["border"])
 
-    # apply to classic widget types
     cls = widget.__class__.__name__
 
     if cls in ("Tk", "Toplevel"):
@@ -120,11 +341,15 @@ def set_color(widget, palette):
 
     if cls == "Button":
         try:
-            widget.configure(bg=palette["button_bg"],
-                             fg=palette["button_fg"],
-                             activebackground=palette["light_red"],
-                             activeforeground="#ffffff",
-                             bd=0, relief="flat", padx=8, pady=4)
+            # base + active + hover handled by bind_hover_classic_button
+            btn_kwargs = dict(
+                bg=palette["button_bg"],
+                fg=palette["button_fg"],
+                activebackground=palette["button_active_bg"],
+                activeforeground="#ffffff",
+                bd=0, relief="flat", padx=8, pady=4
+            )
+            widget.configure(**btn_kwargs)
             bind_hover_classic_button(widget, palette)
         except Exception:
             pass
@@ -137,29 +362,28 @@ def set_color(widget, palette):
 
     # ttk-specific instances
     try:
-        if isinstance(widget, tkinter.ttk.Progressbar):
+        if isinstance(widget, ttk.Progressbar):
             widget.configure(style="Aqua.Horizontal.TProgressbar")
     except Exception:
         pass
 
     try:
-        if isinstance(widget, tkinter.ttk.Button):
+        if isinstance(widget, ttk.Button):
             widget.configure(style="Aqua.Dark.TButton")
     except Exception:
         pass
 
     try:
-        if isinstance(widget, tkinter.ttk.Label):
+        if isinstance(widget, ttk.Label):
             widget.configure(style="Aqua.Dark.TLabel")
     except Exception:
         pass
 
     try:
-        if isinstance(widget, tkinter.ttk.Frame):
+        if isinstance(widget, ttk.Frame):
             widget.configure(style="Aqua.Dark.TFrame")
     except Exception:
         pass
 
-    # style every child widget
     for child in widget.winfo_children():
         set_color(child, palette)
