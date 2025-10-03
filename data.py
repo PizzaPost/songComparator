@@ -42,29 +42,9 @@ def findPlaylist(filename: str) -> list:
     for extension in extensions["playlists"]:
         playlistfile = playlistfolder + filename + extension
         if os.path.exists(playlistfile):
-            tracks = readPlaylistDetails(playlistfile)
+            with open(playlistfile, "r") as f:
+                tracks = json.load(f)
             break
-    return tracks
-
-
-def readPlaylistDetails(file: str) -> list:
-    """
-    Reads a song comparator playlist file and returns the tracks
-    in the playlist.
-
-    Parameters
-    ----------
-    file : str
-        The full relative path to the file to read. Must include an extension.
-
-    Returns
-    -------
-    list
-        A list of tracks in the playlist file along with their details. May be empty if no playlist file is found.
-    """
-    tracks = []
-    with open(file, "r") as f:
-        tracks = json.load(f)
     return tracks
 
 
@@ -83,4 +63,12 @@ def readTrackDetails(filename: str) -> dict:
     dict
         A dictionary containing the details of the song. May be empty if no song details file is found.
     """
+    detailsfolder = "resources/details/"
+    details = {}
+    for extension in extensions["details"]:
+        detailsfile = detailsfolder + filename + extension
+        if os.path.exists(detailsfile):
+            with open(detailsfile, "r") as f:
+                details = json.load(f)
+            break
     return details
