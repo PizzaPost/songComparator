@@ -5,29 +5,38 @@ import tkinter.messagebox
 import customtkinter
 
 
+def submit_settings(theme, appearance_mode, language):
+    with open("resources/settings.json", "w") as f:
+        json.dump({"theme": theme, "appearance_mode": appearance_mode, "language": language}, f)
+    f.close()
+    tkinter.messagebox.showinfo("Info", "Changed will be displayed after restarting.")
+
 def open_settings():
+    with open("resources/settings.json", "r") as f:
+        data = json.load(f)
+    f.close()
     themes=[theme.replace(".json", "") for theme in os.listdir("resources/themes")]
     languages=[language.replace(".json", "") for language in os.listdir("resources/languages")]
-    customtkinter.set_default_color_theme("resources/themes/default.json")
-    customtkinter.set_appearance_mode("dark")
+    customtkinter.set_appearance_mode(data["appearance_mode"])
+    customtkinter.set_default_color_theme(f"resources/themes/{data['theme']}.json")
     tk = customtkinter.CTk()
     tk.title("Settings")
-    tk.geometry(f"500x300+{tk.winfo_screenwidth() // 2 - 200}+{tk.winfo_screenheight() // 2 - 150}")
+    tk.geometry(f"510x300+{tk.winfo_screenwidth() // 2 - 200}+{tk.winfo_screenheight() // 2 - 150}")
     tk.resizable(False, False)
     tk.attributes("-topmost", True)
 
-    frame=customtkinter.CTkFrame(tk)
+    frame=customtkinter.CTkScrollableFrame(tk)
 
-    with open("resources/themes/default.json", "r") as f:
-        data = json.load(f)
+    with open(f"resources/themes/{data["theme"]}.json", "r") as f:
+        data2 = json.load(f)
         if os.name == "nt":
-            font = data["CTkFont"]["Windows"]
+            font = data2["CTkFont"]["Windows"]
         elif os.name == "posix":
-            font = data["CTkFont"]["Linux"]
+            font = data2["CTkFont"]["Linux"]
         elif os.name == "darwin":
-            font = data["CTkFont"]["macOS"]
+            font = data2["CTkFont"]["macOS"]
         else:
-            font = data["CTkFont"]["default"]
+            font = data2["CTkFont"]["default"]
     title=customtkinter.CTkLabel(frame, text="Settings", font=(font, 32, "bold"))
     seperator1=customtkinter.CTkLabel(frame, text="")
     themes_heading=customtkinter.CTkLabel(frame, text="Themes", font=(font, 24, "bold"))
@@ -35,22 +44,16 @@ def open_settings():
     warning1=customtkinter.CTkLabel(frame, text="⚠️ Please install more themes to use this feature ⚠️", text_color="red")
     if len(themes)<=1:
         themes_dropdown.configure(state="disabled")
-    dark_mode = customtkinter.CTkSwitch(frame, text="Dark Mode", onvalue="dark", offvalue="light")
+    dark_mode = customtkinter.CTkOptionMenu(frame, values=["System", "Dark", "Light"])
+    dark_mode.set(data["appearance_mode"])
     warning2=customtkinter.CTkLabel(frame, text="⚠️ This feature may not be available for every theme ⚠️", text_color="orange")
-    if customtkinter.get_appearance_mode() == "Dark":
-        dark_mode.select()
-    def toggle_dark_mode():
-        if dark_mode.get():
-            customtkinter.set_appearance_mode("dark")
-        else:
-            customtkinter.set_appearance_mode("light")
-    dark_mode.configure(command=toggle_dark_mode)
     seperator2=customtkinter.CTkLabel(frame, text="")
     language_heading=customtkinter.CTkLabel(frame, text="Language", font=(font, 24, "bold"))
     language_dropdown=customtkinter.CTkOptionMenu(frame, values=languages)
     language_dropdown.set("English")
+    seperator3=customtkinter.CTkLabel(frame, text="")
 
-
+    submit=customtkinter.CTkButton(frame, text="Submit", command=lambda: submit_settings(themes_dropdown.get(), dark_mode.get(), language_dropdown.get()))
 
     frame.pack(fill="both", expand=True, padx=5, pady=5)
     frame.grid_columnconfigure(0, weight=1)
@@ -66,6 +69,8 @@ def open_settings():
     seperator2.grid(row=5, column=0)
     language_heading.grid(row=6, column=0, padx=5, sticky="w")
     language_dropdown.grid(row=7, column=0, padx=5, pady=5, sticky="w")
+    seperator3.grid(row=8)
+    submit.grid(row=9, column=0, columnspan=2, pady=5, sticky="n")
     tk.mainloop()
 
 

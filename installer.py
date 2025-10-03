@@ -59,7 +59,7 @@ def installer():
                 trying = False
             except ImportError as e:
                 if not e.name in custom_modules:
-                    if e.name=="yt_dlp":
+                    if e.name == "yt_dlp":
                         os.system(f"pip install yt-dlp")
                     else:
                         os.system(f"pip install {e.name}")
@@ -83,6 +83,12 @@ def installer():
         os.makedirs("resources/assets", exist_ok=True)
         finished_steps += 1
         os.makedirs("resources/languages", exist_ok=True)
+        finished_steps += 1
+
+        if not os.path.exists("resources/settings.json"):
+            with open("resources/settings.json", "w") as f:
+                json.dump({"language": "english", "theme": "dark", "appearance_mode": "system"}, f)
+            f.close()
         finished_steps += 1
 
         for file in necessary_files:
@@ -122,7 +128,7 @@ def start_gui():
     tk.attributes("-topmost", True)
     tk.configure(bg=palette["bg"])
     installation_text1 = tkinter.Label(tk, text="Installing...")
-    installation_text2 = tkinter.Label(tk, text=f"Finished Steps: {finished_steps}/21")
+    installation_text2 = tkinter.Label(tk, text=f"Finished Steps: {finished_steps}/22")
     loading_bar = tkinter.ttk.Progressbar(tk, maximum=14, length=360)
     installation_text3 = tkinter.Label(tk, text="Please wait until installation is complete.")
     installation_text1.pack(padx=20, pady=20)
@@ -143,7 +149,7 @@ def start_gui():
 
     def update_ui():
         """Updates the installer GUI."""
-        installation_text2.config(text=f"Finished Steps: {finished_steps}/21")
+        installation_text2.config(text=f"Finished Steps: {finished_steps}/22")
         loading_bar["value"] = finished_steps
         if done_event.is_set():
             tk.title("Installation Complete")
