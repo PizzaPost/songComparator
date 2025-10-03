@@ -2,6 +2,7 @@ def run():
     import pygame
     import pyvidplayer2
     import visuals
+    import data
     running = True
     esc = 0
     pg = pygame.display.set_mode()
@@ -10,6 +11,7 @@ def run():
     pygame.display.set_icon(pygame.image.load("resources/assets/icon.png"))
     clock = pygame.time.Clock()
     video = None
+    coverActive = False
     font = pygame.font.SysFont("Segoe UI", 48)
 
     manager = visuals.ButtonManager(font, spacing=50)
@@ -17,7 +19,8 @@ def run():
     manager.add_button("Track", size=(300, 100), radius=20)
 
     while running:
-        pg.fill((0, 0, 0))
+        if not coverActive:
+            pg.fill((0, 0, 0))
 
         manager.layout(width // 2, height // 2 - 100)
 
@@ -25,6 +28,37 @@ def run():
         for c in clicks:
             if c == "Playlist":
                 print("Playlist pressed")
+                randomPlaylist = data.randomPlaylist()
+                playlist = data.readPlaylist(randomPlaylist)
+                randomTrack = data.randomTrack(playlist)
+                source, stream, isVideo = data.trackSource(randomTrack)
+                pygame.mixer.music.stop()
+                if video: # if you press where the playlist button would be while a track is playing, another one starts
+                    video.stop()
+                    video = None
+                if isVideo:
+                    coverActive = False
+                    video = pyvidplayer2.Video(source, youtube=stream)
+                    video.resize((width, height))
+                else:
+                    pygame.mixer.music.load(source)
+                    coverActive = True
+                    # move cover stuff to visuals?
+                    coverImage = pygame.image.load("resources/covers/" + randomTrack["cover"])
+                    coverWidth, coverHeight = coverImage.get_size()
+                    aspectRatio = coverWidth / coverHeight
+                    if coverWidth > coverHeight:
+                        coverWidth = width
+                        coverHeight = int(coverWidth / aspectRatio)
+                    else:
+                        coverHeight = height
+                        coverWidth = int(coverHeight * aspectRatio)
+                    scaledCover = pygame.transform.scale(coverImage, (coverWidth, coverHeight))
+                    cover_rect = scaledCover.get_rect()
+                    cover_rect.center = (width // 2, height // 2)
+                    pg.fill((0, 0, 0))
+                    pg.blit(scaledCover, cover_rect)
+                    pygame.mixer.music.play()
             elif c == "Track":
                 print("Track pressed")
             else:
@@ -38,11 +72,7 @@ def run():
                 if event.key == pygame.K_k:
                     if video:
                         video.toggle_pause()
-        if keys[pygame.K_SPACE]:
-            url = "https://youtu.be/Qt5wB7KXSaM"
-            video = pyvidplayer2.Video(url, youtube=True)
-            video.resize((width, height))
-        elif keys[pygame.K_l]:
+        if keys[pygame.K_l]:
             if video:
                 video.seek(5)
         elif keys[pygame.K_j]:
