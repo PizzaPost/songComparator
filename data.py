@@ -9,8 +9,8 @@ extensions = {}  # we will use custom file extensions - find them below
 #     covers/
 #       <image files (.jpg, .jpeg, .png, .gif, .svg, .webp)>
 #     details/
-#       <song comparator song details files (.scd, .scsd)>
-extensions["details"] = [".scd", ".scsd"]
+#       <song comparator song/track details files (.scd, .scsd, .sctd)>
+extensions["details"] = [".scd", ".scsd", ".sctd"]
 #     playlists/
 #       <song comparator playlist files (.scpl, .scp)>
 extensions["playlists"] = [".scp", ".scpl"]
@@ -35,7 +35,7 @@ def findPlaylist(filename: str) -> list:
     Returns
     -------
     list
-        A list of tracks in the first found corresponding playlist file along with their details. May be empty if no playlist file with the given nameis found.
+        A list of tracks in the first found corresponding playlist file along with their details. May be empty if no playlist file with the given name is found.
     """
     playlistfolder = "resources/playlists/"
     tracks = []
@@ -70,8 +70,8 @@ def readPlaylistDetails(file: str) -> list:
 
 def readTrackDetails(filename: str) -> dict:
     """
-    Reads a song comparator song details file and returns the details
-    of the song.
+    Reads a song comparator song/track details file and returns the details
+    of the track.
 
     Parameters
     ----------
