@@ -251,6 +251,7 @@ def start_gui():
     global finished_steps
     tk = tkinter.Tk()
     tk.title("Installer")
+    tk.iconbitmap("resources/assets/icon.ico")
     tk.geometry(f"400x185+{tk.winfo_screenwidth() // 2 - 208}+{tk.winfo_screenheight() // 2 - 88}")
     tk.resizable(False, False)
     tk.overrideredirect = True
