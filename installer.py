@@ -82,19 +82,16 @@ def load_palette(filename="resources/themes/default.json"):
     global palette
     default = {
         "background": "#0b0d0f",
-        "card": "#0f1113",
+        "bg": "#0f1113",
         "text": "#e6e6e6",
-        "muted_text": "#b9bdc1",
         "dark_red": "#7C0008",
         "light_red": "#EA5660",
         "button_bg": "#1a1c1e",
         "button_fg": "#f3f4f5",
-        "button_active_bg": "#281213",
-        "button_active_fg": "#ffffff",
+        "button_active_bg": "#EA5660",
         "border": "#232629",
         "progress_trough": "#151718",
         "progress_bar": "#7C0008",
-        "press_red": "#EA5660",
         "hover_red": "#a33c43",
     }
 
@@ -151,7 +148,7 @@ def bind_hover_classic_button(btn, palette):
     btn.bind("<Leave>", on_leave, add="+")
     # ensure pressed color is used when the button is pressed
     try:
-        btn.configure(activebackground=palette["press_red"], activeforeground="#ffffff")
+        btn.configure(activebackground=palette["button_active_bg"], activeforeground="#ffffff")
     except Exception:
         pass
 
@@ -168,15 +165,15 @@ def set_color(widget):
             continue
 
     # TTK styles
-    style.configure("Aqua.Dark.TFrame", background=palette["card"])
-    style.configure("Aqua.Dark.TLabel", background=palette["card"], foreground=palette["text"])
+    style.configure("Aqua.Dark.TFrame", background=palette["bg"])
+    style.configure("Aqua.Dark.TLabel", background=palette["bg"], foreground=palette["text"])
     style.configure("Aqua.Dark.TButton",
                     background=palette["button_bg"],
                     foreground=palette["button_fg"],
                     relief="flat",
                     padding=(8,4))
     style.map("Aqua.Dark.TButton",
-              background=[("active", palette["hover_red"]), ("pressed", palette["press_red"])],
+              background=[("active", palette["hover_red"]), ("pressed", palette["button_active_bg"])],
               foreground=[("active", "#ffffff"), ("pressed", "#ffffff")])
     style.configure("Aqua.Horizontal.TProgressbar",
                     troughcolor=palette["progress_trough"],
@@ -194,13 +191,13 @@ def set_color(widget):
 
     if cls in ("Frame", "LabelFrame"):
         try:
-            widget.configure(bg=palette["card"], bd=0, highlightthickness=0)
+            widget.configure(bg=palette["bg"], bd=0, highlightthickness=0)
         except Exception:
             pass
 
     if cls == "Label":
         try:
-            widget.configure(bg=palette["card"], fg=palette["text"])
+            widget.configure(bg=palette["bg"], fg=palette["text"])
         except Exception:
             pass
 
@@ -217,7 +214,7 @@ def set_color(widget):
 
     if cls in ("Entry", "Text"):
         try:
-            widget.configure(bg=palette["card"], fg=palette["text"], insertbackground=palette["text"], bd=0)
+            widget.configure(bg=palette["bg"], fg=palette["text"], insertbackground=palette["text"], bd=0)
         except Exception:
             pass
 
@@ -270,7 +267,7 @@ def start_gui():
     tk.geometry(f"400x185+{tk.winfo_screenwidth() // 2 - 208}+{tk.winfo_screenheight() // 2 - 88}")
     tk.resizable(False, False)
     tk.overrideredirect = True
-    tk.configure(bg=palette["card"])
+    tk.configure(bg=palette["bg"])
     installation_text1 = tkinter.Label(tk, text="Installing...")
     installation_text2 = tkinter.Label(tk, text=f"Finished Steps: {finished_steps}/16")
     loading_bar = tkinter.ttk.Progressbar(tk, maximum=14, length=360)
