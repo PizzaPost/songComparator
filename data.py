@@ -22,7 +22,7 @@ extensions["playlists"] = [".scp", ".scpl"]
 #       For an up-to-date list of supported file types, see the documentation, or refer to visuals.py.
 
 
-def findPlaylist(filename: str) -> list:
+def readPlaylist(filename: str) -> list:
     """
     Finds a song comparator playlist file and returns the tracks
     in the playlist.
