@@ -15,6 +15,7 @@ try:
 except ImportError:
     link = f"https://raw.githubusercontent.com/PizzaPost/songComparator/master/colors.py"
     urllib.request.urlretrieve(link, f"colors.py")
+import colors
 
 finished_steps = 1
 done_event = threading.Event()
@@ -51,6 +52,7 @@ def installer():
                 finished_steps = 10
                 import window
                 finished_steps = 11
+                import window
 
                 trying = False
             except ImportError as e:
