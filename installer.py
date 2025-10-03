@@ -38,26 +38,31 @@ def installer():
                 finished_steps = 4
                 import customtkinter
                 finished_steps = 5
+                import yt_dlp
+                finished_steps = 6
 
                 # checks custom modules
                 import data
-                finished_steps = 6
-                import main
                 finished_steps = 7
-                import settings
+                import main
                 finished_steps = 8
-                import stats
+                import settings
                 finished_steps = 9
-                import visuals
+                import stats
                 finished_steps = 10
-                import window
+                import visuals
                 finished_steps = 11
+                import window
+                finished_steps = 12
                 import window
 
                 trying = False
             except ImportError as e:
                 if not e.name in custom_modules:
-                    os.system(f"pip install {e.name}")
+                    if e.name=="yt_dlp":
+                        os.system(f"pip install yt-dlp")
+                    else:
+                        os.system(f"pip install {e.name}")
                 else:
                     link = f"https://raw.githubusercontent.com/PizzaPost/songComparator/master/{e.name}.py"
                     urllib.request.urlretrieve(link, f"{e.name}.py")
@@ -117,7 +122,7 @@ def start_gui():
     tk.attributes("-topmost", True)
     tk.configure(bg=palette["bg"])
     installation_text1 = tkinter.Label(tk, text="Installing...")
-    installation_text2 = tkinter.Label(tk, text=f"Finished Steps: {finished_steps}/20")
+    installation_text2 = tkinter.Label(tk, text=f"Finished Steps: {finished_steps}/21")
     loading_bar = tkinter.ttk.Progressbar(tk, maximum=14, length=360)
     installation_text3 = tkinter.Label(tk, text="Please wait until installation is complete.")
     installation_text1.pack(padx=20, pady=20)
@@ -138,7 +143,7 @@ def start_gui():
 
     def update_ui():
         """Updates the installer GUI."""
-        installation_text2.config(text=f"Finished Steps: {finished_steps}/20")
+        installation_text2.config(text=f"Finished Steps: {finished_steps}/21")
         loading_bar["value"] = finished_steps
         if done_event.is_set():
             tk.title("Installation Complete")
