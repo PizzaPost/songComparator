@@ -142,6 +142,7 @@ def start_gui():
         """Runs the main program."""
         try:
             import main
+            tk.withdraw()
             main.run()
         except Exception as e:
             tkinter.messagebox.showerror("Run error", f"Could not start program:\n{e}")
