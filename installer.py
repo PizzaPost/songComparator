@@ -12,7 +12,7 @@ except ImportError as e:
 
 finished_steps = 1
 done_event = threading.Event()
-necessary_files = []
+necessary_files = ["resources/assets/icon.png"]
 custom_modules = ["data", "main", "stats", "visuals", "window"]
 trying = True
 palette = None
@@ -49,10 +49,6 @@ def installer():
                 else:
                     link = f"https://raw.githubusercontent.com/PizzaPost/songComparator/master/{e.name}.py"
                     urllib.request.urlretrieve(link, f"{e.name}.py")
-        for file in necessary_files:
-            if not os.path.exists(file):
-                link = f"https://raw.githubusercontent.com/PizzaPost/songComparator/master/{file}"
-                urllib.request.urlretrieve(link, file)
 
         # create the necessary folders
         os.makedirs("resources/covers", exist_ok=True)
@@ -67,6 +63,14 @@ def installer():
         finished_steps += 1
         os.makedirs("resources/themes", exist_ok=True)
         finished_steps += 1
+        os.makedirs("resources/assets", exist_ok=True)
+        finished_steps += 1
+
+        for file in necessary_files:
+            finished_steps += 1
+            if not os.path.exists(file):
+                link = f"https://raw.githubusercontent.com/PizzaPost/songComparator/master/{file}"
+                urllib.request.urlretrieve(link, file)
     except Exception as e:
         tkinter.messagebox.showerror("Installation Error", str(e))
     finally:
@@ -249,15 +253,26 @@ def set_color(widget):
 def start_gui():
     """Starts the installer GUI."""
     global finished_steps
+    #downloads the icon
+    file="resources/assets/icon.ico"
+    if not os.path.exists(file):
+        try:
+            os.makedirs("resources/assets", exist_ok=True)
+            link = f"https://raw.githubusercontent.com/PizzaPost/songComparator/master/{file}"
+            urllib.request.urlretrieve(link, file)
+            finished_steps += 1
+        except Exception as e:
+            tkinter.messagebox.showerror("Installation Error", f"Failed to Download the Icon for the installer {str(e)}")
+            exit(0)
     tk = tkinter.Tk()
     tk.title("Installer")
-    tk.iconbitmap("resources/assets/icon.ico")
+    tk.iconbitmap(file)
     tk.geometry(f"400x185+{tk.winfo_screenwidth() // 2 - 208}+{tk.winfo_screenheight() // 2 - 88}")
     tk.resizable(False, False)
     tk.overrideredirect = True
     tk.configure(bg=palette["card"])
     installation_text1 = tkinter.Label(tk, text="Installing...")
-    installation_text2 = tkinter.Label(tk, text=f"Finished Steps: {finished_steps}/14")
+    installation_text2 = tkinter.Label(tk, text=f"Finished Steps: {finished_steps}/17")
     loading_bar = tkinter.ttk.Progressbar(tk, maximum=14, length=360)
     installation_text3 = tkinter.Label(tk, text="Please wait until installation is complete.")
     installation_text1.pack(padx=20, pady=20)
@@ -278,7 +293,7 @@ def start_gui():
 
     def update_ui():
         """Updates the installer GUI."""
-        installation_text2.config(text=f"Finished Steps: {finished_steps}/14")
+        installation_text2.config(text=f"Finished Steps: {finished_steps}/17")
         loading_bar["value"] = finished_steps
         if done_event.is_set():
             tk.title("Installation Complete")
