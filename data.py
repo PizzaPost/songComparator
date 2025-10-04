@@ -115,6 +115,18 @@ def randomTrack(playlist: list) -> dict:
     return random.choice(playlist)
 
 
+def tracks(playlist: list):
+    """generator to return one track after the other upon next(tracks)
+
+    Args:
+        playlist (list): the playlist data
+
+    Yields:
+        dict: track data
+    """
+    yield from playlist
+
+
 def trackSource(track: dict, trackFolder: str = "resources/tracks/") -> tuple[str, bool, bool]:
     """
     Returns the source of a track, whether it is a stream (true) or a local file (false), and whether it contains video data.
