@@ -43,19 +43,7 @@ def run():
                 else:
                     pygame.mixer.music.load(source)
                     coverActive = True
-                    # move cover stuff to visuals?
-                    coverImage = pygame.image.load("resources/covers/" + randomTrack["cover"])
-                    coverWidth, coverHeight = coverImage.get_size()
-                    aspectRatio = coverWidth / coverHeight
-                    if coverWidth > coverHeight:
-                        coverWidth = width
-                        coverHeight = int(coverWidth / aspectRatio)
-                    else:
-                        coverHeight = height
-                        coverWidth = int(coverHeight * aspectRatio)
-                    scaledCover = pygame.transform.scale(coverImage, (coverWidth, coverHeight))
-                    cover_rect = scaledCover.get_rect()
-                    cover_rect.center = (width // 2, height // 2)
+                    scaledCover, cover_rect = visuals.calc_cover(randomTrack, width, height)
                     pg.fill((0, 0, 0))
                     pg.blit(scaledCover, cover_rect)
                     pygame.mixer.music.play()

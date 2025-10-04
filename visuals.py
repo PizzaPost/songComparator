@@ -103,3 +103,18 @@ class ButtonManager:
 
     def clear(self):
         self.buttons.clear()
+
+def calc_cover(randomTrack, width, height):
+    coverImage = pygame.image.load("resources/covers/" + randomTrack["cover"])
+    coverWidth, coverHeight = coverImage.get_size()
+    aspectRatio = coverWidth / coverHeight
+    if coverWidth > coverHeight:
+        coverWidth = width
+        coverHeight = int(coverWidth / aspectRatio)
+    else:
+        coverHeight = height
+        coverWidth = int(coverHeight * aspectRatio)
+    scaledCover = pygame.transform.scale(coverImage, (coverWidth, coverHeight))
+    cover_rect = scaledCover.get_rect()
+    cover_rect.center = (width // 2, height // 2)
+    return scaledCover, cover_rect
