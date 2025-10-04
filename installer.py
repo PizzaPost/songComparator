@@ -40,7 +40,7 @@ palette = None
 
 
 def installer():
-    """installs the programm"""
+    """installs the program"""
     global finished_steps, trying
     try:
         while trying:

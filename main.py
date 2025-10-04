@@ -16,8 +16,8 @@ def run():
     coverActive = False
     font = pygame.font.SysFont("Segoe UI", 48)
     manager = visuals.ButtonManager(font, spacing=50)
-    manager.add_button("Playlist" if not lang else lang["programm"]["playlist"], size=(340, 100), radius=20)
-    manager.add_button("Track" if not lang else lang["programm"]["track"], size=(340, 100), radius=20)
+    manager.add_button("Playlist" if not lang else lang["program"]["playlist"], size=(340, 100), radius=20)
+    manager.add_button("Track" if not lang else lang["program"]["track"], size=(340, 100), radius=20)
 
     while running:
         if not coverActive:
@@ -27,7 +27,7 @@ def run():
 
         clicks = manager.draw_and_handle(pg)
         for c in clicks:
-            if c == "Playlist" if not lang else lang["programm"]["playlist"]:
+            if c == "Playlist" if not lang else lang["program"]["playlist"]:
                 print("Playlist pressed")
                 randomPlaylist = data.randomPlaylist()
                 playlist = data.readPlaylist(randomPlaylist)
@@ -48,7 +48,7 @@ def run():
                     pg.fill((0, 0, 0))
                     pg.blit(scaledCover, cover_rect)
                     pygame.mixer.music.play()
-            elif c == "Track" if not lang else lang["programm"]["track"]:
+            elif c == "Track" if not lang else lang["program"]["track"]:
                 print("Track pressed")
             else:
                 print(f"{c} pressed")
