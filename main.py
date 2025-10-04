@@ -35,7 +35,7 @@ def run():
                 randomTrack = data.randomTrack(playlist)
                 source, stream, isVideo = data.trackSource(randomTrack)
                 pygame.mixer.music.stop()
-                if video:  # if you press where the playlist button would be while a track is playing, another one starts
+                if video:
                     video.stop()
                     video = None
                 if isVideo:
