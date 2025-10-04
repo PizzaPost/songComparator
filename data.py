@@ -137,6 +137,6 @@ def trackSource(track: dict, trackFolder: str = "resources/tracks/") -> tuple[st
     if source is None:
         raise KeyError("Track dictionary does not contain 'track' or 'url' key")
     stream = source == track.get("url")
-    isVideo = not source.endswith(".opus")
+    isVideo = track.get("type") == 1
     source = trackFolder + source
     return source, stream, isVideo
