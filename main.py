@@ -3,6 +3,8 @@ def run():
     import pyvidplayer2
     import visuals
     import data
+    import misc
+    lang = misc.load_language()
     running = True
     esc = 0
     pg = pygame.display.set_mode()
@@ -13,10 +15,9 @@ def run():
     video = None
     coverActive = False
     font = pygame.font.SysFont("Segoe UI", 48)
-
     manager = visuals.ButtonManager(font, spacing=50)
-    manager.add_button("Playlist", size=(300, 100), radius=20)
-    manager.add_button("Track", size=(300, 100), radius=20)
+    manager.add_button("Playlist" if not lang else lang["programm"]["playlist"], size=(340, 100), radius=20)
+    manager.add_button("Track" if not lang else lang["programm"]["track"], size=(340, 100), radius=20)
 
     while running:
         if not coverActive:
@@ -26,14 +27,14 @@ def run():
 
         clicks = manager.draw_and_handle(pg)
         for c in clicks:
-            if c == "Playlist":
+            if c == "Playlist" if not lang else lang["programm"]["playlist"]:
                 print("Playlist pressed")
                 randomPlaylist = data.randomPlaylist()
                 playlist = data.readPlaylist(randomPlaylist)
                 randomTrack = data.randomTrack(playlist)
                 source, stream, isVideo = data.trackSource(randomTrack)
                 pygame.mixer.music.stop()
-                if video: # if you press where the playlist button would be while a track is playing, another one starts
+                if video:  # if you press where the playlist button would be while a track is playing, another one starts
                     video.stop()
                     video = None
                 if isVideo:
@@ -47,7 +48,7 @@ def run():
                     pg.fill((0, 0, 0))
                     pg.blit(scaledCover, cover_rect)
                     pygame.mixer.music.play()
-            elif c == "Track":
+            elif c == "Track" if not lang else lang["programm"]["track"]:
                 print("Track pressed")
             else:
                 print(f"{c} pressed")

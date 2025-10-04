@@ -1,0 +1,35 @@
+{
+  "error": {
+    "module_not_found": "Modul '{0}' nicht gefunden. Bitte installiere es mit 'pip install {0}'.",
+    "module_not_found_title": "Modul '{0}' nicht gefunden",
+    "module_not_found_description": "Bitte installiere es mit 'pip install {0}'.",
+    "installation_error_title": "Installationsfehler",
+    "installation_error_description1": "Fehler beim Download des Icons für den Installer:\n{0}",
+    "run_error_title": "Ausführungsfehler",
+    "run_error_description1": "Programm konnte nicht gestartet werden:\n{0}"
+  },
+  "installer": {
+    "title": "Installierungsprogramm",
+    "installing": "Installiere...",
+    "finished_steps": "Fertige Schritte: {0}/{1}",
+    "please_wait": "Bitte warte bis die Installation abgeschlossen ist.",
+    "installation_complete": "Installation abgeschlossen",
+    "run_now": "Möchtest du das Programm jetzt starten?"
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "themes": "Themen",
+    "warning1": "⚠️ Bitte installiere mehr Themen, um diese Funktion zu nutzen ⚠️",
+    "warning2": "⚠️ Diese Funktion ist möglicherweise nicht für jedes Thema verfügbar ⚠️",
+    "language": "Sprache",
+    "submit": "Übernehmen"
+  },
+  "programm": {
+    "playlist": "Wiedergabeliste",
+    "track": "Titel"
+  },
+  "misc": {
+    "yes": "Ja",
+    "no": "Nein"
+  }
+}

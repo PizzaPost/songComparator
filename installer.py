@@ -1,13 +1,27 @@
 # checks default installed modules
 try:
+    import json
+
+    try:
+        import misc
+
+        lang = misc.load_language()
+    except ImportError:
+        lang = None
     import tkinter.ttk
     import tkinter.messagebox
     import os
     import urllib.request
     import threading
-    import json
 except ImportError as e:
-    print(f"Error: '{e.name}' not found. Please install it using 'pip install {e.name}'.")
+    if e.name != "tkinter.messagebox":
+        tkinter.messagebox.showerror(
+            f"Error: '{e.name}' not found." if not lang else lang["error"]["module_not_found_title"].format(e.name),
+            f"Please install it using 'pip install {e.name}'." if not lang else lang["error"][
+                "module_not_found_description"].format(e.name))
+    else:
+        print(f"Error: '{e.name}' not found. Please install it using 'pip install {e.name}'." if not lang else
+              lang["error"]["module_not_found"].format(e.name))
     exit()
 
 try:
@@ -19,8 +33,8 @@ import colors
 
 finished_steps = 1
 done_event = threading.Event()
-necessary_files = ["resources/assets/icon.png"]
-custom_modules = ["colors", "data", "main", "settings", "stats", "visuals", "window"]
+necessary_files = ["resources/assets/icon.png", "resources/languages/Deutsch.json", "resources/languages/English.json"]
+custom_modules = ["colors", "data", "main", "misc", "settings", "stats", "visuals", "window"]
 trying = True
 palette = None
 
@@ -46,14 +60,16 @@ def installer():
                 finished_steps = 7
                 import main
                 finished_steps = 8
-                import settings
+                import misc
                 finished_steps = 9
-                import stats
+                import settings
                 finished_steps = 10
-                import visuals
+                import stats
                 finished_steps = 11
-                import window
+                import visuals
                 finished_steps = 12
+                import window
+                finished_steps = 13
                 import window
 
                 trying = False
@@ -97,7 +113,8 @@ def installer():
                 link = f"https://raw.githubusercontent.com/PizzaPost/songComparator/master/{file}"
                 urllib.request.urlretrieve(link, file)
     except Exception as e:
-        tkinter.messagebox.showerror("Installation Error", str(e))
+        tkinter.messagebox.showerror("Installation Error" if not lang else lang["error"]["installation_error_title"],
+                                     str(e))
     finally:
         done_event.set()
 
@@ -117,20 +134,25 @@ def start_gui():
             urllib.request.urlretrieve(link, file)
             finished_steps += 1
         except Exception as e:
-            tkinter.messagebox.showerror("Installation Error",
-                                         f"Failed to Download the Icon for the installer {str(e)}")
+            tkinter.messagebox.showerror(
+                "Installation Error" if not lang else lang["error"]["installation_error_title"],
+                f"Failed to Download the Icon for the installer:\n{str(e)}" if not lang else lang["error"][
+                    "installation_error_description1"].format(str(e)))
             exit(0)
     tk = tkinter.Tk()
-    tk.title("Installer")
+    tk.title("Installer" if not lang else lang["installer"]["title"])
     tk.iconbitmap(file)
     tk.geometry(f"400x185+{tk.winfo_screenwidth() // 2 - 208}+{tk.winfo_screenheight() // 2 - 88}")
     tk.resizable(False, False)
     tk.attributes("-topmost", True)
     tk.configure(bg=palette["bg"])
-    installation_text1 = tkinter.Label(tk, text="Installing...")
-    installation_text2 = tkinter.Label(tk, text=f"Finished Steps: {finished_steps}/22")
+    installation_text1 = tkinter.Label(tk, text="Installing..." if not lang else lang["installer"]["installing"])
+    installation_text2 = tkinter.Label(tk,
+                                       text=f"Finished Steps: {finished_steps}/25" if not lang else lang["installer"][
+                                           "finished_steps"].format(finished_steps, 25))
     loading_bar = tkinter.ttk.Progressbar(tk, maximum=14, length=360)
-    installation_text3 = tkinter.Label(tk, text="Please wait until installation is complete.")
+    installation_text3 = tkinter.Label(tk, text="Please wait until installation is complete." if not lang else
+    lang["installer"]["please_wait"])
     installation_text1.pack(padx=20, pady=20)
     installation_text2.pack(padx=20)
     loading_bar.pack(padx=20, pady=20)
@@ -145,21 +167,27 @@ def start_gui():
             tk.withdraw()
             main.run()
         except Exception as e:
-            tkinter.messagebox.showerror("Run error", f"Could not start program:\n{e}")
+            tkinter.messagebox.showerror("Run error" if not lang else lang["error"]["run_error_title"],
+                                         f"Could not start program:\n{e}" if not lang else lang["error"][
+                                             "run_error_description1"].format(str(e)))
         tk.destroy()
 
     def update_ui():
         """Updates the installer GUI."""
-        installation_text2.config(text=f"Finished Steps: {finished_steps}/22")
+        installation_text2.config(
+            text=f"Finished Steps: {finished_steps}/25" if not lang else lang["installer"]["finished_steps"].format(
+                finished_steps, 25))
         loading_bar["value"] = finished_steps
         if done_event.is_set():
-            tk.title("Installation Complete")
+            tk.title("Installation Complete" if not lang else lang["installer"]["installation_complete"])
             for widget in tk.winfo_children():
                 widget.destroy()
             frame = tkinter.Frame(tk)
-            open_text1 = tkinter.Label(frame, text="Do you want to run the program?")
-            yes_button = tkinter.Button(frame, text="Yes", command=lambda: run_now())
-            no_button = tkinter.Button(frame, text="No", command=tk.destroy)
+            open_text1 = tkinter.Label(frame, text="Do you want to run the program?" if not lang else lang["installer"][
+                "run_now"])
+            yes_button = tkinter.Button(frame, text="Yes" if not lang else lang["misc"]["yes"],
+                                        command=lambda: run_now())
+            no_button = tkinter.Button(frame, text="No" if not lang else lang["misc"]["no"], command=tk.destroy)
             for widget in tk.winfo_children():
                 colors.set_color(widget, palette)
             frame.pack(padx=20, pady=20)
