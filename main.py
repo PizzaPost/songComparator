@@ -18,17 +18,18 @@ def run():
     manager = visuals.ButtonManager(font, spacing=50)
     manager.add_button("Playlist" if not lang else lang["program"]["playlist"], size=(340, 100), radius=20)
     manager.add_button("Track" if not lang else lang["program"]["track"], size=(340, 100), radius=20)
+    viewport = pygame.Rect(0, 0, width, height)  # full-screen viewport
+    manager.set_viewport(viewport)
+    manager.layout(center_x=viewport.centerx, center_y=viewport.centery, max_width=viewport.w)
 
     while running:
         if not coverActive:
             pg.fill((0, 0, 0))
 
-        manager.layout(width // 2, height // 2 - 100)
-
         clicks = manager.draw_and_handle(pg)
         for c in clicks:
-            if c == "Playlist" if not lang else lang["program"]["playlist"]:
-                print("Playlist pressed")
+            manager.disable_all()
+            if c == ("Playlist" if not lang else lang["program"]["playlist"]):
                 randomPlaylist = data.randomPlaylist()
                 playlist = data.readPlaylist(randomPlaylist)
                 randomTrack = data.randomTrack(playlist)
@@ -48,13 +49,14 @@ def run():
                     pg.fill((0, 0, 0))
                     pg.blit(scaledCover, cover_rect)
                     pygame.mixer.music.play()
-            elif c == "Track" if not lang else lang["program"]["track"]:
+            elif c == ("Track" if not lang else lang["program"]["track"]):
                 print("Track pressed")
             else:
                 print(f"{c} pressed")
 
         keys = pygame.key.get_pressed()
         for event in pygame.event.get():
+            manager.handle_event(event)
             if event.type == pygame.QUIT:
                 running = False
             elif event.type == pygame.KEYUP:

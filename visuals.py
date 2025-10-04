@@ -1,113 +1,377 @@
 import pygame
 
+
 class Button:
-    def __init__(self, text, font, size=(300,100), radius=20,
-                 base_color=(255,255,255), hover_color=(200,200,200), click_color=(150,150,150)):
+    """Represents a single rounded button with pixel-perfect rounded-corner hit-testing,
+    hover and click visuals, and an enabled/disabled state."""
+
+    def __init__(self, text, font, size=(300, None), radius=20,
+                 base_color=(255, 255, 255), hover_color=(200, 200, 200),
+                 click_color=(150, 150, 150), disabled_color=(100, 100, 100),
+                 padding_y=16):
+        """Create a Button.
+
+        Parameters
+        ----------
+            text (str): label shown on the button
+            font (pygame.font.Font): font used to render the label
+            size (tuple): (width, height) where height can be None to auto-calculate
+            radius (int): rounded corner radius
+            base_color/hover_color/click_color/disabled_color (tuples): RGB colors
+            padding_y (int): vertical padding used when auto-calculating height
+        """
         self.text = text
         self.font = font
-        self.w, self.h = size
+        self.w = int(size[0])
+        # allow height to be None -> auto-calculate using font line size + padding
+        self.h = int(size[1]) if len(size) > 1 and size[1] is not None else None
         self.radius = radius
         self.base_color = base_color
         self.hover_color = hover_color
         self.click_color = click_color
+        self.disabled_color = disabled_color
+        self.padding_y = padding_y
 
-        self.rect = pygame.Rect(0,0,self.w,self.h)
+        # auto-calculate height from font if needed
+        if self.h is None:
+            txt_h = self.font.get_linesize()  # line height
+            self.h = txt_h + self.padding_y * 2
+
+        # rect stores position and size in content coordinates (managed by ButtonManager)
+        self.rect = pygame.Rect(0, 0, self.w, self.h)
+        self.enabled = True
+
+        # surfaces and mask prepared for fast rendering and pixel-precise hit detection
         self._create_surfaces()
 
-        # runtime state
+        # runtime state flags
         self.hover = False
         self.pressed = False
 
     def _create_surfaces(self):
-        txt = self.font.render(self.text, True, (0,0,0))
+        """Builds the button surfaces (base / hover / click / disabled) and the mask.
+        Surfaces are RGBA with rounded rects drawn; mask is used for pixel-perfect hit tests."""
+        txt = self.font.render(self.text, True, (0, 0, 0))
+
         def make_surf(color):
+            """Helper: create a single surface for the given solid color and render text centered."""
             s = pygame.Surface((self.w, self.h), pygame.SRCALPHA)
             pygame.draw.rect(s, color + (255,), s.get_rect(), border_radius=self.radius)
-            s.blit(txt, (self.w//2 - txt.get_width()//2, self.h//2 - txt.get_height()//2))
+            s.blit(txt, (self.w // 2 - txt.get_width() // 2, self.h // 2 - txt.get_height() // 2))
             return s
+
+        # create all surfaces and a mask
         self.surf_base = make_surf(self.base_color)
         self.surf_hover = make_surf(self.hover_color)
         self.surf_click = make_surf(self.click_color)
-        # mask only needs to be built from an opaque-surf (base or hover) since alpha layout same
+        self.surf_disabled = make_surf(self.disabled_color)
         self.mask = pygame.mask.from_surface(self.surf_base)
 
     def set_pos(self, x, y):
-        self.rect.topleft = (x, y)
+        """Set the top-left position of this button in content coordinates.
+
+        Parameters
+        ----------
+            x (int): X position
+            y (int): Y position
+        """
+        self.rect.topleft = (int(x), int(y))
+
+    def set_enabled(self, state: bool = True):
+        """Enable or disable the button.
+
+        Parameters
+        ----------
+            state (bool): True to enable; False to disable (default: True)
+        """
+        self.enabled = bool(state)
 
     def draw_and_update(self, surface, mouse_pos, mouse_down):
-        # local coords
-        lx = mouse_pos[0] - self.rect.x
-        ly = mouse_pos[1] - self.rect.y
-        inside = False
-        if 0 <= lx < self.w and 0 <= ly < self.h:
-            try:
-                if self.mask.get_at((int(lx), int(ly))):
-                    inside = True
-            except IndexError:
-                inside = False
+        """Draw the button at its rect and update hover/click visual state.
+        This method expects 'self.rect' to be already positioned in screen coordinates.
+        For content + viewport usage, ButtonManager draws buttons manually (so this method
+        is useful when buttons can't be scrolled).
 
+        Parameters
+        ----------
+            surface (pygame.Surface): target surface to draw onto
+            mouse_pos (tuple): current mouse position in screen coordinates
+            mouse_down (bool): whether left mouse is currently down
+
+        Returns
+        -------
+            bool: True if the button is being pressed (mouse-down on an opaque pixel)
+        """
+        if not self.enabled:
+            surface.blit(self.surf_disabled, self.rect.topleft)
+            return False
+
+        # local mouse coords relative to button top-left
+        lx = int(mouse_pos[0] - self.rect.x)
+        ly = int(mouse_pos[1] - self.rect.y)
+        inside = False
+
+        # bounds check first, then mask lookup
+        if 0 <= lx < self.w and 0 <= ly < self.h:
+            if self.mask.get_at((lx, ly)):
+                inside = True
         self.hover = inside
 
+        # choose visual based on hover / pressed
         if inside and mouse_down:
-            self.pressed = True
             surface.blit(self.surf_click, self.rect.topleft)
-            # return that it's pressed on mouse-down (edge detection handled externally)
+            return True
         elif inside:
             surface.blit(self.surf_hover, self.rect.topleft)
-            self.pressed = False
         else:
             surface.blit(self.surf_base, self.rect.topleft)
-            self.pressed = False
+        return False
 
-        return inside and mouse_down  # True while left mouse is down over an opaque pixel
 
 class ButtonManager:
-    def __init__(self, font, spacing=50):
+    """Manages multiple Buttons, automatic wrapping layout, vertical scrolling,
+    and click detection with pixel-perfect masks."""
+
+    def __init__(self, font, spacing=50, vspacing=20, scroll_speed=40):
+        """Create a ButtonManager.
+
+        Parameters
+        ----------
+            font (pygame.font.Font): font passed to new Buttons
+            spacing (int): horizontal spacing between buttons
+            vspacing (int): vertical spacing between rows
+            scroll_speed (int): pixels to scroll per mousewheel tick
+        """
         self.font = font
         self.spacing = spacing
+        self.vspacing = vspacing
         self.buttons = []
-
-        # for simple click-edge detection
         self._prev_mouse_down = False
 
+        # scrolling state
+        self.viewport = pygame.Rect(0, 0, 800, 600)  # default; set from set_viewport()
+        self.scroll_y = 0
+        self.scroll_speed = scroll_speed
+        self._content_height = 0
+        self._max_scroll = 0
+
     def add_button(self, text, **kwargs):
+        """Create and add a new Button to the manager.
+
+        Returns
+        -------
+            Button: the created button instance
+        """
         b = Button(text, self.font, **kwargs)
         self.buttons.append(b)
         return b
 
-    def layout(self, center_x, center_y):
-        # center the block of buttons horizontally and vertically around center_x, center_y
-        n = len(self.buttons)
-        if n == 0:
-            return
-        total_w = sum(b.w for b in self.buttons) + self.spacing * (n - 1)
-        start_x = int(center_x - total_w // 2)
-        y = int(center_y - self.buttons[0].h // 2)
-        x = start_x
+    def clear(self):
+        """Remove all buttons and reset scroll/layout state."""
+        self.buttons.clear()
+        self.scroll_y = 0
+        self._content_height = 0
+        self._max_scroll = 0
+
+    def set_enabled(self, text, state: bool):
+        """Enable/disable a button by its exact text label.
+
+        Returns
+        -------
+            bool: True if a button was found and updated, False otherwise
+        """
         for b in self.buttons:
-            b.set_pos(x, y)
-            x += b.w + self.spacing
+            if b.text == text:
+                b.set_enabled(state)
+                return True
+        return False
+
+    def disable_all(self):
+        """Disable every button managed by this ButtonManager."""
+        for button in self.buttons:
+            button.set_enabled(False)
+
+    def enable_all(self):
+        """Enable every button managed by this ButtonManager."""
+        for button in self.buttons:
+            button.set_enabled(True)
+
+    def handle_event(self, event):
+        """Call from the event loop. Handles mouse wheel scrolling."""
+        if event.type == pygame.MOUSEWHEEL:
+            self.scroll_y -= event.y * self.scroll_speed
+            self.scroll_y = max(0, min(self.scroll_y, self._max_scroll))
+
+    def set_viewport(self, rect: pygame.Rect):
+        """Set the visible area (viewport) where buttons are drawn and scrolled.
+
+        Parameters
+        ----------
+            rect (pygame.Rect): viewport rectangle in screen coordinates
+        """
+        self.viewport = rect.copy()
+        self.scroll_y = max(0, min(self.scroll_y, getattr(self, "_max_scroll", 0)))
+
+    def layout(self, center_x, center_y, max_width):
+        """Layout buttons into rows in content space.
+
+        The function wraps buttons when row width would exceed max_width. If the resulting
+        content height fits inside the viewport, the whole block is vertically centered.
+        If content is taller than the viewport, it is top-aligned and scrolling is enabled.
+
+        Parameters
+        ----------
+            center_x (int): center x of viewport (not used for vertical placement)
+            center_y (int): center y of viewport (not used when scrolling)
+            max_width (int): available horizontal width for content (usually viewport.w)
+        """
+        if not self.buttons:
+            self._content_height = 0
+            self._max_scroll = 0
+            return
+
+        # build rows with wrapping
+        rows = []
+        current_row = []
+        row_width = 0
+
+        for b in self.buttons:
+            bw = b.w
+            next_width = bw if not current_row else row_width + self.spacing + bw
+            if current_row and next_width > max_width:
+                rows.append(current_row)
+                current_row = [b]
+                row_width = bw
+            else:
+                current_row.append(b)
+                row_width = next_width if len(current_row) > 1 else bw
+        if current_row:
+            rows.append(current_row)
+
+        # calculate total height of content
+        total_h = sum(max(btn.h for btn in row) for row in rows) + self.vspacing * (len(rows) - 1)
+        self._content_height = total_h
+
+        # calculate max scroll value (content taller than viewport)
+        self._max_scroll = max(0, total_h - self.viewport.h)
+
+        # decide start_y in content-space:
+        if total_h <= self.viewport.h:
+            # content fits -> center vertically inside viewport; forbid scrolling
+            start_y = (self.viewport.h - total_h) // 2
+            self.scroll_y = 0
+        else:
+            # content taller -> align to top; allow scrolling
+            start_y = 0
+            self.scroll_y = max(0, min(self.scroll_y, self._max_scroll))
+
+        # place buttons relative to content origin (0,0)
+        y = start_y
+        for row in rows:
+            row_h = max(btn.h for btn in row)
+            row_w = sum(btn.w for btn in row) + self.spacing * (len(row) - 1)
+            start_x = int((max_width - row_w) // 2)
+            x = start_x
+            for btn in row:
+                btn.set_pos(x, y)
+                x += btn.w + self.spacing
+            y += row_h + self.vspacing
 
     def draw_and_handle(self, surface):
+        """Draw buttons inside the configured viewport and return clicked button texts.
+
+        This function:
+          - clips rendering to the viewport
+          - translates content positions to screen positions applying scroll
+          - performs pixel-perfect mask checks against visible button pixels
+          - returns a list of button.text strings that were clicked
+
+        Parameters
+        ----------
+            surface (pygame.Surface): the main screen surface
+
+        Returns
+        -------
+            list[str]: text of buttons clicked this frame
+        """
         mouse_pos = pygame.mouse.get_pos()
         mouse_down = pygame.mouse.get_pressed()[0]
         clicked_names = []
 
+        # restrict drawing to viewport
+        old_clip = surface.get_clip()
+        surface.set_clip(self.viewport)
+
+        vx, vy = self.viewport.topleft
+
         for b in self.buttons:
-            is_down = b.draw_and_update(surface, mouse_pos, mouse_down)
-            # detect mouse-down edge (only fire once when button transitions from up->down)
+            # calculate screen draw position = viewport.topleft + content_pos - scroll_y
+            draw_x = vx + int(b.rect.x)
+            draw_y = vy + int(b.rect.y) - int(self.scroll_y)
+
+            # skip drawing fully outside viewport
+            if draw_y + b.h < vy or draw_y > vy + self.viewport.h:
+                continue
+
+            # local mouse relative to drawn button position
+            local_mouse_x = mouse_pos[0] - draw_x
+            local_mouse_y = mouse_pos[1] - draw_y
+
+            # if disabled -> blit disabled surface
+            if not b.enabled:
+                surface.blit(b.surf_disabled, (draw_x, draw_y))
+                continue
+
+            # safe mask check with local coords
+            lx = int(local_mouse_x)
+            ly = int(local_mouse_y)
+            inside = False
+            if 0 <= lx < b.w and 0 <= ly < b.h:
+                try:
+                    if b.mask.get_at((lx, ly)):
+                        inside = True
+                except IndexError:
+                    inside = False
+
+            # draw the correct visual for this state
+            if inside and mouse_down:
+                surface.blit(b.surf_click, (draw_x, draw_y))
+                is_down = True
+            elif inside:
+                surface.blit(b.surf_hover, (draw_x, draw_y))
+                is_down = False
+            else:
+                surface.blit(b.surf_base, (draw_x, draw_y))
+                is_down = False
+
+            # click edge detection must only trigger when the click occurs inside visible button
             if is_down and not self._prev_mouse_down:
                 clicked_names.append(b.text)
+
+        # restore clip and update the previous mouse state
+        surface.set_clip(old_clip)
         self._prev_mouse_down = mouse_down
         return clicked_names
 
-    def clear(self):
-        self.buttons.clear()
 
-def calc_cover(randomTrack, width, height):
-    coverImage = pygame.image.load("resources/covers/" + randomTrack["cover"])
+def calc_cover(track, width, height):
+    """Load and scale a track cover image to fill the screen while preserving the aspect ratio.
+
+    Parameters
+    ----------
+        track (dict): track metadata containing "cover" filename
+        width (int): available width (usually screen width)
+        height (int): available height (usually screen height)
+
+    Returns
+    -------
+        tuple: (scaledCoverSurface, cover_rect) where cover_rect is centered on screen
+    """
+    coverImage = pygame.image.load("resources/covers/" + track["cover"])
     coverWidth, coverHeight = coverImage.get_size()
     aspectRatio = coverWidth / coverHeight
+
+    # choose the scale type depending on image orientation
     if coverWidth > coverHeight:
         coverWidth = width
         coverHeight = int(coverWidth / aspectRatio)
