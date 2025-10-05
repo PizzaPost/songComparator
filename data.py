@@ -1,6 +1,8 @@
 # data.py reads resource data and supplies it as needed
 
-import json, os, random
+import json
+import os
+import random
 
 extensions = (
     {}
@@ -16,6 +18,8 @@ extensions["details"] = [".scd", ".scsd", ".sctd"]
 #     playlists/
 #       <song comparator playlist files (.scpl, .scp)>
 extensions["playlists"] = [".scp", ".scpl"]
+
+
 #     tracks/
 #       <audio/video files (.mp3, .mp4, .m4a, .ogg, .wav)>
 
@@ -152,3 +156,13 @@ def trackSource(track: dict, trackFolder: str = "resources/tracks/") -> tuple[st
     isVideo = track.get("type") == 1
     source = trackFolder + source
     return source, stream, isVideo
+
+
+def removeExtension(text: str):
+    reversedText = text[::-1]
+    for char in reversedText:
+        reversedText = reversedText[1:]
+        if char == ".":
+            break
+    text = reversedText[::-1]
+    return text
