@@ -5,7 +5,7 @@ class Button:
     """Represents a single rounded button with pixel-perfect rounded-corner hit-testing,
     hover and click visuals, and an enabled/disabled state."""
 
-    def __init__(self, text, font, size=(300, None), radius=20,
+    def __init__(self, text, font, size=None, radius=20,
                  base_color=(255, 255, 255), hover_color=(200, 200, 200),
                  click_color=(150, 150, 150), disabled_color=(100, 100, 100),
                  padding_y=16):
@@ -22,15 +22,23 @@ class Button:
         """
         self.text = text
         self.font = font
-        self.w = int(size[0])
-        # allow height to be None -> auto-calculate using font line size + padding
-        self.h = int(size[1]) if len(size) > 1 and size[1] is not None else None
+        self.padding_y = padding_y
+        # calculate the width and height if not given
+        if size is None:
+            txt_surf = self.font.render(self.text, True, (0, 0, 0))
+            txt_w, txt_h = txt_surf.get_size()
+            self.w = max(100, txt_w + self.padding_y * 2)
+            self.h = max(100, txt_h + self.padding_y * 2)
+        # use given size
+        else:
+            self.w = int(size[0])
+            # allow height to be None -> auto-calculate using font line size + padding
+            self.h = int(size[1]) if len(size) > 1 and size[1] is not None else None
         self.radius = radius
         self.base_color = base_color
         self.hover_color = hover_color
         self.click_color = click_color
         self.disabled_color = disabled_color
-        self.padding_y = padding_y
 
         # auto-calculate height from font if needed
         if self.h is None:
