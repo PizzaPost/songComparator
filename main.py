@@ -18,9 +18,9 @@ def run():
     video = None
     coverActive = False
     font = pygame.font.SysFont("Segoe UI", 48)
-    manager = visuals.ButtonManager(font, spacing=50)
-    manager.add_button("Playlist" if not lang else lang["program"]["playlist"], radius=20)
-    manager.add_button("Track" if not lang else lang["program"]["track"], radius=20)
+    manager = visuals.ButtonManager(font)
+    manager.add_button("Playlist" if not lang else lang["program"]["playlist"])
+    manager.add_button("Track" if not lang else lang["program"]["track"])
     viewport = pygame.Rect(0, 0, width, height)  # full-screen viewport
     manager.set_viewport(viewport)
     manager.layout(center_x=viewport.centerx, center_y=viewport.centery, max_width=viewport.w)
@@ -41,7 +41,7 @@ def run():
                 if c == ("Playlist" if not lang else lang["program"]["playlist"]):
                     if len(os.listdir("resources/playlists"))>1:
                         for playlist in os.listdir("resources/playlists"):
-                            manager.add_button(data.removeExtension(playlist), radius=20)
+                            manager.add_button(data.removeExtension(playlist))
                             manager.layout(center_x=viewport.centerx, center_y=viewport.centery, max_width=viewport.w)
                             currentMenu="playlistSelection"
                     else:
@@ -67,7 +67,7 @@ def run():
                 elif c == ("Track" if not lang else lang["program"]["track"]):
                     if len(os.listdir("resources/tracks")) > 1:
                         for track in os.listdir("resources/tracks"):
-                            manager.add_button(data.removeExtension(track), radius=20)
+                            manager.add_button(data.removeExtension(track))
                             manager.layout(center_x=viewport.centerx, center_y=viewport.centery, max_width=viewport.w)
                             currentMenu = "trackSelection"
             if currentMenu == "playlistSelection":
