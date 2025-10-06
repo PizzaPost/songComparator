@@ -31,7 +31,7 @@ def run():
         if currentMenu=="main":
             if len(os.listdir("resources/playlists")) < 1:
                 manager.set_enabled("Playlist" if not lang else lang["program"]["playlist"], False)
-            if len(os.listdir("resources/tracks"))<1:
+            if len(os.listdir("resources/tracks")) < 1:
                 manager.set_enabled("Track" if not lang else lang["program"]["track"], False)
         clicks = manager.draw_and_handle(pg)
         for c in clicks:
@@ -67,7 +67,7 @@ def run():
                 elif c == ("Track" if not lang else lang["program"]["track"]):
                     if len(os.listdir("resources/tracks")) > 1:
                         for track in os.listdir("resources/tracks"):
-                            manager.add_button(data.removeExtension(track))
+                            manager.add_button(data.displayName(data.details(track, True, True)) or data.removeExtension(track))
                             manager.layout(center_x=viewport.centerx, center_y=viewport.centery, max_width=viewport.w)
                             currentMenu = "trackSelection"
             if currentMenu == "playlistSelection":

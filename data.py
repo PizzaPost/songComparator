@@ -13,9 +13,11 @@ extensions = (
 #     covers/
 #       <image files (.jpg, .jpeg, .png, .gif, .svg, .webp)>
 #     details/
+detailsfolder = "resources/details/"
 #       <song comparator song/track details files (.scd, .scsd, .sctd)>
 extensions["details"] = [".scd", ".scsd", ".sctd"]
 #     playlists/
+playlistfolder = "resources/playlists/"
 #       <song comparator playlist files (.scpl, .scp)>
 extensions["playlists"] = [".scp", ".scpl"]
 
@@ -39,7 +41,11 @@ def randomPlaylist() -> str:
     """
     playlistfolder = "resources/playlists/"
     playlistfiles = os.listdir(playlistfolder)
-    playlistfiles = [f for f in playlistfiles if any(f.endswith(extension) for extension in extensions["playlists"])]
+    playlistfiles = [
+        f
+        for f in playlistfiles
+        if any(f.endswith(extension) for extension in extensions["playlists"])
+    ]
     return random.choice(playlistfiles)
 
 
@@ -58,7 +64,6 @@ def readPlaylist(filename: str) -> list:
     list
         A list of tracks in the first found corresponding playlist file along with their details. May be empty if no playlist file with the given name is found.
     """
-    playlistfolder = "resources/playlists/"
     tracks = []
     found = False
     for extension in extensions["playlists"]:
@@ -71,12 +76,13 @@ def readPlaylist(filename: str) -> list:
     if not found:
         playlistfile = playlistfolder + filename
         if os.path.exists(playlistfile):
-            with open(playlistfile, "r", encoding="utf-8") as f:
-                tracks = json.load(f)
+            tracks = readJSON(playlistfile)
     return tracks
 
 
-def readTrackDetails(filename: str) -> dict:
+def details(
+    filename: str, searchContents: bool = False, searchPlaylists: bool = False
+) -> dict:
     """
     Reads a song comparator song/track details file and returns the details
     of the track.
@@ -84,22 +90,47 @@ def readTrackDetails(filename: str) -> dict:
     Parameters
     ----------
     filename : str
-        The name of the file to read. Assumed to NOT include an extension.
-
+        The name of the track to find the details for. Providing either "track.mp4" or "track" is sufficient.
+    searchContents : bool, optional
+        Whether to also search the contents of arbitrary details files until the requested track is found as the target track. (Needs extension, i.e. "track.mp4", to be provided)
+    searchPlaylists : bool, optional
+        Whether to also search the contents of arbitrary playlist files until the requested track is found as a target track. (Needs extension, i.e. "track.mp4", to be provided)
+    
     Returns
     -------
     dict
-        A dictionary containing the details of the song. May be empty if no song details file is found.
+        A dictionary containing the details of the song. May be empty if no song details file is found based on your criteria.
     """
-    detailsfolder = "resources/details/"
     details = {}
-    for extension in extensions["details"]:
-        detailsfile = detailsfolder + filename + extension
-        if os.path.exists(detailsfile):
-            with open(detailsfile, "r", encoding="utf-8") as f:
-                details = json.load(f)
-            break
+    for _filename in (filename, removeExtension(filename)):
+        if _filename == "":
+            continue
+        for extension in extensions["details"]:
+            detailsfile = detailsfolder + _filename + extension
+            if os.path.exists(detailsfile):
+                details = readJSON(detailsfile)
+                return details
+    if searchContents:
+        for detail in os.listdir(detailsfolder):
+            d = readJSON(detailsfolder + detail)
+            if d["track"] == filename:
+                details = d
+    if searchPlaylists:
+        for playlist in os.listdir(playlistfolder):
+            for track in readPlaylist(playlist):
+                if track["track"] == filename:
+                    details = track
     return details
+
+
+def readJSON(file: str):
+    with openFile(file) as f:
+        j = json.load(f)
+    return j
+
+
+def openFile(file):
+    return open(file, "r", encoding="utf-8")
 
 
 def randomTrack(playlist: list) -> dict:
@@ -131,7 +162,9 @@ def tracks(playlist: list):
     yield from playlist
 
 
-def trackSource(track: dict, trackFolder: str = "resources/tracks/") -> tuple[str, bool, bool]:
+def trackSource(
+    track: dict, trackFolder: str = "resources/tracks/"
+) -> tuple[str, bool, bool]:
     """
     Returns the source of a track, whether it is a stream (true) or a local file (false), and whether it contains video data.
 
@@ -159,10 +192,14 @@ def trackSource(track: dict, trackFolder: str = "resources/tracks/") -> tuple[st
 
 
 def removeExtension(text: str):
-    reversedText = text[::-1]
-    for char in reversedText:
-        reversedText = reversedText[1:]
+    for char in text[::-1]:
+        text = text[:-1]
         if char == ".":
             break
-    text = reversedText[::-1]
     return text
+
+
+def displayName(track: dict):
+    artist = track.get("artist")
+    title = track.get("title")
+    return ((artist + " - ") if artist else "") + (title if title else "")
