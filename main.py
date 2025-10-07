@@ -1,12 +1,14 @@
 import os
 
+import pygame
+import pyvidplayer2
+
+import data
+import misc
+import visuals
+
 
 def run():
-    import pygame
-    import pyvidplayer2
-    import visuals
-    import data
-    import misc
     lang = misc.load_language()
     running = True
     esc = 0
@@ -24,85 +26,122 @@ def run():
     viewport = pygame.Rect(0, 0, width, height)  # full-screen viewport
     manager.set_viewport(viewport)
     manager.layout(center_x=viewport.centerx, center_y=viewport.centery, max_width=viewport.w)
-    currentMenu="main"
+    icon_white = pygame.image.load("resources/assets/icon_white.png")
+    icon_white=pygame.transform.smoothscale_by(icon_white, 3)
+    icon_white = pygame.transform.smoothscale(icon_white, (icon_white.get_width() // 4, icon_white.get_height() // 4))
+    icon_white_height = icon_white.get_height()
+    icon_white_width_half = icon_white.get_width() // 2
+    icon_white_height_half = icon_white.get_height() // 2
+    currentMenu = "main"
+    intro = False # reset to True when finished
+    fadein = 255  # reset to 0 when finished
+    y_intro = height // 2 - icon_white_height_half
+    init_y_intro = y_intro
     while running:
-        if not coverActive:
+        if intro:
             pg.fill((0, 0, 0))
-        if currentMenu=="main":
-            if len(os.listdir("resources/playlists")) < 1:
-                manager.set_enabled("Playlist" if not lang else lang["program"]["playlist"], False)
-            if len(os.listdir("resources/tracks")) < 1:
-                manager.set_enabled("Track" if not lang else lang["program"]["track"], False)
-        clicks = manager.draw_and_handle(pg)
-        for c in clicks:
-            manager.disable_all()
-            if currentMenu=="main":
-                manager.clear()
-                if c == ("Playlist" if not lang else lang["program"]["playlist"]):
-                    if len(os.listdir("resources/playlists"))>1:
-                        for playlist in os.listdir("resources/playlists"):
-                            manager.add_button(data.removeExtension(playlist))
-                            manager.layout(center_x=viewport.centerx, center_y=viewport.centery, max_width=viewport.w)
-                            currentMenu="playlistSelection"
-                    else:
-                        randomPlaylist = data.randomPlaylist()
-                        playlist = data.readPlaylist(randomPlaylist)
-                        randomTrack = data.randomTrack(playlist)
-                        source, stream, isVideo = data.trackSource(randomTrack)
-                        pygame.mixer.music.stop()
-                        if video:
-                            video.stop()
-                            video = None
-                        if isVideo:
-                            coverActive = False
-                            video = pyvidplayer2.Video(source, youtube=stream)
-                            video.resize((width, height))
-                        else:
-                            pygame.mixer.music.load(source)
-                            coverActive = True
-                            scaledCover, cover_rect = visuals.calc_cover(randomTrack, width, height)
-                            pg.fill((0, 0, 0))
-                            pg.blit(scaledCover, cover_rect)
-                            pygame.mixer.music.play()
-                elif c == ("Track" if not lang else lang["program"]["track"]):
-                    if len(os.listdir("resources/tracks")) > 1:
-                        for track in os.listdir("resources/tracks"):
-                            manager.add_button(data.displayName(data.details(track, True, True)) or data.removeExtension(track))
-                            manager.layout(center_x=viewport.centerx, center_y=viewport.centery, max_width=viewport.w)
-                            currentMenu = "trackSelection"
-            if currentMenu == "playlistSelection":
-                pass
-                # play the selected playlist
-            elif currentMenu == "trackSelection":
-                pass
-                # play the selected track
-            else:
-                print(f"{c} pressed")
-
-        keys = pygame.key.get_pressed()
-        for event in pygame.event.get():
-            manager.handle_event(event)
-            if event.type == pygame.QUIT:
-                running = False
-            elif event.type == pygame.KEYUP:
-                if event.key == pygame.K_k:
-                    if video:
-                        video.toggle_pause()
-        if keys[pygame.K_l]:
-            if video:
-                video.seek(5)
-        elif keys[pygame.K_j]:
-            if video:
-                video.seek(-5)
-        if esc == 215:
-            running = False
-        if video:
-            video.draw(pg, (0, 0))
-        if keys[pygame.K_ESCAPE]:
-            esc += 1
-            pg.fill((255, 0, 0), (0, height - 50, width // 200 * esc, 50))
+            pg.blit(icon_white, (width // 2 - icon_white_width_half, height // 2 - icon_white_height_half))
+            pygame.draw.rect(pg, (0, 0, 0), (width // 2 - icon_white_width_half, y_intro, icon_white_width_half * 2,
+                                             icon_white_height_half * 2))
+            y_intro -= 2
+            if y_intro < init_y_intro - icon_white_height * 2:
+                fade_surface = pygame.Surface((width, height))
+                for x in range(75):
+                    fade_surface.set_alpha(x)
+                    fade_surface.fill((0, 0, 0))
+                    pg.blit(fade_surface, (0, 0))
+                    pygame.display.update()
+                    pygame.time.delay(17)
+                intro = False
         else:
-            esc = 0
+            if not coverActive:
+                pg.fill((0, 0, 0))
+            if currentMenu == "main":
+                if len(os.listdir("resources/playlists")) < 1:
+                    manager.set_enabled("Playlist" if not lang else lang["program"]["playlist"], False)
+                if len(os.listdir("resources/tracks")) < 1:
+                    manager.set_enabled("Track" if not lang else lang["program"]["track"], False)
+            clicks = manager.draw_and_handle(pg)
+            for c in clicks:
+                manager.disable_all()
+                if currentMenu == "main":
+                    manager.clear()
+                    if c == ("Playlist" if not lang else lang["program"]["playlist"]):
+                        if len(os.listdir("resources/playlists")) > 1:
+                            for playlist in os.listdir("resources/playlists"):
+                                manager.add_button(data.removeExtension(playlist))
+                                manager.layout(center_x=viewport.centerx, center_y=viewport.centery,
+                                               max_width=viewport.w)
+                                currentMenu = "playlistSelection"
+                        else:
+                            randomPlaylist = data.randomPlaylist()
+                            playlist = data.readPlaylist(randomPlaylist)
+                            randomTrack = data.randomTrack(playlist)
+                            source, stream, isVideo = data.trackSource(randomTrack)
+                            pygame.mixer.music.stop()
+                            if video:
+                                video.stop()
+                                video = None
+                            if isVideo:
+                                coverActive = False
+                                video = pyvidplayer2.Video(source, youtube=stream)
+                                video.resize((width, height))
+                            else:
+                                pygame.mixer.music.load(source)
+                                coverActive = True
+                                scaledCover, cover_rect = visuals.calc_cover(randomTrack, width, height)
+                                pg.fill((0, 0, 0))
+                                pg.blit(scaledCover, cover_rect)
+                                pygame.mixer.music.play()
+                    elif c == ("Track" if not lang else lang["program"]["track"]):
+                        if len(os.listdir("resources/tracks")) > 1:
+                            for track in os.listdir("resources/tracks"):
+                                manager.add_button(
+                                    data.displayName(data.details(track, True, True)) or data.removeExtension(track))
+                                manager.layout(center_x=viewport.centerx, center_y=viewport.centery,
+                                               max_width=viewport.w)
+                                currentMenu = "trackSelection"
+                if currentMenu == "playlistSelection":
+                    pass
+                    # play the selected playlist
+                elif currentMenu == "trackSelection":
+                    pass
+                    # play the selected track
+                else:
+                    print(f"{c} pressed")
+
+            keys = pygame.key.get_pressed()
+            for event in pygame.event.get():
+                manager.handle_event(event)
+                if event.type == pygame.QUIT:
+                    running = False
+                elif event.type == pygame.KEYUP:
+                    if event.key == pygame.K_k:
+                        if video:
+                            video.toggle_pause()
+            if keys[pygame.K_l]:
+                if video:
+                    video.seek(5)
+            elif keys[pygame.K_j]:
+                if video:
+                    video.seek(-5)
+            if esc == 215:
+                running = False
+            if video:
+                video.draw(pg, (0, 0))
+            if keys[pygame.K_ESCAPE]:
+                esc += 1
+                pg.fill((255, 0, 0), (0, height - 50, width // 200 * esc, 50))
+            else:
+                esc = 0
+            if fadein < 255:
+                fade_surface = pygame.Surface((width, height))
+                fade_surface.set_alpha(255 - fadein)
+                fade_surface.fill((0, 0, 0))
+                pg.blit(fade_surface, (0, 0))
+                pygame.display.update()
+                pygame.time.delay(17)
+                fadein += 3
         pygame.display.update()
         clock.tick(120)
     pygame.quit()
