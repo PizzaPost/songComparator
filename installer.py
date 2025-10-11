@@ -174,31 +174,45 @@ def uninstaller(tk):
         colors.set_color(widget, palette)
 
     def uninstall(assets, code, tracks, themes, settings):
-        try:
-            if assets:
-                shutil.rmtree("resources/assets")
-                shutil.rmtree("resources/languages")
-            if code:
-                os.remove("colors.py")
-                os.remove("data.py")
-                os.remove("main.py")
-                os.remove("misc.py")
-                os.remove("settings.py")
-                os.remove("stats.py")
-                os.remove("visuals.py")
-                os.remove("window.py")
-            if tracks:
-                shutil.rmtree("resources/covers")
-                shutil.rmtree("resources/data")
-                shutil.rmtree("resources/details")
-                shutil.rmtree("resources/playlists")
-                shutil.rmtree("resources/tracks")
-            if themes:
-                shutil.rmtree("resources/themes")
-            if settings:
-                os.remove("resources/settings.json")
-        except FileNotFoundError:
-            pass
+        trying=True
+        all=False
+        if assets and tracks and themes and settings:
+            all=True
+        while trying:
+            try:
+                if assets:
+                    assets=False
+                    shutil.rmtree("resources/assets")
+                    shutil.rmtree("resources/languages")
+                if code:
+                    code=False
+                    os.remove("colors.py")
+                    os.remove("data.py")
+                    os.remove("main.py")
+                    os.remove("misc.py")
+                    os.remove("settings.py")
+                    os.remove("stats.py")
+                    os.remove("visuals.py")
+                    os.remove("window.py")
+                if tracks:
+                    tracks=False
+                    shutil.rmtree("resources/covers")
+                    shutil.rmtree("resources/data")
+                    shutil.rmtree("resources/details")
+                    shutil.rmtree("resources/playlists")
+                    shutil.rmtree("resources/tracks")
+                if themes:
+                    themes=False
+                    shutil.rmtree("resources/themes")
+                if settings:
+                    settings=False
+                    os.remove("resources/settings.json")
+                if all:
+                    all=False
+                    shutil.rmtree("resources")
+                trying=False
+            except FileNotFoundError:
+                pass
 
 
 def start_installation(tk):
