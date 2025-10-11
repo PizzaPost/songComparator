@@ -156,11 +156,11 @@ def uninstaller(tk):
         "delete_settings"], variable=frame.delete_settings)
     start_uninstall = tkinter.Button(frame, text="Uninstall" if not lang else lang["uninstaller"]["uninstall"],
                                      width=10, height=3,
-                                     command=lambda: uninstall(delete_assets_checkbox.getvar(),
-                                                               delete_code_checkbox.getvar(),
-                                                               delete_track_related_stuff_checkbox.getvar(),
-                                                               delete_themes_checkbox.getvar(),
-                                                               delete_settings_checkbox.getvar()))
+                                     command=lambda: uninstall(frame.delete_assets.get(),
+                                                               frame.delete_code.get(),
+                                                               frame.delete_track_related_stuff.get(),
+                                                               frame.delete_themes.get(),
+                                                               frame.delete_settings.get()))
     frame.grid_columnconfigure(0, weight=1)
     frame.grid_columnconfigure(1, weight=0)
     delete_assets_checkbox.grid(row=0, column=0, sticky="w", padx=5, pady=6)
@@ -174,27 +174,27 @@ def uninstaller(tk):
 
     def uninstall(assets, code, tracks, themes, settings):
         if assets:
-            os.remove("resources/assets")
-            os.remove("resources/languages")
+            os.chmod("resources/assets", 0o777)
+            os.chmod("resources/languages", 0o777)
         if code:
-            os.remove("colors.py")
-            os.remove("data.py")
-            os.remove("main.py")
-            os.remove("misc.py")
-            os.remove("settings.py")
-            os.remove("stats.py")
-            os.remove("visuals.py")
-            os.remove("window.py")
+            os.chmod("colors.py", 0o777)
+            os.chmod("data.py", 0o777)
+            os.chmod("main.py", 0o777)
+            os.chmod("misc.py", 0o777)
+            os.chmod("settings.py", 0o777)
+            os.chmod("stats.py", 0o777)
+            os.chmod("visuals.py", 0o777)
+            os.chmod("window.py", 0o777)
         if tracks:
-            os.remove("resources/covers")
-            os.remove("resources/data")
-            os.remove("resources/details")
-            os.remove("resources/playlists")
-            os.remove("resources/tracks")
+            os.chmod("resources/covers", 0o777)
+            os.chmod("resources/data", 0o777)
+            os.chmod("resources/details", 0o777)
+            os.chmod("resources/playlists", 0o777)
+            os.chmod("resources/tracks", 0o777)
         if themes:
-            os.remove("resources/themes")
+            os.chmod("resources/themes", 0o777)
         if settings:
-            os.remove("resources/settings.json")
+            os.chmod("resources/settings.json", 0o777)
 
 
 def start_installation(tk):
