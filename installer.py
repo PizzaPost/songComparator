@@ -13,6 +13,7 @@ try:
     import os
     import urllib.request
     import threading
+    import shutil
 except ImportError as e:
     if e.name != "tkinter.messagebox":
         tkinter.messagebox.showerror(
@@ -174,27 +175,27 @@ def uninstaller(tk):
 
     def uninstall(assets, code, tracks, themes, settings):
         if assets:
-            os.chmod("resources/assets", 0o777)
-            os.chmod("resources/languages", 0o777)
+            shutil.rmtree("resources/assets")
+            shutil.rmtree("resources/languages")
         if code:
-            os.chmod("colors.py", 0o777)
-            os.chmod("data.py", 0o777)
-            os.chmod("main.py", 0o777)
-            os.chmod("misc.py", 0o777)
-            os.chmod("settings.py", 0o777)
-            os.chmod("stats.py", 0o777)
-            os.chmod("visuals.py", 0o777)
-            os.chmod("window.py", 0o777)
+            shutil.rmtree("colors.py")
+            shutil.rmtree("data.py")
+            shutil.rmtree("main.py")
+            shutil.rmtree("misc.py")
+            shutil.rmtree("settings.py")
+            shutil.rmtree("stats.py")
+            shutil.rmtree("visuals.py")
+            shutil.rmtree("window.py")
         if tracks:
-            os.chmod("resources/covers", 0o777)
-            os.chmod("resources/data", 0o777)
-            os.chmod("resources/details", 0o777)
-            os.chmod("resources/playlists", 0o777)
-            os.chmod("resources/tracks", 0o777)
+            shutil.rmtree("resources/covers")
+            shutil.rmtree("resources/data")
+            shutil.rmtree("resources/details")
+            shutil.rmtree("resources/playlists")
+            shutil.rmtree("resources/tracks")
         if themes:
-            os.chmod("resources/themes", 0o777)
+            shutil.rmtree("resources/themes")
         if settings:
-            os.chmod("resources/settings.json", 0o777)
+            shutil.rmtree("resources/settings.json")
 
 
 def start_installation(tk):
