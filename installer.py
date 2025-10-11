@@ -103,7 +103,7 @@ def installer():
 
         if not os.path.exists("resources/settings.json"):
             with open("resources/settings.json", "w") as f:
-                json.dump({"language": "english", "theme": "dark", "appearance_mode": "system"}, f)
+                json.dump({"language": "english", "theme": "default", "appearance_mode": "system"}, f)
             f.close()
         finished_steps += 1
 
