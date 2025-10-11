@@ -219,8 +219,8 @@ def start_installation(tk):
         widget.destroy()
     installation_text1 = tkinter.Label(tk, text="Installing..." if not lang else lang["installer"]["installing"])
     installation_text2 = tkinter.Label(tk,
-                                       text=f"Finished Steps: {finished_steps}/27" if not lang else lang["installer"][
-                                           "finished_steps"].format(finished_steps, 27))
+                                       text=f"Finished Steps: {finished_steps}/28" if not lang else lang["installer"][
+                                           "finished_steps"].format(finished_steps, 28))
     loading_bar = tkinter.ttk.Progressbar(tk, maximum=14, length=360)
     installation_text3 = tkinter.Label(tk, text="Please wait until installation is complete." if not lang else
     lang["installer"]["please_wait"])
@@ -246,8 +246,8 @@ def start_installation(tk):
     def update_ui():
         """Updates the installer GUI."""
         installation_text2.config(
-            text=f"Finished Steps: {finished_steps}/27" if not lang else lang["installer"]["finished_steps"].format(
-                finished_steps, 27))
+            text=f"Finished Steps: {finished_steps}/28" if not lang else lang["installer"]["finished_steps"].format(
+                finished_steps, 28))
         loading_bar["value"] = finished_steps
         if done_event.is_set():
             tk.title("Installation Complete" if not lang else lang["installer"]["installation_complete"])
