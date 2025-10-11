@@ -14,7 +14,17 @@
     "finished_steps": "Finished Steps: {0}/{1}",
     "please_wait": "Please wait until installation is complete.",
     "installation_complete": "Installation Complete",
-    "run_now": "Do you want to run the program?"
+    "run_now": "Do you want to run the program?",
+    "install": "install"
+  },
+  "uninstaller": {
+    "title": "Uninstaller",
+    "delete_assets": "Delete Assets",
+    "delete_code": "Delete Program",
+    "delete_tracks": "Delete Tracks",
+    "delete_themes": "Delete Themes",
+    "delete_settings": "Delete Settings",
+    "uninstall": "DELETE"
   },
   "settings": {
     "title": "Settings",

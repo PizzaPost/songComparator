@@ -117,7 +117,9 @@ def build_ctk_theme_from_palette(p):
             "fg_color": [lighten(p["progress_trough"]), p["progress_trough"]],
             "progress_color": [lighten(p["progress_bar"]), p["progress_bar"]],
             "button_color": [lighten(p["button_bg"]), p["button_bg"]],
-            "button_hover_color": [lighten(p["hover_red"]), p["hover_red"]]
+            "button_hover_color": [lighten(p["hover_red"]), p["hover_red"]],
+            "button_color_disabled": [lighten(p["progress_trough"]), p["progress_trough"]],
+            "progress_color_disabled": [lighten(p["progress_trough"]), p["progress_trough"]],
         },
         "CTkOptionMenu": {
             "corner_radius": 6,
@@ -391,6 +393,25 @@ def set_color(widget, palette):
         except Exception:
             pass
 
+    if cls == "Checkbutton":
+        try:
+            cbtn_kwargs = dict(
+                bg=palette["bg"],
+                fg=palette["text"],
+                activebackground=palette["button_bg"],
+                activeforeground=palette["button_active_bg"],
+                selectcolor=palette["button_bg"],
+                bd=0,
+                relief="flat",
+                highlightthickness=0,
+                padx=8,
+                pady=4,
+                disabledforeground=palette.get("text", "gray60")
+            )
+            widget.configure(**cbtn_kwargs)
+        except Exception:
+            pass
+
     # ttk-specific instances
     try:
         if isinstance(widget, ttk.Progressbar):
@@ -413,6 +434,12 @@ def set_color(widget, palette):
     try:
         if isinstance(widget, ttk.Frame):
             widget.configure(style="Aqua.Dark.TFrame")
+    except Exception:
+        pass
+
+    try:
+        if isinstance(widget, ttk.Checkbutton):
+            widget.configure(style="Aqua,Dark.TFrame")
     except Exception:
         pass
 

@@ -33,7 +33,8 @@ import colors
 
 finished_steps = 1
 done_event = threading.Event()
-necessary_files = ["resources/assets/icon.png", "resources/assets/mute.png", "resources/languages/Deutsch.json", "resources/languages/English.json"]
+necessary_files = ["resources/assets/icon.png", "resources/assets/mute.png", "resources/languages/Deutsch.json",
+                   "resources/languages/English.json"]
 custom_modules = ["colors", "data", "main", "misc", "settings", "stats", "visuals", "window"]
 trying = True
 palette = None
@@ -107,7 +108,9 @@ def installer():
 
         if not os.path.exists("resources/settings.json"):
             with open("resources/settings.json", "w") as f:
-                json.dump({"language": "english", "theme": "default", "appearance_mode": "system", "master_volume": 100, "track_volume": 100, "gui_volume": 100, "effects_volume": 100, "enabled_audio": [True, True, True, True]}, f, indent=4)
+                json.dump({"language": "english", "theme": "default", "appearance_mode": "system", "master_volume": 100,
+                           "track_volume": 100, "gui_volume": 100, "effects_volume": 100,
+                           "enabled_audio": [True, True, True, True]}, f, indent=4)
             f.close()
         finished_steps += 1
 
@@ -126,30 +129,77 @@ def installer():
 palette = colors.load_palette()
 
 
-def start_gui():
-    """Starts the installer GUI."""
-    global finished_steps
-    # downloads the icon
-    file = "resources/assets/icon.ico"
-    if not os.path.exists(file):
-        try:
-            os.makedirs("resources/assets", exist_ok=True)
-            link = f"https://raw.githubusercontent.com/PizzaPost/songComparator/master/{file}"
-            urllib.request.urlretrieve(link, file)
-            finished_steps += 1
-        except Exception as e:
-            tkinter.messagebox.showerror(
-                "Installation Error" if not lang else lang["error"]["installation_error_title"],
-                f"Failed to Download the Icon for the installer:\n{str(e)}" if not lang else lang["error"][
-                    "installation_error_description1"].format(str(e)))
-            exit(0)
-    tk = tkinter.Tk()
-    tk.title("Installer" if not lang else lang["installer"]["title"])
-    tk.iconbitmap(file)
-    tk.geometry(f"400x185+{tk.winfo_screenwidth() // 2 - 208}+{tk.winfo_screenheight() // 2 - 88}")
-    tk.resizable(False, False)
-    tk.attributes("-topmost", True)
-    tk.configure(bg=palette["bg"])
+def uninstaller(tk):
+    tk.columnconfigure(0, weight=0)
+    tk.columnconfigure(1, weight=0)
+    tk.rowconfigure(0, weight=0)
+    tk.rowconfigure(1, weight=0)
+    for widget in tk.winfo_children():
+        widget.destroy()
+    tk.title("Uninstaller" if not lang else lang["uninstaller"]["title"])
+    frame = tkinter.Frame(tk)
+    frame.pack(fill="both", expand=True)
+    frame.delete_assets = tkinter.BooleanVar(value=True)
+    frame.delete_code = tkinter.BooleanVar(value=True)
+    frame.delete_track_related_stuff = tkinter.BooleanVar()
+    frame.delete_themes = tkinter.BooleanVar(value=True)
+    frame.delete_settings = tkinter.BooleanVar()
+    delete_assets_checkbox = tkinter.Checkbutton(frame, text="Delete Assets" if not lang else lang["uninstaller"][
+        "delete_assets"], variable=frame.delete_assets)
+    delete_code_checkbox = tkinter.Checkbutton(frame, text="Delete Code" if not lang else lang["uninstaller"][
+        "delete_code"], variable=frame.delete_code)
+    delete_track_related_stuff_checkbox = tkinter.Checkbutton(frame, text="Delete Tracks" if not lang else
+    lang["uninstaller"]["delete_tracks"], variable=frame.delete_track_related_stuff)
+    delete_themes_checkbox = tkinter.Checkbutton(frame, text="Delete Themes" if not lang else lang["uninstaller"][
+        "delete_themes"], variable=frame.delete_themes)
+    delete_settings_checkbox = tkinter.Checkbutton(frame, text="Delete Settings" if not lang else lang["uninstaller"][
+        "delete_settings"], variable=frame.delete_settings)
+    start_uninstall = tkinter.Button(frame, text="Uninstall" if not lang else lang["uninstaller"]["uninstall"],
+                                     width=10, height=3,
+                                     command=lambda: uninstall(delete_assets_checkbox.getvar(),
+                                                               delete_code_checkbox.getvar(),
+                                                               delete_track_related_stuff_checkbox.getvar(),
+                                                               delete_themes_checkbox.getvar(),
+                                                               delete_settings_checkbox.getvar()))
+    frame.grid_columnconfigure(0, weight=1)
+    frame.grid_columnconfigure(1, weight=0)
+    delete_assets_checkbox.grid(row=0, column=0, sticky="w", padx=5, pady=6)
+    delete_code_checkbox.grid(row=1, column=0, sticky="w", padx=5, pady=6)
+    delete_track_related_stuff_checkbox.grid(row=2, column=0, sticky="w", padx=5, pady=6)
+    delete_themes_checkbox.grid(row=3, column=0, sticky="w", padx=5, pady=6)
+    delete_settings_checkbox.grid(row=4, column=0, sticky="w", padx=5, pady=6)
+    start_uninstall.grid(row=0, column=1, rowspan=5, sticky="e", padx=14)
+    for widget in tk.winfo_children():
+        colors.set_color(widget, palette)
+
+    def uninstall(assets, code, tracks, themes, settings):
+        if assets:
+            os.remove("resources/assets")
+            os.remove("resources/languages")
+        if code:
+            os.remove("colors.py")
+            os.remove("data.py")
+            os.remove("main.py")
+            os.remove("misc.py")
+            os.remove("settings.py")
+            os.remove("stats.py")
+            os.remove("visuals.py")
+            os.remove("window.py")
+        if tracks:
+            os.remove("resources/covers")
+            os.remove("resources/data")
+            os.remove("resources/details")
+            os.remove("resources/playlists")
+            os.remove("resources/tracks")
+        if themes:
+            os.remove("resources/themes")
+        if settings:
+            os.remove("resources/settings.json")
+
+
+def start_installation(tk):
+    for widget in tk.winfo_children():
+        widget.destroy()
     installation_text1 = tkinter.Label(tk, text="Installing..." if not lang else lang["installer"]["installing"])
     installation_text2 = tkinter.Label(tk,
                                        text=f"Finished Steps: {finished_steps}/27" if not lang else lang["installer"][
@@ -203,6 +253,50 @@ def start_gui():
 
     threading.Thread(target=installer, daemon=True).start()
     tk.after(1, update_ui)
+
+
+def start_gui():
+    """Starts the installer GUI."""
+    global finished_steps
+    # downloads the icon
+    file = "resources/assets/icon.ico"
+    if not os.path.exists(file):
+        try:
+            os.makedirs("resources/assets", exist_ok=True)
+            link = f"https://raw.githubusercontent.com/PizzaPost/songComparator/master/{file}"
+            urllib.request.urlretrieve(link, file)
+            finished_steps += 1
+        except Exception as e:
+            tkinter.messagebox.showerror(
+                "Installation Error" if not lang else lang["error"]["installation_error_title"],
+                f"Failed to Download the Icon for the installer:\n{str(e)}" if not lang else lang["error"][
+                    "installation_error_description1"].format(str(e)))
+            exit(0)
+    tk = tkinter.Tk()
+    tk.title("Installer" if not lang else lang["installer"]["title"])
+    tk.iconbitmap(file)
+    tk.geometry(f"400x185+{tk.winfo_screenwidth() // 2 - 208}+{tk.winfo_screenheight() // 2 - 88}")
+    tk.resizable(False, False)
+    tk.attributes("-topmost", True)
+    tk.configure(bg=palette["bg"])
+    frame = tkinter.Frame(tk)
+    frame.grid(row=0, column=0, sticky="nsew")
+    install_button = tkinter.Button(frame, text="Install" if not lang else lang["installer"]["install"], width=10,
+                                    height=3, command=lambda: start_installation(tk))
+    uninstall_button = tkinter.Button(frame, text="Uninstall" if not lang else lang["uninstaller"]["uninstall"],
+                                      width=10,
+                                      height=3, command=lambda: uninstaller(tk))
+    tk.columnconfigure(0, weight=1)
+    tk.columnconfigure(1, weight=1)
+    tk.rowconfigure(0, weight=1)
+    tk.rowconfigure(1, weight=1)
+    install_button.grid(row=0, column=0, padx=15)
+    uninstall_button.grid(row=0, column=1, padx=15)
+    frame.update_idletasks()
+    frame.grid_propagate(False)
+    frame.place(relx=0.5, rely=0.5, anchor="center")
+    for widget in tk.winfo_children():
+        colors.set_color(widget, palette)
     tk.mainloop()
 
 

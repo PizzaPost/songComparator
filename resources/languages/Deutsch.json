@@ -14,7 +14,17 @@
     "finished_steps": "Fertige Schritte: {0}/{1}",
     "please_wait": "Bitte warte bis die Installation abgeschlossen ist.",
     "installation_complete": "Installation abgeschlossen",
-    "run_now": "Möchtest du das Programm jetzt starten?"
+    "run_now": "Möchtest du das Programm jetzt starten?",
+    "install": "installieren"
+  },
+  "uninstaller": {
+    "title": "Deinstallierungsprogramm",
+    "delete_assets": "Lösche Ressourcen",
+    "delete_code": "Lösche Programm",
+    "delete_tracks": "Lösche Lieder",
+    "delete_themes": "Lösche Themen",
+    "delete_settings": "Lösche Einstellungen",
+    "uninstall": "LÖSCHEN"
   },
   "settings": {
     "title": "Einstellungen",
