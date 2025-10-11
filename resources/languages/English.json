@@ -22,7 +22,12 @@
     "warning1": "⚠️ Please install more themes to use this feature ⚠️",
     "warning2": "⚠️ This feature may not be available for every theme ⚠️",
     "language": "Language",
-    "submit": "Submit"
+    "submit": "Submit",
+    "audio": "Audio",
+    "master_volume_label": "Master:",
+    "track_volume_label": "Tracks:",
+    "gui_volume_label": "UI:",
+    "effects_volume_label": "Effects:"
   },
   "program": {
     "playlist": "Playlist",

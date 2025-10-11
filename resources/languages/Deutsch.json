@@ -22,7 +22,12 @@
     "warning1": "⚠️ Bitte installiere mehr Themen, um diese Funktion zu nutzen ⚠️",
     "warning2": "⚠️ Diese Funktion ist möglicherweise nicht für jedes Thema verfügbar ⚠️",
     "language": "Sprache",
-    "submit": "Übernehmen"
+    "submit": "Übernehmen",
+    "audio": "Audio",
+    "master_volume_label": "Gesamtlautstärke:",
+    "track_volume_label": "Musik:",
+    "gui_volume_label": "Benutzeroberfläche:",
+    "effects_volume_label": "Effekte:"
   },
   "program": {
     "playlist": "Wiedergabeliste",

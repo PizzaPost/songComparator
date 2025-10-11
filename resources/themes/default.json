@@ -205,12 +205,20 @@
       "#7C0008"
     ],
     "button_color": [
-      "#5e6061",
-      "#1a1c1e"
+      "#a34c52",
+      "#7C0008"
     ],
     "button_hover_color": [
       "#be767b",
       "#a33c43"
+    ],
+    "button_color_disabled": [
+      "#5b5c5d",
+      "#151718"
+    ],
+    "progress_color_disabled": [
+      "#5b5c5d",
+      "#151718"
     ]
   },
   "CTkOptionMenu": {

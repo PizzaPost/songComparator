@@ -1,0 +1,15 @@
+{
+    "theme": "default",
+    "appearance_mode": "system",
+    "language": "english",
+    "master_volume": 67,
+    "track_volume": 73,
+    "gui_volume": 74,
+    "effects_volume": 74,
+    "enabled_audio": [
+        true,
+        false,
+        false,
+        false
+    ]
+}

@@ -33,7 +33,7 @@ import colors
 
 finished_steps = 1
 done_event = threading.Event()
-necessary_files = ["resources/assets/icon.png", "resources/languages/Deutsch.json", "resources/languages/English.json"]
+necessary_files = ["resources/assets/icon.png", "resources/assets/mute.png", "resources/languages/Deutsch.json", "resources/languages/English.json"]
 custom_modules = ["colors", "data", "main", "misc", "settings", "stats", "visuals", "window"]
 trying = True
 palette = None
@@ -54,22 +54,24 @@ def installer():
                 finished_steps = 5
                 import yt_dlp
                 finished_steps = 6
+                import PIL
+                finished_steps = 7
 
                 # checks custom modules
                 import data
-                finished_steps = 7
-                import main
                 finished_steps = 8
-                import misc
+                import main
                 finished_steps = 9
-                import settings
+                import misc
                 finished_steps = 10
-                import stats
+                import settings
                 finished_steps = 11
-                import visuals
+                import stats
                 finished_steps = 12
-                import window
+                import visuals
                 finished_steps = 13
+                import window
+                finished_steps = 14
                 import window
 
                 trying = False
@@ -77,6 +79,8 @@ def installer():
                 if not e.name in custom_modules:
                     if e.name == "yt_dlp":
                         os.system(f"pip install yt-dlp")
+                    elif e.name == "PIL":
+                        os.system(f"pip install pillow")
                     else:
                         os.system(f"pip install {e.name}")
                 else:
@@ -103,7 +107,7 @@ def installer():
 
         if not os.path.exists("resources/settings.json"):
             with open("resources/settings.json", "w") as f:
-                json.dump({"language": "english", "theme": "default", "appearance_mode": "system"}, f)
+                json.dump({"language": "english", "theme": "default", "appearance_mode": "system", "master_volume": 100, "track_volume": 100, "gui_volume": 100, "effects_volume": 100, "enabled_audio": [True, True, True, True]}, f, indent=4)
             f.close()
         finished_steps += 1
 
@@ -148,8 +152,8 @@ def start_gui():
     tk.configure(bg=palette["bg"])
     installation_text1 = tkinter.Label(tk, text="Installing..." if not lang else lang["installer"]["installing"])
     installation_text2 = tkinter.Label(tk,
-                                       text=f"Finished Steps: {finished_steps}/25" if not lang else lang["installer"][
-                                           "finished_steps"].format(finished_steps, 25))
+                                       text=f"Finished Steps: {finished_steps}/27" if not lang else lang["installer"][
+                                           "finished_steps"].format(finished_steps, 27))
     loading_bar = tkinter.ttk.Progressbar(tk, maximum=14, length=360)
     installation_text3 = tkinter.Label(tk, text="Please wait until installation is complete." if not lang else
     lang["installer"]["please_wait"])
@@ -175,8 +179,8 @@ def start_gui():
     def update_ui():
         """Updates the installer GUI."""
         installation_text2.config(
-            text=f"Finished Steps: {finished_steps}/25" if not lang else lang["installer"]["finished_steps"].format(
-                finished_steps, 25))
+            text=f"Finished Steps: {finished_steps}/27" if not lang else lang["installer"]["finished_steps"].format(
+                finished_steps, 27))
         loading_bar["value"] = finished_steps
         if done_event.is_set():
             tk.title("Installation Complete" if not lang else lang["installer"]["installation_complete"])
