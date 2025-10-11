@@ -108,7 +108,7 @@ def installer():
 
         if not os.path.exists("resources/settings.json"):
             with open("resources/settings.json", "w") as f:
-                json.dump({"language": "english", "theme": "default", "appearance_mode": "system", "master_volume": 100,
+                json.dump({"language": "English", "theme": "default", "appearance_mode": "system", "master_volume": 100,
                            "track_volume": 100, "gui_volume": 100, "effects_volume": 100,
                            "enabled_audio": [True, True, True, True]}, f, indent=4)
             f.close()
