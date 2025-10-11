@@ -74,7 +74,6 @@ def installer():
                 finished_steps = 13
                 import window
                 finished_steps = 14
-                import window
 
                 trying = False
             except ImportError as e:
