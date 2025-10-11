@@ -34,7 +34,7 @@ import colors
 
 finished_steps = 1
 done_event = threading.Event()
-necessary_files = ["resources/assets/icon.png", "resources/assets/mute.png", "resources/languages/Deutsch.json",
+necessary_files = ["resources/assets/icon.png", "resources/assets/icon_white.png", "resources/assets/mute.png", "resources/languages/Deutsch.json",
                    "resources/languages/English.json"]
 custom_modules = ["colors", "data", "main", "misc", "settings", "stats", "visuals", "window"]
 trying = True
