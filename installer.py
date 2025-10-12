@@ -37,7 +37,7 @@ done_event = threading.Event()
 necessary_files = ["resources/assets/icon.png", "resources/assets/icon_white.png", "resources/assets/mute.png", "resources/languages/Deutsch.json",
                    "resources/languages/English.json"]
 custom_modules = ["colors", "data", "main", "misc", "settings", "stats", "visuals", "window"]
-official_modules=["pyvidplayer2", "pygame", "customtkinter", "yt-dlp", "PIL"]
+official_modules=["pyvidplayer2", "pygame", "customtkinter", "yt-dlp", "pillow"]
 trying = True
 palette = None
 
@@ -215,7 +215,7 @@ def uninstaller(tk):
                 if modules:
                     modules=False
                     for module in official_modules:
-                        os.system(f"pip uninstall {module}")
+                        os.system(f"pip uninstall --yes {module}")
                 if all:
                     all=False
                     shutil.rmtree("resources")
