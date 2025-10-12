@@ -37,6 +37,7 @@ done_event = threading.Event()
 necessary_files = ["resources/assets/icon.png", "resources/assets/icon_white.png", "resources/assets/mute.png", "resources/languages/Deutsch.json",
                    "resources/languages/English.json"]
 custom_modules = ["colors", "data", "main", "misc", "settings", "stats", "visuals", "window"]
+official_modules=["pyvidplayer2", "pygame", "customtkinter", "yt-dlp", "PIL"]
 trying = True
 palette = None
 
@@ -144,6 +145,7 @@ def uninstaller(tk):
     frame.delete_track_related_stuff = tkinter.BooleanVar()
     frame.delete_themes = tkinter.BooleanVar(value=True)
     frame.delete_settings = tkinter.BooleanVar()
+    frame.delete_modules = tkinter.BooleanVar()
     delete_assets_checkbox = tkinter.Checkbutton(frame, text="Delete Assets" if not lang else lang["uninstaller"][
         "delete_assets"], variable=frame.delete_assets)
     delete_code_checkbox = tkinter.Checkbutton(frame, text="Delete Code" if not lang else lang["uninstaller"][
@@ -154,25 +156,29 @@ def uninstaller(tk):
         "delete_themes"], variable=frame.delete_themes)
     delete_settings_checkbox = tkinter.Checkbutton(frame, text="Delete Settings" if not lang else lang["uninstaller"][
         "delete_settings"], variable=frame.delete_settings)
+    delete_modules_checkbox = tkinter.Checkbutton(frame, text="Delete Modules" if not lang else lang["uninstaller"][
+        "delete_modules"], variable=frame.delete_modules)
     start_uninstall = tkinter.Button(frame, text="Uninstall" if not lang else lang["uninstaller"]["uninstall"],
                                      width=10, height=3,
                                      command=lambda: uninstall(frame.delete_assets.get(),
                                                                frame.delete_code.get(),
                                                                frame.delete_track_related_stuff.get(),
                                                                frame.delete_themes.get(),
-                                                               frame.delete_settings.get()))
+                                                               frame.delete_settings.get(),
+                                                               frame.delete_modules.get()))
     frame.grid_columnconfigure(0, weight=1)
     frame.grid_columnconfigure(1, weight=0)
-    delete_assets_checkbox.grid(row=0, column=0, sticky="w", padx=5, pady=6)
-    delete_code_checkbox.grid(row=1, column=0, sticky="w", padx=5, pady=6)
-    delete_track_related_stuff_checkbox.grid(row=2, column=0, sticky="w", padx=5, pady=6)
-    delete_themes_checkbox.grid(row=3, column=0, sticky="w", padx=5, pady=6)
-    delete_settings_checkbox.grid(row=4, column=0, sticky="w", padx=5, pady=6)
+    delete_assets_checkbox.grid(row=0, column=0, sticky="w", padx=5, pady=3)
+    delete_code_checkbox.grid(row=1, column=0, sticky="w", padx=5, pady=3)
+    delete_track_related_stuff_checkbox.grid(row=2, column=0, sticky="w", padx=5, pady=3)
+    delete_themes_checkbox.grid(row=3, column=0, sticky="w", padx=5, pady=3)
+    delete_settings_checkbox.grid(row=4, column=0, sticky="w", padx=5, pady=3)
+    delete_modules_checkbox.grid(row=5, column=0, sticky="w", padx=5, pady=3)
     start_uninstall.grid(row=0, column=1, rowspan=5, sticky="e", padx=14)
     for widget in tk.winfo_children():
         colors.set_color(widget, palette)
 
-    def uninstall(assets, code, tracks, themes, settings):
+    def uninstall(assets, code, tracks, themes, settings, modules):
         trying=True
         all=False
         if assets and tracks and themes and settings:
@@ -206,6 +212,10 @@ def uninstaller(tk):
                 if settings:
                     settings=False
                     os.remove("resources/settings.json")
+                if modules:
+                    modules=False
+                    for module in official_modules:
+                        os.system(f"pip uninstall {module}")
                 if all:
                     all=False
                     shutil.rmtree("resources")

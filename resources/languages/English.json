@@ -24,6 +24,7 @@
     "delete_tracks": "Delete Tracks",
     "delete_themes": "Delete Themes",
     "delete_settings": "Delete Settings",
+    "delete_modules": "Delete Modules",
     "uninstall": "DELETE"
   },
   "settings": {
