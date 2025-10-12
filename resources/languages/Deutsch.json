@@ -25,6 +25,10 @@
     "delete_themes": "Lösche Themen",
     "delete_settings": "Lösche Einstellungen",
     "delete_modules": "Lösche Module",
+    "uninstalling": "Deinstalliere...",
+    "waiting": "Das sollte nicht lange dauern.",
+    "uninstalled": "Deinstalliert",
+    "you_can_close": "Du kannst das Programm jetzt schließen.",
     "uninstall": "LÖSCHEN"
   },
   "settings": {

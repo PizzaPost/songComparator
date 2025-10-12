@@ -160,12 +160,12 @@ def uninstaller(tk):
         "delete_modules"], variable=frame.delete_modules)
     start_uninstall = tkinter.Button(frame, text="Uninstall" if not lang else lang["uninstaller"]["uninstall"],
                                      width=10, height=3,
-                                     command=lambda: uninstall(frame.delete_assets.get(),
+                                     command=lambda: threading.Thread(target=uninstall, args=(frame.delete_assets.get(),
                                                                frame.delete_code.get(),
                                                                frame.delete_track_related_stuff.get(),
                                                                frame.delete_themes.get(),
                                                                frame.delete_settings.get(),
-                                                               frame.delete_modules.get()))
+                                                               frame.delete_modules.get()), daemon=True).start())
     frame.grid_columnconfigure(0, weight=1)
     frame.grid_columnconfigure(1, weight=0)
     delete_assets_checkbox.grid(row=0, column=0, sticky="w", padx=5, pady=3)
@@ -179,6 +179,21 @@ def uninstaller(tk):
         colors.set_color(widget, palette)
 
     def uninstall(assets, code, tracks, themes, settings, modules):
+        for widget in tk.winfo_children():
+            widget.destroy()
+        tk.title("Uninstalling..." if not lang else lang["uninstaller"]["uninstalling"])
+        uninstalling_text1 = tkinter.Label(tk, text="Uninstalling..." if not lang else lang["uninstaller"]["uninstalling"])
+        uninstalling_text2 = tkinter.Label(tk,
+                                           text=f"This should not take long." if not lang else lang["uninstaller"][
+                                               "waiting"])
+        loading_bar = tkinter.ttk.Progressbar(tk, maximum=10, length=360, mode="indeterminate")
+        loading_bar.start()
+        uninstalling_text1.pack(padx=20, pady=20)
+        uninstalling_text2.pack(padx=20)
+        loading_bar.pack(padx=20, pady=20)
+        for widget in tk.winfo_children():
+            colors.set_color(widget, palette)
+        tk.protocol("WM_DELETE_WINDOW", lambda: None)
         trying=True
         all=False
         if assets and tracks and themes and settings:
@@ -222,11 +237,22 @@ def uninstaller(tk):
                 trying=False
             except FileNotFoundError:
                 pass
+        for widget in tk.winfo_children():
+            widget.destroy()
+        tk.protocol("WM_DELETE_WINDOW", lambda: tk.destroy())
+        tk.title("Uninstalled" if not lang else lang["uninstaller"]["uninstalled"])
+        uninstalling_text1 = tkinter.Label(tk, text="Uninstalled" if not lang else lang["uninstaller"]["uninstalled"])
+        uninstalling_text2 = tkinter.Label(tk, text="You can close this app now." if not lang else lang["uninstaller"]["you_can_close"])
+        uninstalling_text1.pack(padx=20, pady=20)
+        uninstalling_text2.pack(padx=20)
+        for widget in tk.winfo_children():
+            colors.set_color(widget, palette)
 
 
 def start_installation(tk):
     for widget in tk.winfo_children():
         widget.destroy()
+    tk.protocol("WM_DELETE_WINDOW", lambda: None)
     installation_text1 = tkinter.Label(tk, text="Installing..." if not lang else lang["installer"]["installing"])
     installation_text2 = tkinter.Label(tk,
                                        text=f"Finished Steps: {finished_steps}/28" if not lang else lang["installer"][
@@ -260,6 +286,7 @@ def start_installation(tk):
                 finished_steps, 28))
         loading_bar["value"] = finished_steps
         if done_event.is_set():
+            tk.protocol("WM_DELETE_WINDOW", lambda: tk.destroy())
             tk.title("Installation Complete" if not lang else lang["installer"]["installation_complete"])
             for widget in tk.winfo_children():
                 widget.destroy()

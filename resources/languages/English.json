@@ -25,6 +25,10 @@
     "delete_themes": "Delete Themes",
     "delete_settings": "Delete Settings",
     "delete_modules": "Delete Modules",
+    "uninstalling": "Uninstalling...",
+    "waiting": "This should not take long.",
+    "uninstalled": "Uninstalled",
+    "you_can_close": "You can close this app now.",
     "uninstall": "DELETE"
   },
   "settings": {
