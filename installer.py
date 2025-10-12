@@ -131,6 +131,7 @@ palette = colors.load_palette()
 
 
 def uninstaller(tk):
+    """Shows the uninstaller UI."""
     tk.columnconfigure(0, weight=0)
     tk.columnconfigure(1, weight=0)
     tk.rowconfigure(0, weight=0)
@@ -179,6 +180,7 @@ def uninstaller(tk):
         colors.set_color(widget, palette)
 
     def uninstall(assets, code, tracks, themes, settings, modules):
+        """Uninstalls the wanted files."""
         for widget in tk.winfo_children():
             widget.destroy()
         tk.title("Uninstalling..." if not lang else lang["uninstaller"]["uninstalling"])
@@ -239,6 +241,7 @@ def uninstaller(tk):
                 pass
         for widget in tk.winfo_children():
             widget.destroy()
+        # Shows the finished installation view
         tk.protocol("WM_DELETE_WINDOW", lambda: tk.destroy())
         tk.title("Uninstalled" if not lang else lang["uninstaller"]["uninstalled"])
         uninstalling_text1 = tkinter.Label(tk, text="Uninstalled" if not lang else lang["uninstaller"]["uninstalled"])
@@ -250,6 +253,7 @@ def uninstaller(tk):
 
 
 def start_installation(tk):
+    """Shows the installation view."""
     for widget in tk.winfo_children():
         widget.destroy()
     tk.protocol("WM_DELETE_WINDOW", lambda: None)
