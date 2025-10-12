@@ -231,7 +231,7 @@ def start_installation(tk):
     installation_text2 = tkinter.Label(tk,
                                        text=f"Finished Steps: {finished_steps}/28" if not lang else lang["installer"][
                                            "finished_steps"].format(finished_steps, 28))
-    loading_bar = tkinter.ttk.Progressbar(tk, maximum=14, length=360)
+    loading_bar = tkinter.ttk.Progressbar(tk, maximum=28, length=360)
     installation_text3 = tkinter.Label(tk, text="Please wait until installation is complete." if not lang else
     lang["installer"]["please_wait"])
     installation_text1.pack(padx=20, pady=20)
