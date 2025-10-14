@@ -154,10 +154,10 @@ def run():
             if keys[pygame.K_ESCAPE]:
                 esc += 1
                 pg.fill((255, 0, 0), (0, height - 50, width // 200 * esc, 50))
-            if esc == 215:
-                running = False
             else:
                 esc = 0
+            if esc == 215:
+                running = False
 
             # intro fade-in
             if fadein < 255:
