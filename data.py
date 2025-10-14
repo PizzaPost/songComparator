@@ -80,9 +80,7 @@ def readPlaylist(filename: str) -> list:
     return tracks
 
 
-def details(
-    filename: str, searchContents: bool = False, searchPlaylists: bool = False
-) -> dict:
+def details(filename: str, searchContents: bool = False, searchPlaylists: bool = False) -> dict:
     """
     Reads a song comparator song/track details file and returns the details
     of the track.
@@ -162,9 +160,7 @@ def tracks(playlist: list):
     yield from playlist
 
 
-def trackSource(
-    track: dict, trackFolder: str = "resources/tracks/"
-) -> tuple[str, bool, bool]:
+def trackSource(track: dict, trackFolder: str = "resources/tracks/") -> tuple[str, bool, bool]:
     """
     Returns the source of a track, whether it is a stream (true) or a local file (false), and whether it contains video data.
 
@@ -203,3 +199,8 @@ def displayName(track: dict):
     artist = track.get("artist")
     title = track.get("title")
     return ((artist + " - ") if artist else "") + (title if title else "")
+
+
+def save_voting(ratings: list, title):
+    """Saves the votings in every category for the last played track."""
+    pass

@@ -48,6 +48,13 @@
     "playlist": "Wiedergabeliste",
     "track": "Titel"
   },
+  "voting": {
+    "submit": "Abgeben",
+    "relatability": "Beziehbarkeit",
+    "lyrics_quality": "Textqualität",
+    "beat_quality": "Beatqualität",
+    "beat_taste": "Beatgeschmack"
+  },
   "misc": {
     "yes": "Ja",
     "no": "Nein"

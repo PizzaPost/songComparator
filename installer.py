@@ -34,10 +34,12 @@ import colors
 
 finished_steps = 1
 done_event = threading.Event()
-necessary_files = ["resources/assets/icon.png", "resources/assets/icon_white.png", "resources/assets/mute.png", "resources/languages/Deutsch.json",
-                   "resources/languages/English.json"]
+necessary_files = ["resources/assets/icon.png", "resources/assets/icon_white.png", "resources/assets/mute.png",
+                   "resources/assets/star.png", "resources/assets/star_filled.png",
+                   "resources/assets/star_highlighted.png"
+                   "resources/languages/Deutsch.json", "resources/languages/English.json"]
 custom_modules = ["colors", "data", "main", "misc", "settings", "stats", "visuals", "window"]
-official_modules=["pyvidplayer2", "pygame", "customtkinter", "yt-dlp", "pillow"]
+official_modules = ["pyvidplayer2", "pygame", "customtkinter", "yt-dlp", "pillow"]
 trying = True
 palette = None
 
@@ -161,12 +163,14 @@ def uninstaller(tk):
         "delete_modules"], variable=frame.delete_modules)
     start_uninstall = tkinter.Button(frame, text="Uninstall" if not lang else lang["uninstaller"]["uninstall"],
                                      width=10, height=3,
-                                     command=lambda: threading.Thread(target=uninstall, args=(frame.delete_assets.get(),
-                                                               frame.delete_code.get(),
-                                                               frame.delete_track_related_stuff.get(),
-                                                               frame.delete_themes.get(),
-                                                               frame.delete_settings.get(),
-                                                               frame.delete_modules.get()), daemon=True).start())
+                                     command=lambda: threading.Thread(target=uninstall,
+                                                                      args=(frame.delete_assets.get(),
+                                                                            frame.delete_code.get(),
+                                                                            frame.delete_track_related_stuff.get(),
+                                                                            frame.delete_themes.get(),
+                                                                            frame.delete_settings.get(),
+                                                                            frame.delete_modules.get()),
+                                                                      daemon=True).start())
     frame.grid_columnconfigure(0, weight=1)
     frame.grid_columnconfigure(1, weight=0)
     delete_assets_checkbox.grid(row=0, column=0, sticky="w", padx=5, pady=3)
@@ -184,7 +188,8 @@ def uninstaller(tk):
         for widget in tk.winfo_children():
             widget.destroy()
         tk.title("Uninstalling..." if not lang else lang["uninstaller"]["uninstalling"])
-        uninstalling_text1 = tkinter.Label(tk, text="Uninstalling..." if not lang else lang["uninstaller"]["uninstalling"])
+        uninstalling_text1 = tkinter.Label(tk,
+                                           text="Uninstalling..." if not lang else lang["uninstaller"]["uninstalling"])
         uninstalling_text2 = tkinter.Label(tk,
                                            text=f"This should not take long." if not lang else lang["uninstaller"][
                                                "waiting"])
@@ -196,18 +201,18 @@ def uninstaller(tk):
         for widget in tk.winfo_children():
             colors.set_color(widget, palette)
         tk.protocol("WM_DELETE_WINDOW", lambda: None)
-        trying=True
-        all=False
+        trying = True
+        all = False
         if assets and tracks and themes and settings:
-            all=True
+            all = True
         while trying:
             try:
                 if assets:
-                    assets=False
+                    assets = False
                     shutil.rmtree("resources/assets")
                     shutil.rmtree("resources/languages")
                 if code:
-                    code=False
+                    code = False
                     os.remove("colors.py")
                     os.remove("data.py")
                     os.remove("main.py")
@@ -217,26 +222,26 @@ def uninstaller(tk):
                     os.remove("visuals.py")
                     os.remove("window.py")
                 if tracks:
-                    tracks=False
+                    tracks = False
                     shutil.rmtree("resources/covers")
                     shutil.rmtree("resources/data")
                     shutil.rmtree("resources/details")
                     shutil.rmtree("resources/playlists")
                     shutil.rmtree("resources/tracks")
                 if themes:
-                    themes=False
+                    themes = False
                     shutil.rmtree("resources/themes")
                 if settings:
-                    settings=False
+                    settings = False
                     os.remove("resources/settings.json")
                 if modules:
-                    modules=False
+                    modules = False
                     for module in official_modules:
                         os.system(f"pip uninstall --yes {module}")
                 if all:
-                    all=False
+                    all = False
                     shutil.rmtree("resources")
-                trying=False
+                trying = False
             except FileNotFoundError:
                 pass
         for widget in tk.winfo_children():
@@ -245,7 +250,8 @@ def uninstaller(tk):
         tk.protocol("WM_DELETE_WINDOW", lambda: tk.destroy())
         tk.title("Uninstalled" if not lang else lang["uninstaller"]["uninstalled"])
         uninstalling_text1 = tkinter.Label(tk, text="Uninstalled" if not lang else lang["uninstaller"]["uninstalled"])
-        uninstalling_text2 = tkinter.Label(tk, text="You can close this app now." if not lang else lang["uninstaller"]["you_can_close"])
+        uninstalling_text2 = tkinter.Label(tk, text="You can close this app now." if not lang else lang["uninstaller"][
+            "you_can_close"])
         uninstalling_text1.pack(padx=20, pady=20)
         uninstalling_text2.pack(padx=20)
         for widget in tk.winfo_children():

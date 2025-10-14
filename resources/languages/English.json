@@ -48,6 +48,13 @@
     "playlist": "Playlist",
     "track": "Track"
   },
+  "voting": {
+    "submit": "Submit",
+    "relatability": "Relatability",
+    "lyrics_quality": "Lyrics Quality",
+    "beat_quality": "Beat Quality",
+    "beat_taste": "Beat Taste"
+  },
   "misc": {
     "yes": "Yes",
     "no": "No"

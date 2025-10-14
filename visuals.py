@@ -390,3 +390,83 @@ def calc_cover(track, width, height):
     cover_rect = scaledCover.get_rect()
     cover_rect.center = (width // 2, height // 2)
     return scaledCover, cover_rect
+
+
+star = pygame.image.load("resources/assets/star.png")
+star_highlighted = pygame.image.load("resources/assets/star_highlighted.png")
+star_filled = pygame.image.load("resources/assets/star_filled.png")
+
+
+class StarRating:
+    """Manages the state, event handling, and drawing for the rating screen."""
+
+    def __init__(self, x, y, label, font):
+        self.x = x
+        self.y = y
+        self.label = label
+        self.font = font
+        # state: rating is the clicked value, hover_rating is for visual feedback
+        self.rating = 0
+        self.hover_rating = 0
+        # create rectangles for collision detection
+        star_width = star.get_width()
+        self.star_rects = [star.get_rect(topleft=(self.x + star_width * i, self.y)) for i in range(5)]
+
+    def handle_event(self, event):
+        """Processes mouse events to update the widget state."""
+        mouse_pos = pygame.mouse.get_pos()
+        # update hover state based on current mouse position
+        self.hover_rating = 0
+        for i in range(4, -1, -1):
+            if self.star_rects[i].collidepoint(mouse_pos):
+                self.hover_rating = i + 1
+                break
+        # process clicks
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            if self.hover_rating > 0:  # if the click was on a star
+                self.rating = self.hover_rating
+        return self.star_rects[-1]
+
+    def draw(self, surface):
+        """Draws the label and stars based on the current state."""
+        # draw the label text
+        text_surface = self.font.render(self.label, True, (255, 255, 255))
+        surface.blit(text_surface, (self.x - 350, self.y + (star.get_height() - text_surface.get_height()) // 2))
+        # draw the 5 stars
+        for i in range(5):
+            star_index = i + 1
+            star_to_draw = star  # Default texture: star
+            # clicked state takes visual priority over the hover state
+            if star_index <= self.rating:
+                star_to_draw = star_filled
+            elif star_index <= self.hover_rating:
+                star_to_draw = star_highlighted
+            surface.blit(star_to_draw, self.star_rects[i].topleft)
+        return self.rating
+
+
+def setup_voting_widgets(width, height, font, lang):
+    """Creates and returns a list of all interactive StarRating widgets."""
+    widgets = []
+    categories = ["Relatability" if not lang else lang["voting"]["relatability"],
+                  "Lyrics Quality" if not lang else lang["voting"]["lyrics_quality"],
+                  "Beat Quality" if not lang else lang["voting"]["beat_quality"],
+                  "Beat Taste" if not lang else lang["voting"]["beat_taste"]]
+    y_levels = len(categories) * 2 + 1
+    start_x = width // 5
+    text_rect = font.render(categories[0], True, (255, 255, 255)).get_rect()
+
+    for i, category in enumerate(categories):
+        widget_y = (height // y_levels) * (i * 2) + (height // y_levels - text_rect.height // 2)
+        widgets.append(StarRating(start_x, widget_y, category, font))
+
+    return widgets
+
+
+def show_voting_screen(surface, widgets):
+    """Draws the voting widgets."""
+    ratings = []
+    for widget in widgets:
+        rating = widget.draw(surface)
+        ratings.append(rating)
+    return ratings
