@@ -17,15 +17,13 @@ def run():
     pygame.display.set_caption("Song Comparator")
     pygame.display.set_icon(pygame.image.load("resources/assets/icon.png"))
     clock = pygame.time.Clock()
+    track = None
     video = None
     coverActive = False
+    scaledCover = None
+    coverRect = None
     font = pygame.font.SysFont("Segoe UI", 48)
     manager = visuals.ButtonManager(font)
-    manager.add_button("Playlist" if not lang else lang["program"]["playlist"])
-    manager.add_button("Track" if not lang else lang["program"]["track"])
-    viewport = pygame.Rect(0, 0, width, height)  # full-screen viewport
-    manager.set_viewport(viewport)
-    manager.layout(center_x=viewport.centerx, center_y=viewport.centery, max_width=viewport.w)
     icon_white = pygame.image.load("resources/assets/icon_white.png")
     icon_white = pygame.transform.smoothscale_by(icon_white, 3)
     icon_white = pygame.transform.smoothscale(icon_white, (icon_white.get_width() // 4, icon_white.get_height() // 4))
@@ -33,12 +31,17 @@ def run():
     icon_white_width_half = icon_white.get_width() // 2
     icon_white_height_half = icon_white.get_height() // 2
     currentMenu = "main"
-    intro = False  # reset to True when finished
-    fadein = 255  # reset to 0 when finished
+    intro = False  # reset to True when finished coding
+    fadein = 255  # reset to 0 when finished coding
     y_intro = height // 2 - icon_white_height_half
     init_y_intro = y_intro
     main_font = pygame.font.SysFont("Segoe UI", 42, True)
     rating_widgets = visuals.setup_voting_widgets(width, height, main_font, lang)
+    mouse_1_up = False
+    wasSingleTrack = False
+    playedSongOnce = False
+    playlist = None
+    coverIndex = None
     while running:
         pg.fill((0, 0, 0))
         width, height = pg.get_size()
@@ -61,94 +64,162 @@ def run():
 
         # main app
         else:
-            clicks = manager.draw_and_handle(pg)
-            for c in clicks:
+            id, text = manager.draw_and_handle(pg, mouse_1_up)
+            if text:
                 manager.disable_all()
-                if currentMenu == "main":
+                if id == "menu":
                     manager.clear()
-                    if c == ("Playlist" if not lang else lang["program"]["playlist"]):
+                    if text == ("Playlist" if not lang else lang["program"]["playlist"]):
                         if len(os.listdir("resources/playlists")) > 1:
                             for playlist in os.listdir("resources/playlists"):
-                                manager.add_button(data.removeExtension(playlist))
-                                manager.layout(center_x=viewport.centerx, center_y=viewport.centery,
-                                               max_width=viewport.w)
-                                currentMenu = "playlistSelection"
+                                manager.add_button(data.removeExtension(playlist), "playlist")
+                            manager.layout(center_x=viewport.centerx, center_y=viewport.centery,
+                                           max_width=viewport.w)
+                            currentMenu = "playlistSelection"
                         else:
                             randomPlaylist = data.randomPlaylist()
                             playlist = data.readPlaylist(randomPlaylist)
-                            randomTrack = data.randomTrack(playlist)
-                            source, stream, isVideo = data.trackSource(randomTrack)
-                            pygame.mixer.music.stop()
-                            if video:
-                                video.stop()
-                                video = None
-                            if isVideo:
-                                coverActive = False
-                                video = pyvidplayer2.Video(source, youtube=stream)
-                                video.resize((width, height))
-                            else:
-                                pygame.mixer.music.load(source)
-                                coverActive = True
-                                scaledCover, cover_rect = visuals.calc_cover(randomTrack, width, height)
-                                pg.fill((0, 0, 0))
-                                pg.blit(scaledCover, cover_rect)
-                                pygame.mixer.music.play()
-                    elif c == ("Track" if not lang else lang["program"]["track"]):
+                            track = playlist[0]["path"]
+                            isVideo = playlist[0].get("isVideo", True)
+                            isStream = playlist[0].get("isStream", False)
+                            coverIndex = 0
+                            wasSingleTrack = False
+                    elif text == ("Track" if not lang else lang["program"]["track"]):
                         if len(os.listdir("resources/tracks")) > 1:
-                            for track in os.listdir("resources/tracks"):
+                            for iterated_track in os.listdir("resources/tracks"):
                                 manager.add_button(
-                                    data.displayName(data.details(track, True, True)) or data.removeExtension(track))
+                                    data.displayName(data.details(iterated_track, True, True)) or data.removeExtension(
+                                        iterated_track),
+                                    "track")
                                 manager.layout(center_x=viewport.centerx, center_y=viewport.centery,
                                                max_width=viewport.w)
-                                currentMenu = "trackSelection"
+                            currentMenu = "trackSelection"
                         else:
-                            video = pyvidplayer2.Video("resources/tracks/Aber sie.mp4")
-                            print(video)
-                elif currentMenu == "playlistSelection":
+                            wasSingleTrack = True
+                            tracks = os.listdir("resources/tracks")
+                            if len(tracks) == 1:
+                                track = tracks[0]
+                            """Smartly set isStream in the future"""
+                            isStream = False
+                            isVideo = True if track.endswith(
+                                (".mp4", ".webm", ".mov", ".avi", ".mkv", ".flv", ".m4v")) or isStream else False
+                            currentMenu = "watching"
+                    if text == ("Submit" if not lang else lang["voting"]["submit"]):
+                        playedSongOnce = False
+                        if wasSingleTrack:
+                            track = None
+                            video = None
+                            currentMenu = "main"
+                        else:
+                            video = None
+                            try:
+                                for x, i in enumerate(playlist):
+                                    if track == i["path"]:
+                                        track = playlist[x + 1]["path"]
+                                        coverIndex = x + 1
+                                        break
+                            except IndexError:
+                                track = None
+                                video = None
+                                currentMenu = "main"
+                        # (if) search in playlists
+                        '''if '''
+                        """     Pls add your logic here"""
+                        '''else:
+                            title=data.removeExtension(track)'''
+
+                        title = None  # dummy code
+                        data.save_voting(ratings, title)
+                elif id == "playlist":
                     pass
                     # play the selected playlist
-                elif currentMenu == "trackSelection":
+                elif id == "track":
                     pass
                     # play the selected track
-                elif currentMenu == "voting":
-                    if c == ("Submit" if not lang else lang["voting"]["submit"]):
-                        data.save_voting(ratings, title="")
                 else:
-                    print(f"{c} pressed")
+                    print(f"{text} pressed and could not be matched to any id.")
 
             # handle events
+            mouse_1_up = False
             keys = pygame.key.get_pressed()
             for event in pygame.event.get():
                 manager.handle_event(event)
                 if event.type == pygame.QUIT:
                     running = False
                 elif event.type == pygame.KEYUP:
+                    # track key controls
                     if video:
                         if event.key == pygame.K_j:
                             video.seek(-10)
-                        elif event.key == pygame.K_k:
+                        elif event.key == (pygame.K_k or pygame.K_SPACE):
                             video.toggle_pause()
                         elif event.key == pygame.K_l:
                             video.seek(10)
-                        elif event.key == pygame.K_SPACE:
-                            video.toggle_pause()
                         elif event.key == pygame.K_LEFT:
                             video.seek(-5)
                         elif event.key == pygame.K_UP:
                             video.set_volume(video.get_volume() + 0.1)
                         elif event.key == pygame.K_DOWN:
-                            video.set_volume(video.get_volume() - 0.1)
+                            video.set_volume(max(0.1, video.get_volume() - 0.1))
                         elif event.key == pygame.K_RIGHT:
                             video.seek(5)
-                if pygame.mouse.get_pressed()[0]:
-                    if video:
-                        video.toggle_pause()
+                    elif coverActive:
+                        if event.key == pygame.K_j:
+                            current_pos = pygame.mixer.music.get_pos()
+                            new_pos = max(0, current_pos - 10000)
+                            pygame.mixer.music.set_pos(new_pos / 1000)
+                        elif event.key == pygame.K_k or event.key == pygame.K_SPACE:
+                            if pygame.mixer.music.get_busy():
+                                pygame.mixer.music.pause()
+                            else:
+                                pygame.mixer.music.unpause()
+                        elif event.key == pygame.K_l:  # BUGGED!!!
+                            current_pos = pygame.mixer.music.get_pos()
+                            track_length = data.get_track_length(track)
+                            new_pos = min(current_pos + 10000, track_length)
+                            pygame.mixer.music.set_pos(new_pos / 1000)
+                        elif event.key == pygame.K_LEFT:
+                            current_pos = pygame.mixer.music.get_pos()
+                            new_pos = max(0, current_pos - 5000)
+                            pygame.mixer.music.set_pos(new_pos / 1000)
+                        elif event.key == pygame.K_UP:
+                            pygame.mixer.music.set_volume(pygame.mixer.music.get_volume() + 0.1)
+                        elif event.key == pygame.K_DOWN:
+                            pygame.mixer.music.set_volume(max(0.1, pygame.mixer.music.get_volume() - 0.1))
+                        elif event.key == pygame.K_RIGHT:  # BUGGED!!!
+                            current_pos = pygame.mixer.music.get_pos()
+                            track_length = data.get_track_length(track)
+                            new_pos = min(current_pos + 5000, track_length)
+                            pygame.mixer.music.set_pos(new_pos / 1000)
+                # track mouse controls
+                elif event.type == pygame.MOUSEBUTTONUP:
+                    if event.button == 1:
+                        mouse_1_up = True
+                        if video:
+                            video.toggle_pause()
+                        elif coverActive:
+                            if pygame.mixer.music.get_busy():
+                                pygame.mixer.music.pause()
+                            else:
+                                pygame.mixer.music.unpause()
+
                 for widget in rating_widgets:
                     last_rect = widget.handle_event(event)
 
             # draw video under the escape bar
             if video:
-                video.draw(pg, (0, 0))
+                if video.active:
+                    video.draw(pg, (0, 0))
+                    if video.frame == video.frame_count:
+                        currentMenu = "voting"
+                        rating_widgets = visuals.setup_voting_widgets(width, height, main_font, lang)
+            elif coverActive and currentMenu == "watching":
+                pg.blit(scaledCover, coverRect)
+                current_pos = pygame.mixer.music.get_pos()
+                track_length = data.get_track_length(track)
+                if current_pos >= track_length - 50:
+                    currentMenu = "voting"
+                    rating_widgets = visuals.setup_voting_widgets(width, height, main_font, lang)
 
             # quit app logic
             if keys[pygame.K_ESCAPE]:
@@ -171,6 +242,12 @@ def run():
 
             # main menu logic
             if currentMenu == "main":
+                manager.clear()
+                viewport = pygame.Rect(0, 0, width, height)
+                manager.set_viewport(viewport)
+                manager.add_button("Playlist" if not lang else lang["program"]["playlist"], "menu")
+                manager.add_button("Track" if not lang else lang["program"]["track"], "menu")
+                manager.layout(center_x=viewport.centerx, center_y=viewport.centery, max_width=viewport.w)
                 if len(os.listdir("resources/playlists")) < 1:
                     manager.set_enabled("Playlist" if not lang else lang["program"]["playlist"], False)
                 if len(os.listdir("resources/tracks")) < 1:
@@ -179,7 +256,7 @@ def run():
             # voting menu logic
             if currentMenu == "voting":
                 manager.clear()
-                button = manager.add_button("Submit" if not lang else lang["voting"]["submit"])
+                button = manager.add_button("Submit" if not lang else lang["voting"]["submit"], "menu")
                 space_rect_border_v = width - last_rect.x - last_rect.width
                 space_rect_border_h = height - (last_rect.y + last_rect.height)
                 viewport = pygame.Rect(width - space_rect_border_v, height - space_rect_border_h - button.h,
@@ -187,6 +264,53 @@ def run():
                 manager.set_viewport(viewport)
                 manager.layout(center_x=viewport.centerx, center_y=viewport.centery, max_width=viewport.w)
                 ratings = visuals.show_voting_screen(pg, rating_widgets)
+
+            # sets the next video or cover
+            if not video and track and not playedSongOnce:
+                currentMenu = "watching"
+                manager.clear()
+                if isVideo:
+                    if not video:
+                        coverActive = False
+                        video = pyvidplayer2.Video("resources/tracks/" + track, youtube=isStream)
+                        video.resize((width, height))
+                    elif not video.active:
+                        coverActive = False
+                        video = pyvidplayer2.Video("resources/tracks/" + track, youtube=isStream)
+                        video.resize((width, height))
+                else:
+                    current_pos = pygame.mixer.music.get_pos()
+                    track_length = data.get_track_length(track)
+                    if (
+                            current_pos <= track_length - 50) and not playedSongOnce and not currentMenu == "voting" and playlist and coverIndex:
+                        pygame.mixer.music.load("resources/tracks/" + track)
+                        pygame.mixer.music.play()
+                        coverActive = True
+                        cover = playlist[coverIndex]["cover"]
+                        scaledCover, coverRect = visuals.calc_cover(cover, width, height)
+                        playedSongOnce = True
+                    else:
+                        pygame.mixer.music.load("resources/tracks/" + track)
+                        pygame.mixer.music.play()
+                        coverActive = True
+                        coverFound = False
+                        for found_playlist in os.listdir("resources/playlists"):
+                            with open(f"resources/playlists/{found_playlist}", "r") as f:
+                                playlist_data = data.readPlaylist(found_playlist)
+                            f.close()
+                            for index, playlist_track in enumerate(playlist_data):
+                                if playlist_track["track"] == data.removeExtension(track):
+                                    cover = playlist_track["cover"]
+                                    if os.path.exists(f"resources/covers/{cover}"):
+                                        coverFound = True
+                                        break
+                            if coverFound:
+                                break
+                        if not coverFound:
+                            cover = None
+                            coverFound = False
+                        scaledCover, coverRect = visuals.calc_cover(cover, width, height, coverFound)
+                        playedSongOnce = True
         pygame.display.update()
         clock.tick(120)
     pygame.quit()

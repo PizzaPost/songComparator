@@ -4,6 +4,8 @@ import json
 import os
 import random
 
+import mutagen
+
 extensions = (
     {}
 )  # we will use custom file extensions (undercover json files) - find them below
@@ -204,3 +206,25 @@ def displayName(track: dict):
 def save_voting(ratings: list, title):
     """Saves the votings in every category for the last played track."""
     pass
+
+def get_track_length(track):
+    """Returns the length of a track in milliseconds.
+
+    Parameters
+    ----------
+    track : str
+        A track name in resources/tracks.
+
+    Returns
+    -------
+    length : int
+        The length of a track in milliseconds.
+
+    Fallback
+    -------
+        0: int
+    """
+    audio = mutagen.File(f"resources/tracks/{track}")
+    if audio is not None:
+        return int(audio.info.length * 1000)  # convert to milliseconds
+    return 0  # fallback

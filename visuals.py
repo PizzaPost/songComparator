@@ -5,7 +5,7 @@ class Button:
     """Represents a single rounded button with pixel-perfect rounded-corner hit-testing,
     hover and click visuals, and an enabled/disabled state."""
 
-    def __init__(self, text, font, size=None, radius=20,
+    def __init__(self, text, id, font, size=None, radius=20,
                  base_color=(255, 255, 255), hover_color=(200, 200, 200),
                  click_color=(150, 150, 150), disabled_color=(100, 100, 100),
                  padding_y=16):
@@ -21,6 +21,7 @@ class Button:
             padding_y (int): vertical padding used when auto-calculating height
         """
         self.text = text
+        self.id = id
         self.font = font
         self.padding_y = padding_y
         # calculate the width and height if not given
@@ -75,6 +76,9 @@ class Button:
         self.surf_disabled = make_surf(self.disabled_color)
         self.mask = pygame.mask.from_surface(self.surf_base)
 
+    def get_id(self, button):
+        return button.id
+
     def set_pos(self, x, y):
         """Set the top-left position of this button in content coordinates.
 
@@ -125,7 +129,7 @@ class Button:
                 inside = True
         self.hover = inside
 
-        # choose visual based on hover / pressed
+        # choose visual based on hover / pressing or neither
         if inside and mouse_down:
             surface.blit(self.surf_click, self.rect.topleft)
             return True
@@ -163,14 +167,14 @@ class ButtonManager:
         self._content_height = 0
         self._max_scroll = 0
 
-    def add_button(self, text, **kwargs):
+    def add_button(self, text, id, **kwargs):
         """Create and add a new Button to the manager.
 
         Returns
         -------
             Button: the created button instance
         """
-        b = Button(text, self.font, **kwargs)
+        b = Button(text, id, self.font, **kwargs)
         self.buttons.append(b)
         return b
 
@@ -285,7 +289,7 @@ class ButtonManager:
                 x += btn.w + self.spacing
             y += row_h + self.vspacing
 
-    def draw_and_handle(self, surface):
+    def draw_and_handle(self, surface, mouse_up):
         """Draw buttons inside the configured viewport and return clicked button texts.
 
         This function:
@@ -304,13 +308,15 @@ class ButtonManager:
         """
         mouse_pos = pygame.mouse.get_pos()
         mouse_down = pygame.mouse.get_pressed()[0]
-        clicked_names = []
 
         # restrict drawing to viewport
         old_clip = surface.get_clip()
         surface.set_clip(self.viewport)
 
         vx, vy = self.viewport.topleft
+
+        clicked_id = None
+        clicked_text = None
 
         for b in self.buttons:
             # calculate screen draw position = viewport.topleft + content_pos - scroll_y
@@ -342,27 +348,30 @@ class ButtonManager:
                     inside = False
 
             # draw the correct visual for this state
-            if inside and mouse_down:
+            if inside and mouse_up:
+                is_clicked = True
+            elif inside and mouse_down:
                 surface.blit(b.surf_click, (draw_x, draw_y))
-                is_down = True
-            elif inside:
+                is_clicked = False
+            elif inside and not mouse_down:
                 surface.blit(b.surf_hover, (draw_x, draw_y))
-                is_down = False
+                is_clicked = False
             else:
                 surface.blit(b.surf_base, (draw_x, draw_y))
-                is_down = False
+                is_clicked = False
 
             # click edge detection must only trigger when the click occurs inside visible button
-            if is_down and not self._prev_mouse_down:
-                clicked_names.append(b.text)
+            if is_clicked and not self._prev_mouse_down:
+                clicked_id = b.id
+                clicked_text = b.text
 
         # restore clip and update the previous mouse state
         surface.set_clip(old_clip)
-        self._prev_mouse_down = mouse_down
-        return clicked_names
+        self._prev_mouse_down = mouse_up
+        return clicked_id, clicked_text
 
 
-def calc_cover(track, width, height):
+def calc_cover(cover, width, height, coverFound=True):
     """Load and scale a track cover image to fill the screen while preserving the aspect ratio.
 
     Parameters
@@ -373,9 +382,9 @@ def calc_cover(track, width, height):
 
     Returns
     -------
-        tuple: (scaledCoverSurface, cover_rect) where cover_rect is centered on screen
+        tuple: (scaledCoverSurface, coverRect) where coverRect is centered on screen
     """
-    coverImage = pygame.image.load("resources/covers/" + track["cover"])
+    coverImage = pygame.image.load(("resources/covers/" + cover if coverFound else "resources/assets/tnf.png"))
     coverWidth, coverHeight = coverImage.get_size()
     aspectRatio = coverWidth / coverHeight
 
@@ -386,10 +395,13 @@ def calc_cover(track, width, height):
     else:
         coverHeight = height
         coverWidth = int(coverHeight * aspectRatio)
-    scaledCover = pygame.transform.scale(coverImage, (coverWidth, coverHeight))
-    cover_rect = scaledCover.get_rect()
-    cover_rect.center = (width // 2, height // 2)
-    return scaledCover, cover_rect
+    if coverFound:
+        scaledCover = pygame.transform.smoothscale(coverImage, (coverWidth, coverHeight))
+    else:
+        scaledCover = coverImage
+    coverRect = scaledCover.get_rect()
+    coverRect.center = (width // 2, height // 2)
+    return scaledCover, coverRect
 
 
 star = pygame.image.load("resources/assets/star.png")
@@ -459,7 +471,6 @@ def setup_voting_widgets(width, height, font, lang):
     for i, category in enumerate(categories):
         widget_y = (height // y_levels) * (i * 2) + (height // y_levels - text_rect.height // 2)
         widgets.append(StarRating(start_x, widget_y, category, font))
-
     return widgets
 
 

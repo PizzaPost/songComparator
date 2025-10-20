@@ -33,10 +33,11 @@ except ImportError:
 import colors
 
 finished_steps = 1
+number_of_steps = 29
 done_event = threading.Event()
 necessary_files = ["resources/assets/icon.png", "resources/assets/icon_white.png", "resources/assets/mute.png",
                    "resources/assets/star.png", "resources/assets/star_filled.png",
-                   "resources/assets/star_highlighted.png"
+                   "resources/assets/star_highlighted.png", "resources/assets/tnf.png",
                    "resources/languages/Deutsch.json", "resources/languages/English.json"]
 custom_modules = ["colors", "data", "main", "misc", "settings", "stats", "visuals", "window"]
 official_modules = ["pyvidplayer2", "pygame", "customtkinter", "yt-dlp", "pillow"]
@@ -265,9 +266,10 @@ def start_installation(tk):
     tk.protocol("WM_DELETE_WINDOW", lambda: None)
     installation_text1 = tkinter.Label(tk, text="Installing..." if not lang else lang["installer"]["installing"])
     installation_text2 = tkinter.Label(tk,
-                                       text=f"Finished Steps: {finished_steps}/28" if not lang else lang["installer"][
-                                           "finished_steps"].format(finished_steps, 28))
-    loading_bar = tkinter.ttk.Progressbar(tk, maximum=28, length=360)
+                                       text=f"Finished Steps: {finished_steps}/{number_of_steps}" if not lang else
+                                       lang["installer"][
+                                           "finished_steps"].format(finished_steps, number_of_steps))
+    loading_bar = tkinter.ttk.Progressbar(tk, maximum=number_of_steps, length=360)
     installation_text3 = tkinter.Label(tk, text="Please wait until installation is complete." if not lang else
     lang["installer"]["please_wait"])
     installation_text1.pack(padx=20, pady=20)
@@ -292,8 +294,9 @@ def start_installation(tk):
     def update_ui():
         """Updates the installer GUI."""
         installation_text2.config(
-            text=f"Finished Steps: {finished_steps}/28" if not lang else lang["installer"]["finished_steps"].format(
-                finished_steps, 28))
+            text=f"Finished Steps: {finished_steps}/{number_of_steps}" if not lang else lang["installer"][
+                "finished_steps"].format(
+                finished_steps, number_of_steps))
         loading_bar["value"] = finished_steps
         if done_event.is_set():
             tk.protocol("WM_DELETE_WINDOW", lambda: tk.destroy())
