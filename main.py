@@ -154,7 +154,10 @@ def run():
                         elif event.key == (pygame.K_k or pygame.K_SPACE):
                             video.toggle_pause()
                         elif event.key == pygame.K_l:
-                            video.seek(10)
+                            remaining_length = video.frame_count - video.frame
+                            if video.duration > (video.frame/video.frame_count)*video.duration+10:
+                                seek_amount = min(10, remaining_length)
+                                video.seek(seek_amount)
                         elif event.key == pygame.K_LEFT:
                             video.seek(-5)
                         elif event.key == pygame.K_UP:
@@ -162,7 +165,10 @@ def run():
                         elif event.key == pygame.K_DOWN:
                             video.set_volume(max(0.1, video.get_volume() - 0.1))
                         elif event.key == pygame.K_RIGHT:
-                            video.seek(5)
+                            remaining_length = video.frame_count - video.frame
+                            if video.duration > (video.frame / video.frame_count) * video.duration + 5:
+                                seek_amount = min(5, remaining_length)
+                                video.seek(seek_amount)
                     elif coverActive:
                         if event.key == pygame.K_j:
                             current_pos = pygame.mixer.music.get_pos()
