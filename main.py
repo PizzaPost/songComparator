@@ -153,24 +153,26 @@ def run():
                     if video:
                         if event.key == pygame.K_j:
                             video.seek(-10)
-                        elif event.key == (pygame.K_k or pygame.K_SPACE):
+                        elif event.key == pygame.K_k or event.key == pygame.K_SPACE:
                             video.toggle_pause()
-                        elif event.key == pygame.K_l:
-                            remaining_length = video.frame_count - video.frame
-                            if video.duration > (video.frame / video.frame_count) * video.duration + 10:
-                                seek_amount = min(10, remaining_length)
-                                video.seek(seek_amount)
+                        # I don't really know if it should be possible to skip forward
+                        # elif event.key == pygame.K_l:
+                        #     remaining_length = video.frame_count - video.frame
+                        #     if video.duration > (video.frame / video.frame_count) * video.duration + 10:
+                        #         seek_amount = min(10, remaining_length)
+                        #         video.seek(seek_amount)
                         elif event.key == pygame.K_LEFT:
                             video.seek(-5)
                         elif event.key == pygame.K_UP:
                             video.set_volume(video.get_volume() + 0.1)
                         elif event.key == pygame.K_DOWN:
                             video.set_volume(max(0.1, video.get_volume() - 0.1))
-                        elif event.key == pygame.K_RIGHT:
-                            remaining_length = video.frame_count - video.frame
-                            if video.duration > (video.frame / video.frame_count) * video.duration + 5:
-                                seek_amount = min(5, remaining_length)
-                                video.seek(seek_amount)
+                        # I don't really know if it should be possible to skip forward
+                        # elif event.key == pygame.K_RIGHT:
+                        #     remaining_length = video.frame_count - video.frame
+                        #     if video.duration > (video.frame / video.frame_count) * video.duration + 5:
+                        #         seek_amount = min(5, remaining_length)
+                        #         video.seek(seek_amount)
                     elif coverActive:
                         if event.key == pygame.K_j:
                             current_pos = pygame.mixer.music.get_pos()
@@ -181,11 +183,12 @@ def run():
                                 pygame.mixer.music.pause()
                             else:
                                 pygame.mixer.music.unpause()
-                        elif event.key == pygame.K_l:  # BUGGED!!!
-                            current_pos = pygame.mixer.music.get_pos()
-                            track_length = data.get_track_length(track)
-                            new_pos = min(current_pos + 10000, track_length)
-                            pygame.mixer.music.set_pos(new_pos / 1000)
+                        # I don't really know if it should be possible to skip forward
+                        # elif event.key == pygame.K_l:  # BUGGED!!!
+                        #     current_pos = pygame.mixer.music.get_pos()
+                        #     track_length = data.get_track_length(track)
+                        #     new_pos = min(current_pos + 10000, track_length)
+                        #     pygame.mixer.music.set_pos(new_pos / 1000)
                         elif event.key == pygame.K_LEFT:
                             current_pos = pygame.mixer.music.get_pos()
                             new_pos = max(0, current_pos - 5000)
@@ -194,11 +197,12 @@ def run():
                             pygame.mixer.music.set_volume(pygame.mixer.music.get_volume() + 0.1)
                         elif event.key == pygame.K_DOWN:
                             pygame.mixer.music.set_volume(max(0.1, pygame.mixer.music.get_volume() - 0.1))
-                        elif event.key == pygame.K_RIGHT:  # BUGGED!!!
-                            current_pos = pygame.mixer.music.get_pos()
-                            track_length = data.get_track_length(track)
-                            new_pos = min(current_pos + 5000, track_length)
-                            pygame.mixer.music.set_pos(new_pos / 1000)
+                        # I don't really know if it should be possible to skip forward
+                        # elif event.key == pygame.K_RIGHT:  # BUGGED!!!
+                        #     current_pos = pygame.mixer.music.get_pos()
+                        #     track_length = data.get_track_length(track)
+                        #     new_pos = min(current_pos + 5000, track_length)
+                        #     pygame.mixer.music.set_pos(new_pos / 1000)"""
                 # track mouse controls
                 elif event.type == pygame.MOUSEBUTTONUP:
                     if event.button == 1:
@@ -242,12 +246,19 @@ def run():
                 surface = pygame.Surface((int(width * video.frame / video.frame_count), 10))
                 surface.set_alpha(mouse_move_timeout)
                 surface.fill((61, 55, 107))
+                # FUTURE:
+                # current second
+                # duration
+                # display the title
+                # display the artist
+                # display extra notes
                 pg.blit(surface, (0, 0))
             if start_mouse_move_timeout:
                 mouse_move_timeout += 12
                 if mouse_move_timeout >= 2400:
                     start_mouse_move_timeout = False
                     mouse_move_timeout = 2400
+
             # quit app logic
             if keys[pygame.K_ESCAPE]:
                 esc += 1
