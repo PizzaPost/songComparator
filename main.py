@@ -42,6 +42,8 @@ def run():
     playedSongOnce = False
     playlist = None
     coverIndex = None
+    mouse_move_timeout = 0
+    start_mouse_move_timeout = False
     while running:
         pg.fill((0, 0, 0))
         width, height = pg.get_size()
@@ -155,7 +157,7 @@ def run():
                             video.toggle_pause()
                         elif event.key == pygame.K_l:
                             remaining_length = video.frame_count - video.frame
-                            if video.duration > (video.frame/video.frame_count)*video.duration+10:
+                            if video.duration > (video.frame / video.frame_count) * video.duration + 10:
                                 seek_amount = min(10, remaining_length)
                                 video.seek(seek_amount)
                         elif event.key == pygame.K_LEFT:
@@ -208,6 +210,12 @@ def run():
                                 pygame.mixer.music.pause()
                             else:
                                 pygame.mixer.music.unpause()
+                # video progressbar
+                elif event.type == pygame.MOUSEMOTION:
+                    if currentMenu == "watching":
+                        start_mouse_move_timeout = True
+                if currentMenu == "watching" and (video.paused or not pygame.mixer.music.get_busy()):
+                    start_mouse_move_timeout = True
 
                 for widget in rating_widgets:
                     last_rect = widget.handle_event(event)
@@ -227,6 +235,19 @@ def run():
                     currentMenu = "voting"
                     rating_widgets = visuals.setup_voting_widgets(width, height, main_font, lang)
 
+            # draw video progressbar
+            if mouse_move_timeout > 0 and currentMenu == "watching" and not start_mouse_move_timeout:
+                mouse_move_timeout -= 12
+            if mouse_move_timeout > 0 and currentMenu == "watching":
+                surface = pygame.Surface((int(width * video.frame / video.frame_count), 10))
+                surface.set_alpha(mouse_move_timeout)
+                surface.fill((61, 55, 107))
+                pg.blit(surface, (0, 0))
+            if start_mouse_move_timeout:
+                mouse_move_timeout += 12
+                if mouse_move_timeout >= 2400:
+                    start_mouse_move_timeout = False
+                    mouse_move_timeout = 2400
             # quit app logic
             if keys[pygame.K_ESCAPE]:
                 esc += 1
