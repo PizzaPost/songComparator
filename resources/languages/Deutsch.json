@@ -43,7 +43,8 @@
     "track_volume_label": "Musik:",
     "gui_volume_label": "Benutzeroberfläche:",
     "effects_volume_label": "Effekte:",
-    "close": "Schließen"
+    "close": "Schließen",
+    "submit_info": "Änderungen werden nach einem Neustart angezeigt."
   },
   "program": {
     "playlist": "Wiedergabeliste",

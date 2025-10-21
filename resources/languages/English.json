@@ -43,7 +43,8 @@
     "track_volume_label": "Tracks:",
     "gui_volume_label": "UI:",
     "effects_volume_label": "Effects:",
-    "close": "Close"
+    "close": "Close",
+    "submit_info": "Changed will be displayed after a restarting."
   },
   "program": {
     "playlist": "Playlist",

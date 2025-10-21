@@ -9,7 +9,7 @@ from customtkinter import CTkImage
 import misc
 
 
-def submit_settings(lang, theme, appearance_mode, language, master_volume, track_volume, gui_volume, effects_volume,
+def submit_settings(tk, lang, theme, appearance_mode, language, master_volume, track_volume, gui_volume, effects_volume,
                     enabled_audio):
     with open("resources/settings.json", "w") as f:
         json.dump({"theme": theme, "appearance_mode": appearance_mode, "language": language,
@@ -17,7 +17,10 @@ def submit_settings(lang, theme, appearance_mode, language, master_volume, track
                    "gui_volume": int(gui_volume), "effects_volume": int(effects_volume),
                    "enabled_audio": enabled_audio}, f, indent=4)
     f.close()
-    tkinter.messagebox.showinfo("Info", "Changed will be displayed after restarting.")
+    tkinter.messagebox.showinfo(
+        "Info",
+        "Changed will be displayed after a restarting." if not lang else lang["settings"]["submit_info"])
+    close_settings(tk, True)
 
 
 def open_settings():
@@ -134,7 +137,7 @@ def open_settings():
                                                        text=f"{"   " if value < 100 else ""}{"  " if value < 10 else ""}{value}%")
     seperator5 = customtkinter.CTkLabel(frame2, text="")
     submit = customtkinter.CTkButton(frame3, text="Submit" if not lang else lang["settings"]["submit"],
-                                     command=lambda: submit_settings(lang, themes_dropdown.get(), dark_mode.get(),
+                                     command=lambda: submit_settings(tk, lang, themes_dropdown.get(), dark_mode.get(),
                                                                      language_dropdown.get(), master_volume.get(),
                                                                      track_volume.get(), gui_volume.get(),
                                                                      effects_volume.get(), [False if master_volume.cget(
@@ -143,7 +146,7 @@ def open_settings():
                                              "state") == "disabled" else True, False if effects_volume.cget(
                                              "state") == "disabled" else True]))
     close = customtkinter.CTkButton(frame3, text="Close" if not lang else lang["settings"]["close"],
-                                    command=lambda: close_settings(tk))
+                                    command=lambda: close_settings(tk, False))
 
     frame.pack(fill="both", expand=True, padx=5, pady=5)
     frame2.pack()
@@ -226,9 +229,11 @@ def update_slider_colors(widgets, theme_colors):
                              button_hover_color=theme_colors["CTkSlider"]["button_color_disabled"])
 
 
-def close_settings(tk):
-    if tkinter.messagebox.askyesno("Close", "Are you sure you want to close the settings without saving?"):
+def close_settings(tk, saved):
+    if saved or tkinter.messagebox.askyesno("Close",
+                                            "Are you sure you want to close the settings without saving?"):
         tk.withdraw()
+
 
 if __name__ == "__main__":
     pass
