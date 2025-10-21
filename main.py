@@ -30,6 +30,9 @@ def run():
     manager2 = visuals.ButtonManager(font)
     manager3 = visuals.ButtonManager(emojiFont)
     manager3.add_button("⚙️", "menu")
+    full_screen_viewport = pygame.Rect(0, 0, width, height)
+    title_button_viewport = pygame.Rect(width - 200, height - 200, 200, 200)
+    title_viewport = pygame.Rect(0, 100, width, height - 100)
     icon_white = pygame.image.load("resources/assets/icon_white.png")
     icon_white = pygame.transform.smoothscale_by(icon_white, 3)
     icon_white = pygame.transform.smoothscale(icon_white, (icon_white.get_width() // 4, icon_white.get_height() // 4))
@@ -52,6 +55,8 @@ def run():
     start_mouse_move_timeout = False
     escaped = False
     settings_window = None
+    paused_by_esc = False
+    track_paused = None
     while running:
         pg.fill((0, 0, 0))
         width, height = pg.get_size()
@@ -89,8 +94,8 @@ def run():
                         if len(os.listdir("resources/playlists")) > 1:
                             for playlist in os.listdir("resources/playlists"):
                                 manager.add_button(data.removeExtension(playlist), "playlist")
-                            manager.layout(center_x=viewport.centerx, center_y=viewport.centery,
-                                           max_width=viewport.w)
+                            manager.layout(center_x=full_screen_viewport.centerx, center_y=full_screen_viewport.centery,
+                                           max_width=full_screen_viewport.w)
                             currentMenu = "playlistSelection"
                         else:
                             randomPlaylist = data.randomPlaylist()
@@ -107,8 +112,9 @@ def run():
                                     data.displayName(data.details(iterated_track, True, True)) or data.removeExtension(
                                         iterated_track),
                                     "track")
-                                manager.layout(center_x=viewport.centerx, center_y=viewport.centery,
-                                               max_width=viewport.w)
+                                manager.layout(center_x=full_screen_viewport.centerx,
+                                               center_y=full_screen_viewport.centery,
+                                               max_width=full_screen_viewport.w)
                             currentMenu = "trackSelection"
                         else:
                             wasSingleTrack = True
@@ -171,6 +177,10 @@ def run():
                             video.seek(-10)
                         elif event.key == pygame.K_k or event.key == pygame.K_SPACE:
                             video.toggle_pause()
+                            if track.paused:
+                                track_paused = True
+                            else:
+                                track_paused = False
                         # I don't really know if it should be possible to skip forward
                         # elif event.key == pygame.K_l:
                         #     remaining_length = video.frame_count - video.frame
@@ -197,8 +207,10 @@ def run():
                         elif event.key == pygame.K_k or event.key == pygame.K_SPACE:
                             if pygame.mixer.music.get_busy():
                                 pygame.mixer.music.pause()
+                                track_paused = True
                             else:
                                 pygame.mixer.music.unpause()
+                                track_paused = False
                         # I don't really know if it should be possible to skip forward
                         # elif event.key == pygame.K_l:  # BUGGED!!!
                         #     current_pos = pygame.mixer.music.get_pos()
@@ -221,15 +233,28 @@ def run():
                         #     pygame.mixer.music.set_pos(new_pos / 1000)"""
                 # track mouse controls
                 elif event.type == pygame.MOUSEBUTTONUP:
+                    mouse_pos = pygame.mouse.get_pos()
+                    mouse_over_any_button = (
+                            manager.is_mouse_over_any_button(mouse_pos) or
+                            manager3.is_mouse_over_any_button(mouse_pos) or
+                            (escaped or manager2.is_mouse_over_any_button(mouse_pos))
+                    )
                     if event.button == 1:
                         mouse_1_up = True
-                        if video:
-                            video.toggle_pause()
-                        elif coverActive:
-                            if pygame.mixer.music.get_busy():
-                                pygame.mixer.music.pause()
-                            else:
-                                pygame.mixer.music.unpause()
+                        if not text and not mouse_over_any_button:
+                            if video:
+                                video.toggle_pause()
+                                if video.paused:
+                                    track_paused = True
+                                else:
+                                    track_paused = False
+                            elif coverActive:
+                                if pygame.mixer.music.get_busy():
+                                    pygame.mixer.music.pause()
+                                    track_paused = True
+                                else:
+                                    pygame.mixer.music.unpause()
+                                    track_paused = False
                 # video progressbar
                 elif event.type == pygame.MOUSEMOTION:
                     if currentMenu == "watching":
@@ -300,11 +325,11 @@ def run():
             # main menu logic
             if currentMenu == "main":
                 manager.clear()
-                viewport = pygame.Rect(0, 0, width, height)
-                manager.set_viewport(viewport)
+                manager.set_viewport(full_screen_viewport)
                 manager.add_button("Playlist" if not lang else lang["program"]["playlist"], "menu")
                 manager.add_button("Track" if not lang else lang["program"]["track"], "menu")
-                manager.layout(center_x=viewport.centerx, center_y=viewport.centery, max_width=viewport.w)
+                manager.layout(center_x=full_screen_viewport.centerx, center_y=full_screen_viewport.centery,
+                               max_width=full_screen_viewport.w)
                 if len(os.listdir("resources/playlists")) < 1:
                     manager.set_enabled("Playlist" if not lang else lang["program"]["playlist"], False)
                 if len(os.listdir("resources/tracks")) < 1:
@@ -316,10 +341,11 @@ def run():
                 button = manager.add_button("Submit" if not lang else lang["voting"]["submit"], "menu")
                 space_rect_border_v = width - last_rect.x - last_rect.width
                 space_rect_border_h = height - (last_rect.y + last_rect.height)
-                viewport = pygame.Rect(width - space_rect_border_v, height - space_rect_border_h - button.h,
-                                       space_rect_border_v, button.h)
-                manager.set_viewport(viewport)
-                manager.layout(center_x=viewport.centerx, center_y=viewport.centery, max_width=viewport.w)
+                voting_viewport = pygame.Rect(width - space_rect_border_v, height - space_rect_border_h - button.h,
+                                              space_rect_border_v, button.h)
+                manager.set_viewport(voting_viewport)
+                manager.layout(center_x=voting_viewport.centerx, center_y=voting_viewport.centery,
+                               max_width=voting_viewport.w)
                 ratings = visuals.show_voting_screen(pg, rating_widgets)
 
             # sets the next video or cover
@@ -369,15 +395,22 @@ def run():
                         scaledCover, coverRect = visuals.calc_cover(cover, width, height, coverFound)
                         playedSongOnce = True
             if currentMenu == "main" or mouse_move_timeout > 0:
-                viewport = pygame.Rect(width - 200, height - 200, 200, 200)
-                manager3.set_viewport(viewport)
-                manager3.layout(center_x=viewport.centerx, center_y=viewport.centery, max_width=viewport.w)
+                manager3.set_viewport(title_button_viewport)
+                manager3.layout(center_x=title_button_viewport.centerx, center_y=title_button_viewport.centery,
+                                max_width=title_button_viewport.w)
                 id, text = manager3.draw_and_handle(pg, mouse_1_up)
                 if id == "menu":
                     if text == "⚙️":
                         escaped = True
                         manager3.set_enabled("⚙️", False)
             if escaped:
+                if video or coverActive:
+                    if not track_paused:
+                        paused_by_esc = True
+                        if video:
+                            video.pause()
+                        elif coverActive:
+                            pygame.mixer.music.pause()
                 esc_menu = pygame.Surface((width, height))
                 esc_menu.set_alpha(200)
                 esc_menu.fill((0, 0, 0))
@@ -388,9 +421,9 @@ def run():
                 manager2.add_button("Back", "esc_menu")
                 manager2.add_button("Settings", "esc_menu")
                 manager2.add_button("Calculate Data", "esc_menu")
-                viewport = pygame.Rect(0, 100, width, height - 100)
-                manager2.set_viewport(viewport)
-                manager2.layout(center_x=viewport.centerx, center_y=viewport.centery, max_width=viewport.w)
+                manager2.set_viewport(title_viewport)
+                manager2.layout(center_x=title_viewport.centerx, center_y=title_viewport.centery,
+                                max_width=title_viewport.w)
                 id, text = manager2.draw_and_handle(pg, mouse_1_up)
                 if id == "esc_menu":
                     if text == "Back":
@@ -405,6 +438,13 @@ def run():
                             frame._parent_canvas.yview_moveto(0)
                     elif text == "Calculate Data":
                         tkinter.messagebox.showinfo("Calculate Data", "This feature is not yet implemented")
+            else:
+                if paused_by_esc:
+                    if video:
+                        video.resume()
+                    elif coverActive:
+                        pygame.mixer.music.unpause()
+                    paused_by_esc = False
 
             # quit app logic
             if keys[pygame.K_ESCAPE]:

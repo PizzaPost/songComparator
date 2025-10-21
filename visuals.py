@@ -370,6 +370,41 @@ class ButtonManager:
         self._prev_mouse_down = mouse_up
         return clicked_id, clicked_text
 
+    def is_mouse_over_any_button(self, mouse_pos):
+        """Checks if the mouse is currently over any button (active or disabled doesn't matter).
+
+        Parameters
+        ----------
+            mouse_pos (tuple): mouse position in screen coordinates
+
+        Returns
+        -------
+            bool: True if mouse is over any button, otherwise False
+        """
+        vx, vy = self.viewport.topleft
+
+        for b in self.buttons:
+            # calculate screen position of this button
+            draw_x = vx + int(b.rect.x)
+            draw_y = vy + int(b.rect.y) - int(self.scroll_y)
+
+            # skip buttons completely outside viewport
+            if draw_y + b.h < vy or draw_y > vy + self.viewport.h:
+                continue
+
+            # local mouse coordinates relative to button position
+            local_mouse_x = mouse_pos[0] - draw_x
+            local_mouse_y = mouse_pos[1] - draw_y
+
+            # check if mouse is within button bounds and on visible pixel
+            if 0 <= local_mouse_x < b.w and 0 <= local_mouse_y < b.h:
+                try:
+                    if b.mask.get_at((int(local_mouse_x), int(local_mouse_y))):
+                        return True
+                except IndexError:
+                    continue
+        return False
+
 
 def calc_cover(cover, width, height, coverFound=True):
     """Load and scale a track cover image to fill the screen while preserving the aspect ratio.
