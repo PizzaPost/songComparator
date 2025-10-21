@@ -116,7 +116,7 @@ def build_ctk_theme_from_palette(p):
             "button_length": 0,
             "fg_color": [lighten(p["progress_trough"]), p["progress_trough"]],
             "progress_color": [lighten(p["progress_bar"]), p["progress_bar"]],
-            "button_color": [lighten(p["button_bg"]), p["button_bg"]],
+            "button_color": [lighten(p["progress_bar"]), p["progress_bar"]],
             "button_hover_color": [lighten(p["hover_red"]), p["hover_red"]],
             "button_color_disabled": [lighten(p["progress_trough"]), p["progress_trough"]],
             "progress_color_disabled": [lighten(p["progress_trough"]), p["progress_trough"]],

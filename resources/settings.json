@@ -1,7 +1,7 @@
 {
-    "language": "English",
     "theme": "default",
     "appearance_mode": "system",
+    "language": "English",
     "master_volume": 100,
     "track_volume": 100,
     "gui_volume": 100,

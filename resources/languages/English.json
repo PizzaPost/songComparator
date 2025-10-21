@@ -42,7 +42,8 @@
     "master_volume_label": "Master:",
     "track_volume_label": "Tracks:",
     "gui_volume_label": "UI:",
-    "effects_volume_label": "Effects:"
+    "effects_volume_label": "Effects:",
+    "close": "Close"
   },
   "program": {
     "playlist": "Playlist",

@@ -42,7 +42,8 @@
     "master_volume_label": "Gesamtlautstärke:",
     "track_volume_label": "Musik:",
     "gui_volume_label": "Benutzeroberfläche:",
-    "effects_volume_label": "Effekte:"
+    "effects_volume_label": "Effekte:",
+    "close": "Schließen"
   },
   "program": {
     "playlist": "Wiedergabeliste",

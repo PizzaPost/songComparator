@@ -185,7 +185,7 @@ class ButtonManager:
         self._content_height = 0
         self._max_scroll = 0
 
-    def set_enabled(self, text, state: bool):
+    def set_enabled(self, text, state: bool = True):
         """Enable/disable a button by its exact text label.
 
         Returns

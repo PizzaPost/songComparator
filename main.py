@@ -1,10 +1,12 @@
 import os
+import tkinter
 
 import pygame
 import pyvidplayer2
 
 import data
 import misc
+import settings
 import visuals
 
 
@@ -23,7 +25,11 @@ def run():
     scaledCover = None
     coverRect = None
     font = pygame.font.SysFont("Segoe UI", 48)
+    emojiFont = pygame.font.SysFont("segoeuiemoji", 48)
     manager = visuals.ButtonManager(font)
+    manager2 = visuals.ButtonManager(font)
+    manager3 = visuals.ButtonManager(emojiFont)
+    manager3.add_button("⚙️", "menu")
     icon_white = pygame.image.load("resources/assets/icon_white.png")
     icon_white = pygame.transform.smoothscale_by(icon_white, 3)
     icon_white = pygame.transform.smoothscale(icon_white, (icon_white.get_width() // 4, icon_white.get_height() // 4))
@@ -44,6 +50,8 @@ def run():
     coverIndex = None
     mouse_move_timeout = 0
     start_mouse_move_timeout = False
+    escaped = False
+    settings_window = None
     while running:
         pg.fill((0, 0, 0))
         width, height = pg.get_size()
@@ -66,6 +74,12 @@ def run():
 
         # main app
         else:
+            # update the settings window if possible
+            if settings_window:
+                try:
+                    settings_window.update()
+                except tkinter.TclError:
+                    settings_window = None
             id, text = manager.draw_and_handle(pg, mouse_1_up)
             if text:
                 manager.disable_all()
@@ -149,6 +163,8 @@ def run():
                 if event.type == pygame.QUIT:
                     running = False
                 elif event.type == pygame.KEYUP:
+                    if event.key == pygame.K_RETURN:
+                        escaped = True
                     # track key controls
                     if video:
                         if event.key == pygame.K_j:
@@ -349,6 +365,43 @@ def run():
                             coverFound = False
                         scaledCover, coverRect = visuals.calc_cover(cover, width, height, coverFound)
                         playedSongOnce = True
+            if currentMenu == "main" or mouse_move_timeout > 0:
+                viewport = pygame.Rect(width - 200, height - 200, 200, 200)
+                manager3.set_viewport(viewport)
+                manager3.layout(center_x=viewport.centerx, center_y=viewport.centery, max_width=viewport.w)
+                id, text = manager3.draw_and_handle(pg, mouse_1_up)
+                if id == "menu":
+                    if text == "⚙️":
+                        escaped = True
+                        manager3.set_enabled("⚙️", False)
+            if escaped:
+                esc_menu = pygame.Surface((width, height))
+                esc_menu.set_alpha(200)
+                esc_menu.fill((0, 0, 0))
+                pg.blit(esc_menu, (0, 0))
+                manager.set_enabled("Playlist" if not lang else lang["program"]["playlist"], False)
+                manager.set_enabled("Track" if not lang else lang["program"]["track"], False)
+                manager2.clear()
+                manager2.add_button("Back", "esc_menu")
+                manager2.add_button("Settings", "esc_menu")
+                manager2.add_button("Calculate Data", "esc_menu")
+                viewport = pygame.Rect(0, 100, width, height - 100)
+                manager2.set_viewport(viewport)
+                manager2.layout(center_x=viewport.centerx, center_y=viewport.centery, max_width=viewport.w)
+                id, text = manager2.draw_and_handle(pg, mouse_1_up)
+                if id == "esc_menu":
+                    if text == "Back":
+                        escaped = False
+                        manager3.set_enabled("⚙️")
+                    elif text == "Settings":
+                        if settings_window is None:
+                            settings_window, frame = settings.open_settings()
+                        else:
+                            settings_window.deiconify()
+                            settings_window.focus()
+                            frame._parent_canvas.yview_moveto(0)
+                    elif text == "Calculate Data":
+                        tkinter.messagebox.showinfo("Calculate Data", "This feature is not yet implemented")
         pygame.display.update()
         clock.tick(120)
     pygame.quit()

@@ -31,12 +31,15 @@ def open_settings():
     customtkinter.set_default_color_theme(f"resources/themes/{data['theme']}.json")
     theme_colors = json.load(open(f"resources/themes/{data["theme"]}.json", "r"))
     tk = customtkinter.CTk()
+    tk.overrideredirect(True)
     tk.title("Settings" if not lang else lang["settings"]["title"])
     tk.geometry(f"650x370+{tk.winfo_screenwidth() // 2 - 325}+{tk.winfo_screenheight() // 2 - 185}")
     tk.resizable(False, False)
     tk.attributes("-topmost", True)
 
     frame = customtkinter.CTkScrollableFrame(tk)
+    frame2 = customtkinter.CTkFrame(frame)
+    frame3 = customtkinter.CTkFrame(frame)
 
     with open(f"resources/themes/{data["theme"]}.json", "r") as f:
         data2 = json.load(f)
@@ -48,88 +51,89 @@ def open_settings():
             font = data2["CTkFont"]["macOS"]
         else:
             font = data2["CTkFont"]["default"]
-    title = customtkinter.CTkLabel(frame, text="Settings" if not lang else lang["settings"]["title"],
+    title = customtkinter.CTkLabel(frame2, text="Settings" if not lang else lang["settings"]["title"],
                                    font=(font, 32, "bold"))
-    seperator1 = customtkinter.CTkLabel(frame, text="")
-    themes_heading = customtkinter.CTkLabel(frame, text="Themes" if not lang else lang["settings"]["themes"],
+    seperator1 = customtkinter.CTkLabel(frame2, text="")
+    themes_heading = customtkinter.CTkLabel(frame2, text="Themes" if not lang else lang["settings"]["themes"],
                                             font=(font, 24, "bold"))
-    themes_dropdown = customtkinter.CTkOptionMenu(frame, values=themes)
-    warning1 = customtkinter.CTkLabel(frame,
+    themes_dropdown = customtkinter.CTkOptionMenu(frame2, values=themes)
+    warning1 = customtkinter.CTkLabel(frame2,
                                       text="⚠️ Please install more themes to use this feature ⚠️" if not lang else
                                       lang["settings"]["warning1"], text_color="red")
     if len(themes) <= 1:
         themes_dropdown.configure(state="disabled")
-    dark_mode = customtkinter.CTkOptionMenu(frame, values=["System", "Dark", "Light"])
+    dark_mode = customtkinter.CTkOptionMenu(frame2, values=["System", "Dark", "Light"])
     dark_mode.set(data["appearance_mode"])
-    warning2 = customtkinter.CTkLabel(frame,
+    warning2 = customtkinter.CTkLabel(frame2,
                                       text="⚠️ This feature may not be available for every theme ⚠️" if not lang else
                                       lang["settings"]["warning2"], text_color="orange")
-    seperator2 = customtkinter.CTkLabel(frame, text="")
-    language_heading = customtkinter.CTkLabel(frame, text="Language" if not lang else lang["settings"]["language"],
+    seperator2 = customtkinter.CTkLabel(frame2, text="")
+    language_heading = customtkinter.CTkLabel(frame2, text="Language" if not lang else lang["settings"]["language"],
                                               font=(font, 24, "bold"))
-    language_dropdown = customtkinter.CTkOptionMenu(frame, values=languages)
+    language_dropdown = customtkinter.CTkOptionMenu(frame2, values=languages)
     language_dropdown.set(data["language"])
-    seperator3 = customtkinter.CTkLabel(frame, text="")
-    audio_heading = customtkinter.CTkLabel(frame, text="Audio" if not lang else lang["settings"]["audio"],
+    seperator3 = customtkinter.CTkLabel(frame2, text="")
+    audio_heading = customtkinter.CTkLabel(frame2, text="Audio" if not lang else lang["settings"]["audio"],
                                            font=(font, 24, "bold"))
-    master_volume_label = customtkinter.CTkLabel(frame, text=f"Master Volume:" if not lang else lang["settings"][
+    master_volume_label = customtkinter.CTkLabel(frame2, text=f"Master Volume:" if not lang else lang["settings"][
         "master_volume_label"])
     mute_img = CTkImage(light_image=pillow.Image.open("resources/assets/mute.png"),
                         dark_image=pillow.Image.open("resources/assets/mute.png"), size=(25, 25))
-    master_volume_mute = customtkinter.CTkButton(frame, text="", image=mute_img, width=1, height=1,
-                                                 fg_color="transparent", hover_color=frame.cget("fg_color"),
+    master_volume_mute = customtkinter.CTkButton(frame2, text="", image=mute_img, width=1, height=1,
+                                                 fg_color="transparent", hover_color=frame2.cget("fg_color"),
                                                  command=lambda: change_everything(
                                                      [master_volume, track_volume, gui_volume, effects_volume],
                                                      theme_colors))
-    master_volume = customtkinter.CTkSlider(frame, from_=0, to=100,
+    master_volume = customtkinter.CTkSlider(frame2, from_=0, to=100,
                                             state="normal" if data["enabled_audio"][0] else "disabled",
                                             command=lambda event: update_volume(master_volume_percentage,
                                                                                 master_volume.get()))
     master_volume.set(data["master_volume"])
     value = int(master_volume.get())
-    master_volume_percentage = customtkinter.CTkLabel(frame,
+    master_volume_percentage = customtkinter.CTkLabel(frame2,
                                                       text=f"{"   " if value < 100 else ""}{"  " if value < 10 else ""}{value}%")
-    seperator4 = customtkinter.CTkLabel(frame, text="━" * 200, height=20, text_color="gray30")
-    track_volume_label = customtkinter.CTkLabel(frame, text=f"Track Volume:" if not lang else lang["settings"][
+    seperator4 = customtkinter.CTkLabel(frame2, text="━" * 200, height=20, text_color="gray30")
+    track_volume_label = customtkinter.CTkLabel(frame2, text=f"Track Volume:" if not lang else lang["settings"][
         "track_volume_label"])
-    track_volume_mute = customtkinter.CTkButton(frame, text="", image=mute_img, width=1, height=1,
-                                                fg_color="transparent", hover_color=frame.cget("fg_color"),
+    track_volume_mute = customtkinter.CTkButton(frame2, text="", image=mute_img, width=1, height=1,
+                                                fg_color="transparent", hover_color=frame2.cget("fg_color"),
                                                 command=lambda: change_state(track_volume, theme_colors))
-    track_volume = customtkinter.CTkSlider(frame, from_=0, to=100,
+    track_volume = customtkinter.CTkSlider(frame2, from_=0, to=100,
                                            state="normal" if data["enabled_audio"][1] else "disabled",
                                            command=lambda event: update_volume(track_volume_percentage,
                                                                                track_volume.get()))
     track_volume.set(data["track_volume"])
     value = int(track_volume.get())
-    track_volume_percentage = customtkinter.CTkLabel(frame,
+    track_volume_percentage = customtkinter.CTkLabel(frame2,
                                                      text=f"{"   " if value < 100 else ""}{"  " if value < 10 else ""}{value}%")
-    gui_volume_label = customtkinter.CTkLabel(frame,
+    gui_volume_label = customtkinter.CTkLabel(frame2,
                                               text=f"GUI Volume:" if not lang else lang["settings"]["gui_volume_label"])
-    gui_volume_mute = customtkinter.CTkButton(frame, text="", image=mute_img, width=1, height=1, fg_color="transparent",
-                                              hover_color=frame.cget("fg_color"),
+    gui_volume_mute = customtkinter.CTkButton(frame2, text="", image=mute_img, width=1, height=1,
+                                              fg_color="transparent",
+                                              hover_color=frame2.cget("fg_color"),
                                               command=lambda: change_state(gui_volume, theme_colors))
-    gui_volume = customtkinter.CTkSlider(frame, from_=0, to=100,
+    gui_volume = customtkinter.CTkSlider(frame2, from_=0, to=100,
                                          state="normal" if data["enabled_audio"][2] else "disabled",
                                          command=lambda event: update_volume(gui_volume_percentage, gui_volume.get()))
     gui_volume.set(data["gui_volume"])
     value = int(gui_volume.get())
-    gui_volume_percentage = customtkinter.CTkLabel(frame,
+    gui_volume_percentage = customtkinter.CTkLabel(frame2,
                                                    text=f"{"   " if value < 100 else ""}{"  " if value < 10 else ""}{value}%")
-    effects_volume_label = customtkinter.CTkLabel(frame, text=f"Effects Volume:" if not lang else lang["settings"][
+    effects_volume_label = customtkinter.CTkLabel(frame2, text=f"Effects Volume:" if not lang else lang["settings"][
         "effects_volume_label"])
-    effects_volume_mute = customtkinter.CTkButton(frame, text="", image=mute_img, width=1, height=1,
-                                                  fg_color="transparent", hover_color=frame.cget("fg_color"),
+    effects_volume_mute = customtkinter.CTkButton(frame2, text="", image=mute_img, width=1, height=1,
+                                                  fg_color="transparent", hover_color=frame2.cget("fg_color"),
                                                   command=lambda: change_state(effects_volume, theme_colors))
-    effects_volume = customtkinter.CTkSlider(frame, from_=0, to=100,
+    effects_volume = customtkinter.CTkSlider(frame2, from_=0, to=100,
                                              state="normal" if data["enabled_audio"][3] is True else "disabled",
                                              command=lambda event: update_volume(effects_volume_percentage,
                                                                                  effects_volume.get()))
     effects_volume.set(data["effects_volume"])
     value = int(effects_volume.get())
-    effects_volume_percentage = customtkinter.CTkLabel(frame,
+    effects_volume_percentage = customtkinter.CTkLabel(frame2,
                                                        text=f"{"   " if value < 100 else ""}{"  " if value < 10 else ""}{value}%")
-    seperator5 = customtkinter.CTkLabel(frame, text="")
-    submit = customtkinter.CTkButton(frame, text="Submit" if not lang else lang["settings"]["submit"],
+    seperator5 = customtkinter.CTkLabel(frame2, text="")
+    submit = customtkinter.CTkButton(frame3, text="Submit" if not lang else lang["settings"]["submit"],
                                      command=lambda: submit_settings(lang, themes_dropdown.get(), dark_mode.get(),
                                                                      language_dropdown.get(), master_volume.get(),
                                                                      track_volume.get(), gui_volume.get(),
@@ -138,10 +142,14 @@ def open_settings():
                                              "state") == "disabled" else True, False if gui_volume.cget(
                                              "state") == "disabled" else True, False if effects_volume.cget(
                                              "state") == "disabled" else True]))
+    close = customtkinter.CTkButton(frame3, text="Close" if not lang else lang["settings"]["close"],
+                                    command=lambda: close_settings(tk))
 
     frame.pack(fill="both", expand=True, padx=5, pady=5)
-    frame.grid_columnconfigure(0, weight=1)
-    frame.grid_columnconfigure(1, weight=1)
+    frame2.pack()
+    frame2.grid_columnconfigure(0, weight=1)
+    frame2.grid_columnconfigure(1, weight=1)
+    frame3.pack()
 
     title.grid(row=0, column=0, columnspan=4, pady=5, sticky="n")
     seperator1.grid(row=1, column=0)
@@ -173,9 +181,11 @@ def open_settings():
     effects_volume.grid(row=14, column=2, padx=5, sticky="e")
     effects_volume_percentage.grid(row=14, column=3, padx=5, sticky="e")
     seperator5.grid(row=15)
-    submit.grid(row=16, column=0, columnspan=4, pady=5, sticky="n")
+    submit.grid(row=16, column=0, columnspan=2, padx=15, pady=5, sticky="n")
+    close.grid(row=16, column=2, columnspan=2, padx=15, pady=5, sticky="n")
     update_slider_colors([master_volume, track_volume, gui_volume, effects_volume], theme_colors)
-    tk.mainloop()
+    tk.update()
+    return tk, frame
 
 
 def change_everything(audio_widgets, theme_colors):
@@ -216,5 +226,11 @@ def update_slider_colors(widgets, theme_colors):
                              button_hover_color=theme_colors["CTkSlider"]["button_color_disabled"])
 
 
+def close_settings(tk):
+    if tkinter.messagebox.askyesno("Close", "Are you sure you want to close the settings without saving?"):
+        tk.withdraw()
+
+
 if __name__ == "__main__":
-    open_settings()
+    settings_tk = open_settings()
+    settings_tk.mainloop()
