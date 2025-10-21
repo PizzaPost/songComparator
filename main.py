@@ -275,14 +275,6 @@ def run():
                     start_mouse_move_timeout = False
                     mouse_move_timeout = 2400
 
-            # quit app logic
-            if keys[pygame.K_ESCAPE]:
-                esc += 1
-                pg.fill((255, 0, 0), (0, height - 50, width // 200 * esc, 50))
-            else:
-                esc = 0
-            if esc == 215:
-                running = False
 
             # intro fade-in
             if fadein < 255:
@@ -402,6 +394,15 @@ def run():
                             frame._parent_canvas.yview_moveto(0)
                     elif text == "Calculate Data":
                         tkinter.messagebox.showinfo("Calculate Data", "This feature is not yet implemented")
+
+            # quit app logic
+            if keys[pygame.K_ESCAPE]:
+                esc += 1
+                pg.fill((255, 0, 0), (0, height - 50, width // 200 * esc, 50))
+            else:
+                esc = 0
+            if esc == 215:
+                running = False
         pygame.display.update()
         clock.tick(120)
     pygame.quit()

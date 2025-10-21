@@ -230,7 +230,5 @@ def close_settings(tk):
     if tkinter.messagebox.askyesno("Close", "Are you sure you want to close the settings without saving?"):
         tk.withdraw()
 
-
 if __name__ == "__main__":
-    settings_tk = open_settings()
-    settings_tk.mainloop()
+    pass
