@@ -234,7 +234,11 @@ def run():
                 elif event.type == pygame.MOUSEMOTION:
                     if currentMenu == "watching":
                         start_mouse_move_timeout = True
-                if currentMenu == "watching" and (video.paused or not pygame.mixer.music.get_busy()):
+                temp = False
+                if video:
+                    if video.paused:
+                        temp = True
+                if currentMenu == "watching" and (not pygame.mixer.music.get_busy() or temp):
                     start_mouse_move_timeout = True
 
                 for widget in rating_widgets:
@@ -259,22 +263,29 @@ def run():
             if mouse_move_timeout > 0 and currentMenu == "watching" and not start_mouse_move_timeout:
                 mouse_move_timeout -= 12
             if mouse_move_timeout > 0 and currentMenu == "watching":
-                surface = pygame.Surface((int(width * video.frame / video.frame_count), 10))
-                surface.set_alpha(mouse_move_timeout)
-                surface.fill((61, 55, 107))
+                video_progressbar_bg = pygame.Surface((width, 10))
+                if video:
+                    video_progressbar_fg = pygame.Surface((int(width * video.frame / video.frame_count), 10))
+                elif coverActive:
+                    video_progressbar_fg = pygame.Surface(
+                        (int(width * pygame.mixer.music.get_pos() / data.get_track_length(track)), 10))
+                video_progressbar_bg.fill((111, 105, 157))
+                video_progressbar_fg.set_alpha(mouse_move_timeout)
+                video_progressbar_fg.fill((51, 45, 97))
                 # FUTURE:
                 # current second
                 # duration
                 # display the title
                 # display the artist
                 # display extra notes
-                pg.blit(surface, (0, 0))
+                # queue
+                pg.blit(video_progressbar_bg, (0, 0))
+                pg.blit(video_progressbar_fg, (0, 0))
             if start_mouse_move_timeout:
                 mouse_move_timeout += 12
                 if mouse_move_timeout >= 2400:
                     start_mouse_move_timeout = False
                     mouse_move_timeout = 2400
-
 
             # intro fade-in
             if fadein < 255:
