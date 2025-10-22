@@ -26,6 +26,7 @@ extensions["playlists"] = [".scp", ".scpl"]
 
 #     tracks/
 #       <audio/video files (.mp3, .mp4, .m4a, .ogg, .wav)>
+trackFolder = "resources/tracks/"
 
 # note: reading non-custom file extensions is not done by this file.
 #       Updates to the compatibility of this program with more file types may not update this file immediately.
@@ -162,7 +163,7 @@ def tracks(playlist: list):
     yield from playlist
 
 
-def trackSource(track: dict, trackFolder: str = "resources/tracks/") -> tuple[str, bool, bool]:
+def trackSource(track: dict, trackFolder: str = trackFolder) -> tuple[str, bool, bool]:
     """
     Returns the source of a track, whether it is a stream (true) or a local file (false), and whether it contains video data.
 
@@ -224,7 +225,7 @@ def get_track_length(track):
     -------
         0: int
     """
-    audio = mutagen.File(f"resources/tracks/{track}")
+    audio = mutagen.File(f"{trackFolder}{track}")
     if audio is not None:
         return int(audio.info.length * 1000)  # convert to milliseconds
     return 0  # fallback
