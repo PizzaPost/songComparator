@@ -320,6 +320,8 @@ def run():
                 if mouse_move_timeout >= 2400:
                     start_mouse_move_timeout = False
                     mouse_move_timeout = 2400
+            if currentMenu!="watching":
+                mouse_move_timeout=0
 
             # intro fade-in
             if fadein < 255:
