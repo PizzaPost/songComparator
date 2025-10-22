@@ -150,7 +150,7 @@ def run():
                         '''else:
                             title=data.removeExtension(track)'''
 
-                        title = None  # dummy code
+                        title = track  # dummy code
                         data.save_voting(ratings, title)
                 elif id == "playlist":
                     pass
