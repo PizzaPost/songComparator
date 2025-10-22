@@ -100,7 +100,7 @@ def run():
                         else:
                             randomPlaylist = data.randomPlaylist()
                             playlist = data.readPlaylist(randomPlaylist)
-                            track = playlist[0]["path"]
+                            track = playlist[0]["track"]
                             isVideo = playlist[0].get("isVideo", True)
                             isStream = playlist[0].get("isStream", False)
                             coverIndex = 0
@@ -136,8 +136,8 @@ def run():
                             video = None
                             try:
                                 for x, i in enumerate(playlist):
-                                    if track == i["path"]:
-                                        track = playlist[x + 1]["path"]
+                                    if track == i["track"]:
+                                        track = playlist[x + 1]["track"]
                                         coverIndex = x + 1
                                         break
                             except IndexError:
