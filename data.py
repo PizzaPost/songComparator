@@ -14,6 +14,7 @@ extensions = (
 #   resources/
 #     covers/
 #       <image files (.jpg, .jpeg, .png, .gif, .svg, .webp)>
+coverfolder = "resources/covers/"
 #     details/
 detailsfolder = "resources/details/"
 #       <song comparator song/track details files (.scd, .scsd, .sctd)>
