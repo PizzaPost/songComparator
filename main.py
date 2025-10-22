@@ -85,7 +85,7 @@ def run():
                     settings_window.update()
                 except tkinter.TclError:
                     settings_window = None
-            id, text = manager.draw_and_handle(pg, mouse_1_up)
+            id, text, bdetails = manager.draw_and_handle(pg, mouse_1_up)
             if text:
                 manager.disable_all()
                 if id == "menu":
@@ -93,7 +93,7 @@ def run():
                     if text == ("Playlist" if not lang else lang["program"]["playlist"]):
                         if len(os.listdir("resources/playlists")) > 1:
                             for playlist in os.listdir("resources/playlists"):
-                                manager.add_button(data.removeExtension(playlist), "playlist")
+                                manager.add_button(data.removeExtension(playlist), "playlist", details=data.readPlaylist(playlist))
                             manager.layout(center_x=full_screen_viewport.centerx, center_y=full_screen_viewport.centery,
                                            max_width=full_screen_viewport.w)
                             currentMenu = "playlistSelection"
@@ -108,10 +108,11 @@ def run():
                     elif text == ("Track" if not lang else lang["program"]["track"]):
                         if len(os.listdir("resources/tracks")) > 1:
                             for iterated_track in os.listdir("resources/tracks"):
+                                trackDetails = data.details(iterated_track, True, True)
                                 manager.add_button(
-                                    data.displayName(data.details(iterated_track, True, True)) or data.removeExtension(
+                                    data.displayName(trackDetails) or data.removeExtension(
                                         iterated_track),
-                                    "track")
+                                    "track", details=trackDetails)
                                 manager.layout(center_x=full_screen_viewport.centerx,
                                                center_y=full_screen_viewport.centery,
                                                max_width=full_screen_viewport.w)
@@ -153,11 +154,18 @@ def run():
                         title = track  # dummy code
                         data.save_voting(ratings, title)
                 elif id == "playlist":
-                    pass
-                    # play the selected playlist
+                    playlist = bdetails
+                    track = playlist[0]["track"]
+                    isVideo = playlist[0].get("isVideo", True)
+                    isStream = True if playlist[0].get("url") else False
+                    coverIndex = 0
+                    wasSingleTrack = False
                 elif id == "track":
-                    pass
-                    # play the selected track
+                    trackDetails = bdetails
+                    track = trackDetails["track"]
+                    isVideo = trackDetails.get("isVideo", True)
+                    isStream = True if trackDetails.get("url") else False
+                    wasSingleTrack = True
                 else:
                     print(f"{text} pressed and could not be matched to any id.")
 
@@ -353,11 +361,7 @@ def run():
                 currentMenu = "watching"
                 manager.clear()
                 if isVideo:
-                    if not video:
-                        coverActive = False
-                        video = pyvidplayer2.Video("resources/tracks/" + track, youtube=isStream)
-                        video.resize((width, height))
-                    elif not video.active:
+                    if not video or not video.active:
                         coverActive = False
                         video = pyvidplayer2.Video("resources/tracks/" + track, youtube=isStream)
                         video.resize((width, height))
@@ -393,7 +397,7 @@ def run():
                 manager3.set_viewport(title_button_viewport)
                 manager3.layout(center_x=title_button_viewport.centerx, center_y=title_button_viewport.centery,
                                 max_width=title_button_viewport.w)
-                id, text = manager3.draw_and_handle(pg, mouse_1_up)
+                id, text, bdetails = manager3.draw_and_handle(pg, mouse_1_up)
                 if id == "menu":
                     if text == "⚙️":
                         escaped = True
@@ -419,7 +423,7 @@ def run():
                 manager2.set_viewport(title_viewport)
                 manager2.layout(center_x=title_viewport.centerx, center_y=title_viewport.centery,
                                 max_width=title_viewport.w)
-                id, text = manager2.draw_and_handle(pg, mouse_1_up)
+                id, text, bdetails = manager2.draw_and_handle(pg, mouse_1_up)
                 if id == "esc_menu":
                     if text == "Back":
                         escaped = False

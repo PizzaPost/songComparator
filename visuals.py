@@ -8,7 +8,7 @@ class Button:
     def __init__(self, text, id, font, size=None, radius=20,
                  base_color=(255, 255, 255), hover_color=(200, 200, 200),
                  click_color=(150, 150, 150), disabled_color=(100, 100, 100),
-                 padding_y=16):
+                 padding_y=16, details=None):
         """Create a Button.
 
         Parameters
@@ -22,6 +22,7 @@ class Button:
         """
         self.text = text
         self.id = id
+        self.details = details
         self.font = font
         self.padding_y = padding_y
         # calculate the width and height if not given
@@ -317,6 +318,7 @@ class ButtonManager:
 
         clicked_id = None
         clicked_text = None
+        clicked_details = None
 
         for b in self.buttons:
             # calculate screen draw position = viewport.topleft + content_pos - scroll_y
@@ -364,11 +366,12 @@ class ButtonManager:
             if is_clicked and not self._prev_mouse_down:
                 clicked_id = b.id
                 clicked_text = b.text
+                clicked_details = b.details
 
         # restore clip and update the previous mouse state
         surface.set_clip(old_clip)
         self._prev_mouse_down = mouse_up
-        return clicked_id, clicked_text
+        return clicked_id, clicked_text, clicked_details
 
     def is_mouse_over_any_button(self, mouse_pos):
         """Checks if the mouse is currently over any button (active or disabled doesn't matter).
