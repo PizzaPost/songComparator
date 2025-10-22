@@ -23,16 +23,9 @@ extensions["details"] = [".scd", ".scsd", ".sctd"]
 playlistfolder = "resources/playlists/"
 #       <song comparator playlist files (.scpl, .scp)>
 extensions["playlists"] = [".scp", ".scpl"]
-
-
 #     tracks/
 #       <audio/video files (.mp3, .mp4, .m4a, .ogg, .wav)>
-trackFolder = "resources/tracks/"
-
-# note: reading non-custom file extensions is not done by this file.
-#       Updates to the compatibility of this program with more file types may not update this file immediately.
-#       For an up-to-date list of supported file types, see the documentation, or refer to visuals.py.
-
+trackfolder = "resources/tracks/"
 
 def randomPlaylist() -> str:
     """
@@ -164,7 +157,7 @@ def tracks(playlist: list):
     yield from playlist
 
 
-def trackSource(track: dict, trackFolder: str = trackFolder) -> tuple[str, bool, bool]:
+def trackSource(track: dict, trackFolder: str = trackfolder) -> tuple[str, bool, bool]:
     """
     Returns the source of a track, whether it is a stream (true) or a local file (false), and whether it contains video data.
 
@@ -226,7 +219,13 @@ def get_track_length(track):
     -------
         0: int
     """
-    audio = mutagen.File(f"{trackFolder}{track}")
+    audio = mutagen.File(f"{trackfolder}{track}")
     if audio is not None:
         return int(audio.info.length * 1000)  # convert to milliseconds
     return 0  # fallback
+
+def listTrackFolder():
+    return os.listdir(trackfolder)
+
+def listPlaylistFolder():
+    return os.listdir(playlistfolder)

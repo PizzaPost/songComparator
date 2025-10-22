@@ -91,8 +91,8 @@ def run():
                 if id == "menu":
                     manager.clear()
                     if text == ("Playlist" if not lang else lang["program"]["playlist"]):
-                        if len(os.listdir("resources/playlists")) > 1:
-                            for playlist in os.listdir("resources/playlists"):
+                        if len(data.listPlaylistFolder()) > 1:
+                            for playlist in data.listPlaylistFolder():
                                 manager.add_button(data.removeExtension(playlist), "playlist", details=data.readPlaylist(playlist))
                             manager.layout(center_x=full_screen_viewport.centerx, center_y=full_screen_viewport.centery,
                                            max_width=full_screen_viewport.w)
@@ -100,14 +100,15 @@ def run():
                         else:
                             randomPlaylist = data.randomPlaylist()
                             playlist = data.readPlaylist(randomPlaylist)
+                            trackDetails = playlist[0]
                             track = playlist[0]["track"]
                             isVideo = playlist[0].get("isVideo", True)
                             isStream = True if playlist[0].get("url") else False
                             coverIndex = 0
                             wasSingleTrack = False
                     elif text == ("Track" if not lang else lang["program"]["track"]):
-                        if len(os.listdir("resources/tracks")) > 1:
-                            for iterated_track in os.listdir("resources/tracks"):
+                        if len(data.listTrackFolder()) > 1:
+                            for iterated_track in data.listTrackFolder():
                                 trackDetails = data.details(iterated_track, True, True)
                                 manager.add_button(
                                     data.displayName(trackDetails) or data.removeExtension(
@@ -119,7 +120,7 @@ def run():
                             currentMenu = "trackSelection"
                         else:
                             wasSingleTrack = True
-                            tracks = os.listdir("resources/tracks")
+                            tracks = data.listTrackFolder()
                             if len(tracks) == 1:
                                 track = tracks[0]
                             """Smartly set isStream in the future"""
@@ -338,9 +339,9 @@ def run():
                 manager.add_button("Track" if not lang else lang["program"]["track"], "menu")
                 manager.layout(center_x=full_screen_viewport.centerx, center_y=full_screen_viewport.centery,
                                max_width=full_screen_viewport.w)
-                if len(os.listdir("resources/playlists")) < 1:
+                if len(data.listPlaylistFolder()) < 1:
                     manager.set_enabled("Playlist" if not lang else lang["program"]["playlist"], False)
-                if len(os.listdir("resources/tracks")) < 1:
+                if len(data.listTrackFolder()) < 1:
                     manager.set_enabled("Track" if not lang else lang["program"]["track"], False)
 
             # voting menu logic
@@ -363,21 +364,21 @@ def run():
                 if isVideo:
                     if not video or not video.active:
                         coverActive = False
-                        video = pyvidplayer2.Video("resources/tracks/" + track, youtube=isStream)
+                        video = pyvidplayer2.Video(data.trackfolder + track, youtube=isStream)
                         video.resize((width, height))
                 else:
                     current_pos = pygame.mixer.music.get_pos()
                     track_length = data.get_track_length(track)
                     if ((current_pos <= track_length - 50) and not playedSongOnce and not currentMenu == "voting"
                             and playlist and coverIndex):
-                        pygame.mixer.music.load("resources/tracks/" + track)
+                        pygame.mixer.music.load(data.trackfolder + track)
                         pygame.mixer.music.play()
                         coverActive = True
                         cover = playlist[coverIndex]["cover"]
                         scaledCover, coverRect = visuals.calc_cover(cover, width, height)
                         playedSongOnce = True
                     else:
-                        pygame.mixer.music.load("resources/tracks/" + track)
+                        pygame.mixer.music.load(data.trackfolder + track)
                         pygame.mixer.music.play()
                         coverActive = True
                         details=data.details(track, True, True)
