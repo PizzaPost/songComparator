@@ -406,12 +406,12 @@ class ButtonManager:
         return False
 
 
-def calc_cover(cover, width, height, coverFound=True):
+def calc_cover(cover: str, width, height, coverFound=True):
     """Load and scale a track cover image to fill the screen while preserving the aspect ratio.
 
     Parameters
     ----------
-        track (dict): track metadata containing "cover" filename
+        cover (str): track "cover" filename
         width (int): available width (usually screen width)
         height (int): available height (usually screen height)
 
