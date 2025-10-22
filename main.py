@@ -177,7 +177,7 @@ def run():
                             video.seek(-10)
                         elif event.key == pygame.K_k or event.key == pygame.K_SPACE:
                             video.toggle_pause()
-                            if track.paused:
+                            if video.paused:
                                 track_paused = True
                             else:
                                 track_paused = False
