@@ -364,8 +364,8 @@ def run():
                 else:
                     current_pos = pygame.mixer.music.get_pos()
                     track_length = data.get_track_length(track)
-                    if (
-                            current_pos <= track_length - 50) and not playedSongOnce and not currentMenu == "voting" and playlist and coverIndex:
+                    if ((current_pos <= track_length - 50) and not playedSongOnce and not currentMenu == "voting"
+                            and playlist and coverIndex):
                         pygame.mixer.music.load("resources/tracks/" + track)
                         pygame.mixer.music.play()
                         coverActive = True
@@ -376,22 +376,17 @@ def run():
                         pygame.mixer.music.load("resources/tracks/" + track)
                         pygame.mixer.music.play()
                         coverActive = True
-                        coverFound = False
-                        for found_playlist in os.listdir("resources/playlists"):
-                            with open(f"resources/playlists/{found_playlist}", "r") as f:
-                                playlist_data = data.readPlaylist(found_playlist)
-                            f.close()
-                            for index, playlist_track in enumerate(playlist_data):
-                                if playlist_track["track"] == track:
-                                    cover = playlist_track["cover"]
-                                    if os.path.exists(f"resources/covers/{cover}"):
-                                        coverFound = True
-                                        break
-                            if coverFound:
-                                break
-                        if not coverFound:
-                            cover = None
+                        details=data.details(track, True, True)
+                        if "cover" in details and details["cover"]:
+                            if os.path.exists(f"resources/covers/{details["cover"]}"):
+                                coverFound = True
+                                cover = details["cover"]
+                            else:
+                                coverFound = False
+                                cover = None
+                        else:
                             coverFound = False
+                            cover = None
                         scaledCover, coverRect = visuals.calc_cover(cover, width, height, coverFound)
                         playedSongOnce = True
             if currentMenu == "main" or mouse_move_timeout > 0:
