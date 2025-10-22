@@ -382,7 +382,7 @@ def run():
                                 playlist_data = data.readPlaylist(found_playlist)
                             f.close()
                             for index, playlist_track in enumerate(playlist_data):
-                                if playlist_track["track"] == data.removeExtension(track):
+                                if playlist_track["track"] == track:
                                     cover = playlist_track["cover"]
                                     if os.path.exists(f"resources/covers/{cover}"):
                                         coverFound = True
