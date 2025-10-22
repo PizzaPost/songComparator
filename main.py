@@ -102,7 +102,7 @@ def run():
                             playlist = data.readPlaylist(randomPlaylist)
                             track = playlist[0]["track"]
                             isVideo = playlist[0].get("isVideo", True)
-                            isStream = playlist[0].get("isStream", False)
+                            isStream = True if playlist[0].get("url") else False
                             coverIndex = 0
                             wasSingleTrack = False
                     elif text == ("Track" if not lang else lang["program"]["track"]):
