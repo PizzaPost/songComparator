@@ -57,6 +57,7 @@ def run():
     settings_window = None
     paused_by_esc = False
     track_paused = None
+    replay = False
     while running:
         pg.fill((0, 0, 0))
         width, height = pg.get_size()
@@ -76,6 +77,7 @@ def run():
                     pygame.display.update()
                     pygame.time.delay(17)
                 intro = False
+                data.add_value("sessions", 1)
 
         # main app
         else:
@@ -93,7 +95,8 @@ def run():
                     if text == ("Playlist" if not lang else lang["program"]["playlist"]):
                         if len(data.listPlaylistFolder()) > 1:
                             for playlist in data.listPlaylistFolder():
-                                manager.add_button(data.removeExtension(playlist), "playlist", details=data.readPlaylist(playlist))
+                                manager.add_button(data.removeExtension(playlist), "playlist",
+                                                   details=data.readPlaylist(playlist))
                             manager.layout(center_x=full_screen_viewport.centerx, center_y=full_screen_viewport.centery,
                                            max_width=full_screen_viewport.w)
                             currentMenu = "playlistSelection"
@@ -128,7 +131,7 @@ def run():
                             isVideo = True if track.endswith(
                                 (".mp4", ".webm", ".mov", ".avi", ".mkv", ".flv", ".m4v")) or isStream else False
                             currentMenu = "watching"
-                    if text == ("Submit" if not lang else lang["voting"]["submit"]):
+                    elif text == ("Submit" if not lang else lang["voting"]["submit"]):
                         playedSongOnce = False
                         if wasSingleTrack:
                             track = None
@@ -154,6 +157,8 @@ def run():
 
                         title = track  # dummy code
                         data.save_voting(ratings, title)
+                    elif text == ("Replay" if not lang else lang["voting"]["replay"]):
+                        replay = True
                 elif id == "playlist":
                     playlist = bdetails
                     track = playlist[0]["track"]
@@ -246,8 +251,7 @@ def run():
                     mouse_over_any_button = (
                             manager.is_mouse_over_any_button(mouse_pos) or
                             manager3.is_mouse_over_any_button(mouse_pos) or
-                            (escaped or manager2.is_mouse_over_any_button(mouse_pos))
-                    )
+                            (escaped or manager2.is_mouse_over_any_button(mouse_pos)))
                     if event.button == 1:
                         mouse_1_up = True
                         if not text and not mouse_over_any_button:
@@ -297,15 +301,16 @@ def run():
             if mouse_move_timeout > 0 and currentMenu == "watching" and not start_mouse_move_timeout:
                 mouse_move_timeout -= 12
             if mouse_move_timeout > 0 and currentMenu == "watching":
-                video_progressbar_bg = pygame.Surface((width, 10))
                 if video:
                     video_progressbar_fg = pygame.Surface((int(width * video.frame / video.frame_count), 10))
                 elif coverActive:
                     video_progressbar_fg = pygame.Surface(
                         (int(width * pygame.mixer.music.get_pos() / data.get_track_length(track)), 10))
+                video_progressbar_bg = pygame.Surface((width - video_progressbar_fg.get_width(), 10))
                 video_progressbar_bg.fill((111, 105, 157))
-                video_progressbar_fg.set_alpha(mouse_move_timeout)
                 video_progressbar_fg.fill((51, 45, 97))
+                video_progressbar_bg.set_alpha(mouse_move_timeout)
+                video_progressbar_fg.set_alpha(mouse_move_timeout)
                 # FUTURE:
                 # current second
                 # duration
@@ -313,25 +318,15 @@ def run():
                 # display the artist
                 # display extra notes
                 # queue
-                pg.blit(video_progressbar_bg, (0, 0))
+                pg.blit(video_progressbar_bg, (video_progressbar_fg.get_width(), 0))
                 pg.blit(video_progressbar_fg, (0, 0))
-            if start_mouse_move_timeout:
+            if start_mouse_move_timeout or track_paused:
                 mouse_move_timeout += 12
                 if mouse_move_timeout >= 2400:
                     start_mouse_move_timeout = False
                     mouse_move_timeout = 2400
-            if currentMenu!="watching":
-                mouse_move_timeout=0
-
-            # intro fade-in
-            if fadein < 255:
-                fade_surface = pygame.Surface((width, height))
-                fade_surface.set_alpha(255 - fadein)
-                fade_surface.fill((0, 0, 0))
-                pg.blit(fade_surface, (0, 0))
-                pygame.display.update()
-                pygame.time.delay(17)
-                fadein += 3
+            if currentMenu != "watching":
+                mouse_move_timeout = 0
 
             # main menu logic
             if currentMenu == "main":
@@ -349,6 +344,7 @@ def run():
             # voting menu logic
             if currentMenu == "voting":
                 manager.clear()
+                manager.add_button("Replay" if not lang else lang["voting"]["replay"], "menu")
                 button = manager.add_button("Submit" if not lang else lang["voting"]["submit"], "menu")
                 space_rect_border_v = width - last_rect.x - last_rect.width
                 space_rect_border_h = height - (last_rect.y + last_rect.height)
@@ -360,7 +356,8 @@ def run():
                 ratings = visuals.show_voting_screen(pg, rating_widgets)
 
             # sets the next video or cover
-            if not video and track and not playedSongOnce:
+            if (not video and track and not playedSongOnce) or replay:
+                replay = False
                 currentMenu = "watching"
                 manager.clear()
                 if isVideo:
@@ -383,7 +380,7 @@ def run():
                         pygame.mixer.music.load(data.trackfolder + track)
                         pygame.mixer.music.play()
                         coverActive = True
-                        details=data.details(track, True, True)
+                        details = data.details(track, True, True)
                         if "cover" in details and details["cover"]:
                             if os.path.exists(f"{data.coverfolder}{details["cover"]}"):
                                 coverFound = True
@@ -413,6 +410,7 @@ def run():
                             video.pause()
                         elif coverActive:
                             pygame.mixer.music.pause()
+                        track_paused = True
                 esc_menu = pygame.Surface((width, height))
                 esc_menu.set_alpha(200)
                 esc_menu.fill((0, 0, 0))
@@ -447,6 +445,7 @@ def run():
                     elif coverActive:
                         pygame.mixer.music.unpause()
                     paused_by_esc = False
+                    track_paused = False
 
             # quit app logic
             if keys[pygame.K_ESCAPE]:
@@ -456,6 +455,15 @@ def run():
                 esc = 0
             if esc == 215:
                 running = False
+            # intro fade-in
+            if fadein < 255:
+                fade_surface = pygame.Surface((width, height))
+                fade_surface.set_alpha(255 - fadein)
+                fade_surface.fill((0, 0, 0))
+                pg.blit(fade_surface, (0, 0))
+                pygame.display.update()
+                pygame.time.delay(17)
+                fadein += 3
         pygame.display.update()
         clock.tick(120)
     pygame.quit()

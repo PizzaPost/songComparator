@@ -27,6 +27,7 @@ extensions["playlists"] = [".scp", ".scpl"]
 #       <audio/video files (.mp3, .mp4, .m4a, .ogg, .wav)>
 trackfolder = "resources/tracks/"
 
+
 def randomPlaylist() -> str:
     """
     Returns the name of a random song comparator playlist file.
@@ -202,6 +203,7 @@ def save_voting(ratings: list, title):
     """Saves the votings in every category for the last played track."""
     pass
 
+
 def get_track_length(track):
     """Returns the length of a track in milliseconds.
 
@@ -224,8 +226,52 @@ def get_track_length(track):
         return int(audio.info.length * 1000)  # convert to milliseconds
     return 0  # fallback
 
+
 def listTrackFolder():
     return os.listdir(trackfolder)
 
+
 def listPlaylistFolder():
     return os.listdir(playlistfolder)
+
+
+def load_data(filename: str = "default"):
+    if os.path.exists(f"resources/data/{filename}.json"):
+        with open(f"resources/data/{filename}.json", "r", encoding="utf-8") as f:
+            data = json.load(f)
+            f.close()
+        return data
+    else:
+        with open(f"resources/data/{filename}.json", "w") as f:
+            json.dump({}, f, indent=4)
+            f.close()
+        return {}
+
+
+def set_value(key: str, value, filename: str = "default"):
+    data = load_data(filename)
+    data[key] = value
+    with open(f"resources/data/{filename}.json", "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=4)
+        f.close()
+
+
+def get_value(key: str, filename: str = "default"):
+    data = load_data(filename)
+    return data.get(key)
+
+
+def add_value(key: str, amount: int, filename: str = "default"):
+    data = load_data(filename)
+    data[key] = data.get(key, 0) + amount
+    with open(f"resources/data/{filename}.json", "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=4)
+        f.close()
+
+
+def change_bool(key: str, filename: str = "default"):
+    data = load_data(filename)
+    data[key] = not data.get(key)
+    with open(f"resources/data/{filename}.json", "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=4)
+        f.close()

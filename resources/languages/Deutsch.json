@@ -55,7 +55,8 @@
     "relatability": "Beziehbarkeit",
     "lyrics_quality": "Textqualität",
     "beat_quality": "Beatqualität",
-    "beat_taste": "Beatgeschmack"
+    "beat_taste": "Beatgeschmack",
+    "replay": "Wiederholen"
   },
   "misc": {
     "yes": "Ja",
