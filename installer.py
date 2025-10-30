@@ -33,12 +33,13 @@ except ImportError:
 import colors
 
 finished_steps = 1
-number_of_steps = 29
+number_of_steps = 32
 done_event = threading.Event()
 necessary_files = ["resources/assets/icon.png", "resources/assets/icon_white.png", "resources/assets/mute.png",
                    "resources/assets/star.png", "resources/assets/star_filled.png",
                    "resources/assets/star_highlighted.png", "resources/assets/tnf.png",
-                   "resources/languages/Deutsch.json", "resources/languages/English.json"]
+                   "resources/languages/Deutsch.json", "resources/languages/English.json",
+                   "resources/fonts/NotoEmoji.ttf", "resources/fonts/NotoSans.ttf"]
 custom_modules = ["colors", "data", "main", "misc", "settings", "stats", "visuals", "window"]
 official_modules = ["pyvidplayer2", "pygame", "customtkinter", "yt-dlp", "pillow"]
 trying = True
@@ -108,6 +109,8 @@ def installer():
         os.makedirs("resources/assets", exist_ok=True)
         finished_steps += 1
         os.makedirs("resources/languages", exist_ok=True)
+        finished_steps += 1
+        os.makedirs("resources/fonts", exist_ok=True)
         finished_steps += 1
 
         if not os.path.exists("resources/settings.json"):

@@ -24,10 +24,10 @@ def run():
     coverActive = False
     scaledCover = None
     coverRect = None
-    font = pygame.font.SysFont("Segoe UI", 48)
-    emojiFont = pygame.font.SysFont("segoeuiemoji", 48)
-    manager = visuals.ButtonManager(font)
-    manager2 = visuals.ButtonManager(font)
+    button_font = pygame.font.Font("resources/fonts/NotoSans.ttf", 48)
+    emojiFont = pygame.font.Font("resources/fonts/NotoEmoji.ttf", 48)
+    manager = visuals.ButtonManager(button_font)
+    manager2 = visuals.ButtonManager(button_font)
     manager3 = visuals.ButtonManager(emojiFont)
     manager3.add_button("⚙️", "menu")
     full_screen_viewport = pygame.Rect(0, 0, width, height)
@@ -45,7 +45,7 @@ def run():
     y_intro = height // 2 - icon_white_height_half
     init_y_intro = y_intro
     animation_state=0
-    main_font = pygame.font.SysFont("Segoe UI", 42, True)
+    main_font = pygame.font.Font("resources/fonts/NotoSans.ttf", 42)
     rating_widgets = visuals.setup_voting_widgets(width, height, main_font, lang)
     mouse_1_up = False
     wasSingleTrack = False
@@ -70,7 +70,7 @@ def run():
             pygame.draw.rect(pg, (0, 0, 0), (width // 2 - icon_white_width_half, y_intro, icon_white_width_half * 2,
                                              icon_white_height_half * 2))
             if animation_state>50:
-                text=pygame.font.SysFont("Segoe UI", 42, True).render("Song Comparator"[:(animation_state-50)//10], True, (255, 255, 255))
+                text=main_font.render("Song Comparator"[:(animation_state-50)//10], True, (255, 255, 255))
                 text.set_alpha(animation_state+50)
                 pg.blit(text, (width // 2 - text.get_width()//2, height // 2 + icon_white.get_height() // 2))
             y_intro -= 2
