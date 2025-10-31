@@ -4,15 +4,29 @@ import tkinter.messagebox
 
 import PIL as pillow
 import customtkinter
+import matplotlib.font_manager
 from customtkinter import CTkImage
 
 import misc
 
 
-def submit_settings(tk, lang, theme, appearance_mode, language, master_volume, track_volume, gui_volume, effects_volume,
+def submit_settings(tk, lang, theme, appearance_mode, language, font_dropdown, font_specifier, font_list, master_volume,
+                    track_volume, gui_volume,
+                    effects_volume,
                     enabled_audio):
+    selected_font_name = font_dropdown.get()
+    font = "resources/fonts/NotoSans.ttf"
+    if selected_font_name == "NotoSans (default)":
+        font = "resources/fonts/NotoSans.ttf"
+    else:
+        matching_fonts = [f for f in font_list if
+                          matplotlib.font_manager.FontProperties(fname=f).get_name() == selected_font_name]
+        if matching_fonts:
+            font = matching_fonts[0]
+            if font_specifier.get() != "Select a specific version.":
+                font = font_specifier.get()
     with open("resources/settings.json", "w") as f:
-        json.dump({"theme": theme, "appearance_mode": appearance_mode, "language": language,
+        json.dump({"theme": theme, "appearance_mode": appearance_mode, "language": language, "font": font,
                    "master_volume": int(master_volume), "track_volume": int(track_volume),
                    "gui_volume": int(gui_volume), "effects_volume": int(effects_volume),
                    "enabled_audio": enabled_audio}, f, indent=4)
@@ -23,8 +37,21 @@ def submit_settings(tk, lang, theme, appearance_mode, language, master_volume, t
     close_settings(tk, True)
 
 
+def update_font_specifier(lang, font_specifier, selected, font_list, startup=False, font_path=None):
+    matching_fonts = [f for f in font_list if matplotlib.font_manager.FontProperties(fname=f).get_name() == selected]
+    if selected == "NotoSans (default)" or len(matching_fonts) < 2:
+        font_specifier.grid_forget()
+    else:
+        font_specifier.grid(row=8, column=1, columnspan=2, padx=5, pady=5, sticky="w")
+    font_specifier.configure(values=matching_fonts)
+    if startup:
+        font_specifier.set(font_path)
+    else:
+        font_specifier.set("Select a specific version." if not lang else lang["settings"]["font_specifier_info"])
+
+
 def open_settings():
-    lang = misc.load_language()
+    lang = misc.load_language(misc.load_settings())
     with open("resources/settings.json", "r") as f:
         data = json.load(f)
     f.close()
@@ -71,10 +98,25 @@ def open_settings():
                                       text="⚠️ This feature may not be available for every theme ⚠️" if not lang else
                                       lang["settings"]["warning2"], text_color="orange")
     seperator2 = customtkinter.CTkLabel(frame2, text="")
-    language_heading = customtkinter.CTkLabel(frame2, text="Language" if not lang else lang["settings"]["language"],
+    language_heading = customtkinter.CTkLabel(frame2, text="Text" if not lang else lang["settings"]["text"],
                                               font=(font, 24, "bold"))
     language_dropdown = customtkinter.CTkOptionMenu(frame2, values=languages)
     language_dropdown.set(data["language"])
+    font_list = matplotlib.font_manager.findSystemFonts()
+    font_list.sort(key=lambda font_name: matplotlib.font_manager.FontProperties(fname=font_name).get_name())
+    font_list.insert(0, "resources/fonts/NotoSans.ttf")
+    names = ["NotoSans (default)" if font_name == "resources/fonts/NotoSans.ttf"
+             else matplotlib.font_manager.FontProperties(fname=font_name).get_name()
+             for font_name in font_list]
+    names = list(dict.fromkeys(names))
+    font_dropdown = customtkinter.CTkOptionMenu(frame2, values=names,
+                                                command=lambda selected: update_font_specifier(lang, font_specifier,
+                                                                                               font_dropdown.get(),
+                                                                                               font_list))
+    font_dropdown.set(matplotlib.font_manager.FontProperties(fname=data["font"]).get_name())
+    font_specifier = customtkinter.CTkOptionMenu(frame2, values=None)
+    font_specifier.set(data["font"])
+    update_font_specifier(lang, font_specifier, font_dropdown.get(), font_list, True, data["font"])
     seperator3 = customtkinter.CTkLabel(frame2, text="")
     audio_heading = customtkinter.CTkLabel(frame2, text="Audio" if not lang else lang["settings"]["audio"],
                                            font=(font, 24, "bold"))
@@ -138,13 +180,18 @@ def open_settings():
     seperator5 = customtkinter.CTkLabel(frame2, text="")
     submit = customtkinter.CTkButton(frame3, text="Submit" if not lang else lang["settings"]["submit"],
                                      command=lambda: submit_settings(tk, lang, themes_dropdown.get(), dark_mode.get(),
-                                                                     language_dropdown.get(), master_volume.get(),
-                                                                     track_volume.get(), gui_volume.get(),
-                                                                     effects_volume.get(), [False if master_volume.cget(
-                                             "state") == "disabled" else True, False if track_volume.cget(
-                                             "state") == "disabled" else True, False if gui_volume.cget(
-                                             "state") == "disabled" else True, False if effects_volume.cget(
-                                             "state") == "disabled" else True]))
+                                                                     language_dropdown.get(), font_dropdown,
+                                                                     font_specifier, font_list,
+                                                                     master_volume.get(), track_volume.get(),
+                                                                     gui_volume.get(), effects_volume.get(),
+                                                                     [False if master_volume.cget(
+                                                                         "state") == "disabled" else True,
+                                                                      False if track_volume.cget(
+                                                                          "state") == "disabled" else True,
+                                                                      False if gui_volume.cget(
+                                                                          "state") == "disabled" else True,
+                                                                      False if effects_volume.cget(
+                                                                          "state") == "disabled" else True]))
     close = customtkinter.CTkButton(frame3, text="Close" if not lang else lang["settings"]["close"],
                                     command=lambda: close_settings(tk, False))
 
@@ -164,28 +211,29 @@ def open_settings():
     seperator2.grid(row=5, column=0)
     language_heading.grid(row=6, column=0, padx=5, sticky="w")
     language_dropdown.grid(row=7, column=0, padx=5, pady=5, sticky="w")
-    seperator3.grid(row=8)
-    audio_heading.grid(row=9, column=0, pady=5, sticky="w")
-    master_volume_label.grid(row=10, column=0, padx=5, sticky="w")
-    master_volume_mute.grid(row=10, column=1, padx=5, sticky="e")
-    master_volume.grid(row=10, column=2, padx=5, sticky="e")
-    master_volume_percentage.grid(row=10, column=3, padx=5, sticky="e")
-    seperator4.grid(row=11, column=0, columnspan=4)
-    track_volume_label.grid(row=12, column=0, padx=5, sticky="w")
-    track_volume_mute.grid(row=12, column=1, padx=5, sticky="e")
-    track_volume.grid(row=12, column=2, padx=5, sticky="e")
-    track_volume_percentage.grid(row=12, column=3, padx=5, sticky="e")
-    gui_volume_label.grid(row=13, column=0, padx=5, sticky="w")
-    gui_volume_mute.grid(row=13, column=1, padx=5, sticky="e")
-    gui_volume.grid(row=13, column=2, padx=5, sticky="e")
-    gui_volume_percentage.grid(row=13, column=3, padx=5, sticky="e")
-    effects_volume_label.grid(row=14, column=0, padx=5, sticky="w")
-    effects_volume_mute.grid(row=14, column=1, padx=5, sticky="e")
-    effects_volume.grid(row=14, column=2, padx=5, sticky="e")
+    font_dropdown.grid(row=8, column=0, padx=5, pady=5, sticky="w")
+    seperator3.grid(row=9)
+    audio_heading.grid(row=10, column=0, pady=5, sticky="w")
+    master_volume_label.grid(row=11, column=0, padx=5, sticky="w")
+    master_volume_mute.grid(row=11, column=1, padx=5, sticky="e")
+    master_volume.grid(row=11, column=2, padx=5, sticky="e")
+    master_volume_percentage.grid(row=11, column=3, padx=5, sticky="e")
+    seperator4.grid(row=12, column=0, columnspan=4)
+    track_volume_label.grid(row=13, column=0, padx=5, sticky="w")
+    track_volume_mute.grid(row=13, column=1, padx=5, sticky="e")
+    track_volume.grid(row=13, column=2, padx=5, sticky="e")
+    track_volume_percentage.grid(row=13, column=3, padx=5, sticky="e")
+    gui_volume_label.grid(row=14, column=0, padx=5, sticky="w")
+    gui_volume_mute.grid(row=14, column=1, padx=5, sticky="e")
+    gui_volume.grid(row=14, column=2, padx=5, sticky="e")
+    gui_volume_percentage.grid(row=14, column=3, padx=5, sticky="e")
+    effects_volume_label.grid(row=15, column=0, padx=5, sticky="w")
+    effects_volume_mute.grid(row=15, column=1, padx=5, sticky="e")
+    effects_volume.grid(row=15, column=2, padx=5, sticky="e")
     effects_volume_percentage.grid(row=14, column=3, padx=5, sticky="e")
-    seperator5.grid(row=15)
-    submit.grid(row=16, column=0, columnspan=2, padx=15, pady=5, sticky="n")
-    close.grid(row=16, column=2, columnspan=2, padx=15, pady=5, sticky="n")
+    seperator5.grid(row=16)
+    submit.grid(row=17, column=0, columnspan=2, padx=15, pady=5, sticky="n")
+    close.grid(row=17, column=2, columnspan=2, padx=15, pady=5, sticky="n")
     update_slider_colors([master_volume, track_volume, gui_volume, effects_volume], theme_colors)
     tk.update()
     return tk, frame

@@ -36,7 +36,7 @@
     "themes": "Themes",
     "warning1": "⚠️ Please install more themes to use this feature ⚠️",
     "warning2": "⚠️ This feature may not be available for every theme ⚠️",
-    "language": "Language",
+    "text": "Text",
     "submit": "Submit",
     "audio": "Audio",
     "master_volume_label": "Master:",
@@ -44,7 +44,8 @@
     "gui_volume_label": "UI:",
     "effects_volume_label": "Effects:",
     "close": "Close",
-    "submit_info": "Changed will be displayed after a restarting."
+    "submit_info": "Changed will be displayed after a restarting.",
+    "font_specifier_info": "Select a specific version."
   },
   "program": {
     "playlist": "Playlist",

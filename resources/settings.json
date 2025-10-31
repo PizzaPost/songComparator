@@ -1,15 +1,16 @@
 {
-    "theme": "default",
-    "appearance_mode": "system",
-    "language": "English",
-    "master_volume": 100,
-    "track_volume": 100,
-    "gui_volume": 100,
-    "effects_volume": 100,
-    "enabled_audio": [
-        true,
-        true,
-        true,
-        true
-    ]
+  "theme": "default",
+  "appearance_mode": "system",
+  "language": "English",
+  "font": "C:\\Users\\Phil\\AppData\\Local\\Microsoft\\Windows\\Fonts\\ChalkboardSE-Light-01.ttf",
+  "master_volume": 100,
+  "track_volume": 100,
+  "gui_volume": 100,
+  "effects_volume": 100,
+  "enabled_audio": [
+    true,
+    true,
+    true,
+    true
+  ]
 }

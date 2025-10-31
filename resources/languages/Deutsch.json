@@ -36,7 +36,7 @@
     "themes": "Themen",
     "warning1": "⚠️ Bitte installiere mehr Themen, um diese Funktion zu nutzen ⚠️",
     "warning2": "⚠️ Diese Funktion ist möglicherweise nicht für jedes Thema verfügbar ⚠️",
-    "language": "Sprache",
+    "text": "Text",
     "submit": "Übernehmen",
     "audio": "Audio",
     "master_volume_label": "Gesamtlautstärke:",
@@ -44,7 +44,8 @@
     "gui_volume_label": "Benutzeroberfläche:",
     "effects_volume_label": "Effekte:",
     "close": "Schließen",
-    "submit_info": "Änderungen werden nach einem Neustart angezeigt."
+    "submit_info": "Änderungen werden nach einem Neustart angezeigt.",
+    "font_specifier_info": "Wähle eine bestimmte Version aus."
   },
   "program": {
     "playlist": "Wiedergabeliste",

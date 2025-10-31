@@ -5,7 +5,7 @@ try:
     try:
         import misc
 
-        lang = misc.load_language()
+        lang = misc.load_language(misc.load_settings())
     except ImportError:
         lang = None
     import tkinter.ttk
@@ -33,7 +33,7 @@ except ImportError:
 import colors
 
 finished_steps = 1
-number_of_steps = 32
+number_of_steps = 33
 done_event = threading.Event()
 necessary_files = ["resources/assets/icon.png", "resources/assets/icon_white.png", "resources/assets/mute.png",
                    "resources/assets/star.png", "resources/assets/star_filled.png",
@@ -41,7 +41,7 @@ necessary_files = ["resources/assets/icon.png", "resources/assets/icon_white.png
                    "resources/languages/Deutsch.json", "resources/languages/English.json",
                    "resources/fonts/NotoEmoji.ttf", "resources/fonts/NotoSans.ttf"]
 custom_modules = ["colors", "data", "main", "misc", "settings", "stats", "visuals", "window"]
-official_modules = ["pyvidplayer2", "pygame", "customtkinter", "yt-dlp", "pillow"]
+official_modules = ["pyvidplayer2", "pygame", "customtkinter", "yt-dlp", "pillow", "matplotlib"]
 trying = True
 palette = None
 
@@ -63,22 +63,24 @@ def installer():
                 finished_steps = 6
                 import PIL
                 finished_steps = 7
+                import matplotlib
+                finished_steps = 8
 
                 # checks custom modules
                 import data
-                finished_steps = 8
-                import main
                 finished_steps = 9
-                import misc
+                import main
                 finished_steps = 10
-                import settings
+                import misc
                 finished_steps = 11
-                import stats
+                import settings
                 finished_steps = 12
-                import visuals
+                import stats
                 finished_steps = 13
-                import window
+                import visuals
                 finished_steps = 14
+                import window
+                finished_steps = 15
 
                 trying = False
             except ImportError as e:
@@ -115,7 +117,7 @@ def installer():
 
         if not os.path.exists("resources/settings.json"):
             with open("resources/settings.json", "w") as f:
-                json.dump({"language": "English", "theme": "default", "appearance_mode": "system", "master_volume": 100,
+                json.dump({"theme": "default", "appearance_mode": "system", "language": "English", "font": "resources/fonts/NotoSans.ttf", "master_volume": 100,
                            "track_volume": 100, "gui_volume": 100, "effects_volume": 100,
                            "enabled_audio": [True, True, True, True]}, f, indent=4)
             f.close()

@@ -1,7 +1,7 @@
 import json
 
 
-def load_language(lang=None):
+def load_language(settings, lang=None):
     """loads the language file
 
     Parameters
@@ -21,10 +21,17 @@ def load_language(lang=None):
     """
     try:
         if lang is None:
-            lang = json.load(open("resources/settings.json", "r"))["language"]
+            lang = settings["language"]
         with open(f"resources/languages/{lang}.json", "r", encoding="utf-8") as f:
             data = json.load(f)
         f.close()
     except FileNotFoundError:
         data = None
+    return data
+
+
+def load_settings():
+    with open("resources/settings.json", "r") as f:
+        data = json.load(f)
+    f.close()
     return data

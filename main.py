@@ -11,7 +11,8 @@ import visuals
 
 
 def run():
-    lang = misc.load_language()
+    settings_json = misc.load_settings()
+    lang = misc.load_language(settings_json)
     running = True
     esc = 0
     pg = pygame.display.set_mode()
@@ -24,7 +25,7 @@ def run():
     coverActive = False
     scaledCover = None
     coverRect = None
-    button_font = pygame.font.Font("resources/fonts/NotoSans.ttf", 48)
+    button_font = pygame.font.Font(settings_json["font"], 48)
     emojiFont = pygame.font.Font("resources/fonts/NotoEmoji.ttf", 48)
     manager = visuals.ButtonManager(button_font)
     manager2 = visuals.ButtonManager(button_font)
@@ -44,8 +45,8 @@ def run():
     fadein = 255  # reset to 0 when finished coding
     y_intro = height // 2 - icon_white_height_half
     init_y_intro = y_intro
-    animation_state=0
-    main_font = pygame.font.Font("resources/fonts/NotoSans.ttf", 42)
+    animation_state = 0
+    main_font = pygame.font.Font(settings_json["font"], 42)
     rating_widgets = visuals.setup_voting_widgets(width, height, main_font, lang)
     mouse_1_up = False
     wasSingleTrack = False
@@ -65,14 +66,14 @@ def run():
 
         # start up animation
         if intro:
-            animation_state+=1
+            animation_state += 1
             pg.blit(icon_white, (width // 2 - icon_white_width_half, height // 2 - icon_white_height_half))
             pygame.draw.rect(pg, (0, 0, 0), (width // 2 - icon_white_width_half, y_intro, icon_white_width_half * 2,
                                              icon_white_height_half * 2))
-            if animation_state>50:
-                text=main_font.render("Song Comparator"[:(animation_state-50)//10], True, (255, 255, 255))
-                text.set_alpha(animation_state+50)
-                pg.blit(text, (width // 2 - text.get_width()//2, height // 2 + icon_white.get_height() // 2))
+            if animation_state > 50:
+                text = main_font.render("Song Comparator"[:(animation_state - 50) // 10], True, (255, 255, 255))
+                text.set_alpha(animation_state + 50)
+                pg.blit(text, (width // 2 - text.get_width() // 2, height // 2 + icon_white.get_height() // 2))
             y_intro -= 2
             if y_intro < init_y_intro - icon_white_height * 2:
                 fade_surface = pygame.Surface((width, height))
