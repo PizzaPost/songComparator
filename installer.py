@@ -16,6 +16,7 @@ try:
     import urllib.request
     import threading
     import shutil
+    import math
 except ImportError as e:
     if e.name != "tkinter.messagebox":
         tkinter.messagebox.showerror(
@@ -35,11 +36,12 @@ except ImportError:
 import colors
 
 finished_steps = 1
-number_of_steps = 33
+number_of_steps = 35
 done_event = threading.Event()
 necessary_files = ["resources/assets/icon.png", "resources/assets/icon_white.png", "resources/assets/mute.png",
-                   "resources/assets/star.png", "resources/assets/star_filled.png",
-                   "resources/assets/star_highlighted.png", "resources/assets/tnf.png",
+                   "resources/assets/star.png", "resources/assets/star_filled.png", "resources/assets/icon_glow.png"
+                                                                                    "resources/assets/star_highlighted.png",
+                   "resources/assets/tnf.png",
                    "resources/languages/Deutsch.json", "resources/languages/English.json",
                    "resources/fonts/NotoEmoji.ttf", "resources/fonts/NotoSans.ttf"]
 custom_modules = ["colors", "data", "main", "misc", "settings", "stats", "visuals", "window"]
@@ -56,33 +58,33 @@ def installer():
             try:
                 # checks other modules
                 import pyvidplayer2
-                finished_steps = 3
-                import pygame
                 finished_steps = 4
-                import customtkinter
+                import pygame
                 finished_steps = 5
-                import yt_dlp
+                import customtkinter
                 finished_steps = 6
-                import PIL
+                import yt_dlp
                 finished_steps = 7
-                import matplotlib
+                import PIL
                 finished_steps = 8
+                import matplotlib
+                finished_steps = 9
 
                 # checks custom modules
                 import data
-                finished_steps = 9
-                import main
                 finished_steps = 10
-                import misc
+                import main
                 finished_steps = 11
-                import settings
+                import misc
                 finished_steps = 12
-                import stats
+                import settings
                 finished_steps = 13
-                import visuals
+                import stats
                 finished_steps = 14
-                import window
+                import visuals
                 finished_steps = 15
+                import window
+                finished_steps = 16
 
                 trying = False
             except ImportError as e:
@@ -139,6 +141,7 @@ def installer():
 
 
 palette = colors.load_palette(color_path)
+finished_steps += 1
 
 
 def uninstaller(tk):
