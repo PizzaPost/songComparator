@@ -1,9 +1,10 @@
+import json
 import os
 import tkinter
 
 import pygame
 import pyvidplayer2
-
+import colors
 import data
 import misc
 import settings
@@ -27,10 +28,15 @@ def run():
     coverRect = None
     button_font = pygame.font.Font(settings_json["font"], 48)
     emojiFont = pygame.font.Font("resources/fonts/NotoEmoji.ttf", 48)
+    color_palette=colors.get_colors(f"resources/themes/{settings_json["theme"]}.json")
+    base_color = colors.hex_to_rgb(color_palette["CTkButton"]["fg_color"][0 if settings_json["appearance_mode"] == "Light" else 1])
+    hover_color =colors.hex_to_rgb(color_palette["CTkButton"]["hover_color"][0 if settings_json["appearance_mode"] == "Light" else 1])
+    click_color =colors.hex_to_rgb(color_palette["palette"]["button_active_bg"])
+    disabled_color =colors.hex_to_rgb(color_palette["palette"]["button_active_bg"])
     manager = visuals.ButtonManager(button_font)
     manager2 = visuals.ButtonManager(button_font)
     manager3 = visuals.ButtonManager(emojiFont)
-    manager3.add_button("⚙️", "menu")
+    manager3.add_button("⚙️", "menu", base_color=base_color, hover_color=hover_color, click_color=click_color, disabled_color=disabled_color)
     full_screen_viewport = pygame.Rect(0, 0, width, height)
     title_button_viewport = pygame.Rect(width - 200, height - 200, 200, 200)
     title_viewport = pygame.Rect(0, 100, width, height - 100)
@@ -61,7 +67,7 @@ def run():
     track_paused = None
     replay = False
     while running:
-        pg.fill((0, 0, 0))
+        pg.fill(colors.hex_to_rgb(color_palette["CTk"]["fg_color"][0 if settings_json["appearance_mode"] == "Light" else 1]))
         width, height = pg.get_size()
 
         # start up animation
@@ -103,7 +109,7 @@ def run():
                         if len(data.listPlaylistFolder()) > 1:
                             for playlist in data.listPlaylistFolder():
                                 manager.add_button(data.removeExtension(playlist), "playlist",
-                                                   details=data.readPlaylist(playlist))
+                                                   details=data.readPlaylist(playlist), base_color=base_color, hover_color=hover_color, click_color=click_color, disabled_color=disabled_color)
                             manager.layout(center_x=full_screen_viewport.centerx, center_y=full_screen_viewport.centery,
                                            max_width=full_screen_viewport.w)
                             currentMenu = "playlistSelection"
@@ -123,7 +129,7 @@ def run():
                                 manager.add_button(
                                     data.displayName(trackDetails) or data.removeExtension(
                                         iterated_track),
-                                    "track", details=trackDetails)
+                                    "track", details=trackDetails, base_color=base_color, hover_color=hover_color, click_color=click_color, disabled_color=disabled_color)
                                 manager.layout(center_x=full_screen_viewport.centerx,
                                                center_y=full_screen_viewport.centery,
                                                max_width=full_screen_viewport.w)
@@ -339,8 +345,8 @@ def run():
             if currentMenu == "main":
                 manager.clear()
                 manager.set_viewport(full_screen_viewport)
-                manager.add_button("Playlist" if not lang else lang["program"]["playlist"], "menu")
-                manager.add_button("Track" if not lang else lang["program"]["track"], "menu")
+                manager.add_button("Playlist" if not lang else lang["program"]["playlist"], "menu", base_color=base_color, hover_color=hover_color, click_color=click_color, disabled_color=disabled_color)
+                manager.add_button("Track" if not lang else lang["program"]["track"], "menu", base_color=base_color, hover_color=hover_color, click_color=click_color, disabled_color=disabled_color)
                 manager.layout(center_x=full_screen_viewport.centerx, center_y=full_screen_viewport.centery,
                                max_width=full_screen_viewport.w)
                 if len(data.listPlaylistFolder()) < 1:
@@ -351,8 +357,8 @@ def run():
             # voting menu logic
             if currentMenu == "voting":
                 manager.clear()
-                manager.add_button("Replay" if not lang else lang["voting"]["replay"], "menu")
-                button = manager.add_button("Submit" if not lang else lang["voting"]["submit"], "menu")
+                manager.add_button("Replay" if not lang else lang["voting"]["replay"], "menu", base_color=base_color, hover_color=hover_color, click_color=click_color, disabled_color=disabled_color)
+                button = manager.add_button("Submit" if not lang else lang["voting"]["submit"], "menu", base_color=base_color, hover_color=hover_color, click_color=click_color, disabled_color=disabled_color)
                 space_rect_border_v = width - last_rect.x - last_rect.width
                 space_rect_border_h = height - (last_rect.y + last_rect.height)
                 voting_viewport = pygame.Rect(width - space_rect_border_v, height - space_rect_border_h - button.h,
@@ -425,9 +431,9 @@ def run():
                 manager.set_enabled("Playlist" if not lang else lang["program"]["playlist"], False)
                 manager.set_enabled("Track" if not lang else lang["program"]["track"], False)
                 manager2.clear()
-                manager2.add_button("Back", "esc_menu")
-                manager2.add_button("Settings", "esc_menu")
-                manager2.add_button("Calculate Data", "esc_menu")
+                manager2.add_button("Back", "esc_menu", base_color=base_color, hover_color=hover_color, click_color=click_color, disabled_color=disabled_color)
+                manager2.add_button("Settings", "esc_menu", base_color=base_color, hover_color=hover_color, click_color=click_color, disabled_color=disabled_color)
+                manager2.add_button("Calculate Data", "esc_menu", base_color=base_color, hover_color=hover_color, click_color=click_color, disabled_color=disabled_color)
                 manager2.set_viewport(title_viewport)
                 manager2.layout(center_x=title_viewport.centerx, center_y=title_viewport.centery,
                                 max_width=title_viewport.w)

@@ -6,8 +6,10 @@ try:
         import misc
 
         lang = misc.load_language(misc.load_settings())
+        color_path=f"resources/themes/{misc.load_settings()["theme"]}.json"
     except ImportError:
         lang = None
+        color_path="resources/themes/default.json"
     import tkinter.ttk
     import tkinter.messagebox
     import os
@@ -136,7 +138,7 @@ def installer():
         done_event.set()
 
 
-palette = colors.load_palette()
+palette = colors.load_palette(color_path)
 
 
 def uninstaller(tk):

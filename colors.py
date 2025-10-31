@@ -1,185 +1,10 @@
 import json
 import os
+import urllib
 from tkinter import ttk
 
 
-def lighten(color, amount=0.3):
-    """Return a lighter version of a color. (hex)"""
-    hex_color = color.lstrip('#')
-    r, g, b = [int(hex_color[i:i + 2], 16) for i in (0, 2, 4)]
 
-    # blend with white
-    r = int(r + (255 - r) * amount)
-    g = int(g + (255 - g) * amount)
-    b = int(b + (255 - b) * amount)
-
-    return f"#{r:02x}{g:02x}{b:02x}"
-
-
-def darken(color, amount=0.3):
-    """Returns a darker version of a color. (hex)"""
-    hex_color = color.lstrip('#')
-    r, g, b = [int(hex_color[i:i + 2], 16) for i in (0, 2, 4)]
-
-    # blend with black
-    r = int(r * (1 - amount))
-    g = int(g * (1 - amount))
-    b = int(b * (1 - amount))
-
-    return f"#{r:02x}{g:02x}{b:02x}"
-
-
-def build_ctk_theme_from_palette(p):
-    """This function generates a ctk theme from a palette."""
-    # the 'p' palette contains the dark-mode colors.
-    # lighten(p[color]) generates a light-mode color.
-    # the structure should be: [light_mode_color, dark_mode_color]
-
-    return {
-        "CTk": {
-            "fg_color": [lighten(p["bg"]), p["bg"]]
-        },
-        "CTkToplevel": {
-            "fg_color": [lighten(p["bg"]), p["bg"]]
-        },
-        "CTkFrame": {
-            "corner_radius": 6,
-            "border_width": 0,
-            "fg_color": [lighten(p["button_bg"]), p["button_bg"]],
-            "top_fg_color": [lighten(p["bg"]), p["bg"]],
-            "border_color": [lighten(p["border"]), p["border"]]
-        },
-        "CTkButton": {
-            "corner_radius": 6,
-            "border_width": 0,
-            "fg_color": [lighten(p["button_bg"], 0.25), darken(p["button_bg"], 0.25)],
-            "hover_color": [lighten(p["hover_red"], 0.25), darken(p["hover_red"], 0.25)],
-            "border_color": [lighten(p["border"], 0.25), darken(p["border"], 0.25)],
-            "text_color": [lighten(p["button_fg"], 0.25), darken(p["button_fg"], 0.25)],
-            "text_color_disabled": [lighten(p["text"], 0.25), darken(p["text"], 0.25)]
-        },
-        "CTkLabel": {
-            "corner_radius": 0,
-            "fg_color": "transparent",
-            "text_color": [lighten(p["text"]), p["text"]]
-        },
-        "CTkEntry": {
-            "corner_radius": 6,
-            "border_width": 2,
-            "fg_color": [lighten(p["bg"]), p["bg"]],
-            "border_color": [lighten(p["border"]), p["border"]],
-            "text_color": [lighten(p["text"]), p["text"]],
-            "placeholder_text_color": [lighten(p["text"]), p["text"]]
-        },
-        "CTkCheckBox": {
-            "corner_radius": 6,
-            "border_width": 3,
-            "fg_color": [lighten(p["button_bg"]), p["button_bg"]],
-            "border_color": [lighten(p["border"]), p["border"]],
-            "hover_color": [lighten(p["hover_red"]), p["hover_red"]],
-            "checkmark_color": [lighten(p["button_fg"]), p["button_fg"]],
-            "text_color": [lighten(p["text"]), p["text"]],
-            "text_color_disabled": [lighten(p["text"]), p["text"]]
-        },
-        "CTkSwitch": {
-            "corner_radius": 1000,
-            "border_width": 3,
-            "button_length": 0,
-            "fg_color": [lighten(p["border"]), p["border"]],
-            "progress_color": [lighten(p["button_bg"]), p["button_bg"]],
-            "button_color": [lighten(p["button_bg"]), p["button_bg"]],
-            "button_hover_color": [lighten(p["hover_red"]), p["hover_red"]],
-            "text_color": [lighten(p["text"]), p["text"]],
-            "text_color_disabled": [lighten(p["text"]), p["text"]]
-        },
-        "CTkRadioButton": {
-            "corner_radius": 1000,
-            "border_width_checked": 6,
-            "border_width_unchecked": 3,
-            "fg_color": [lighten(p["button_bg"]), p["button_bg"]],
-            "border_color": [lighten(p["border"]), p["border"]],
-            "hover_color": [lighten(p["hover_red"]), p["hover_red"]],
-            "text_color": [lighten(p["text"]), p["text"]],
-            "text_color_disabled": [lighten(p["text"]), p["text"]]
-        },
-        "CTkProgressBar": {
-            "corner_radius": 1000,
-            "border_width": 0,
-            "fg_color": [lighten(p["progress_trough"]), p["progress_trough"]],
-            "progress_color": [lighten(p["progress_bar"]), p["progress_bar"]],
-            "border_color": [lighten(p["border"]), p["border"]]
-        },
-        "CTkSlider": {
-            "corner_radius": 1000,
-            "button_corner_radius": 1000,
-            "border_width": 6,
-            "button_length": 0,
-            "fg_color": [lighten(p["progress_trough"]), p["progress_trough"]],
-            "progress_color": [lighten(p["progress_bar"]), p["progress_bar"]],
-            "button_color": [lighten(p["progress_bar"]), p["progress_bar"]],
-            "button_hover_color": [lighten(p["hover_red"]), p["hover_red"]],
-            "button_color_disabled": [lighten(p["progress_trough"]), p["progress_trough"]],
-            "progress_color_disabled": [lighten(p["progress_trough"]), p["progress_trough"]],
-        },
-        "CTkOptionMenu": {
-            "corner_radius": 6,
-            "fg_color": [lighten(p["button_bg"], 0.25), darken(p["button_bg"], 0.25)],
-            "button_color": [lighten(p["button_bg"], 0.25), darken(p["button_bg"], 0.25)],
-            "button_hover_color": [lighten(p["hover_red"], 0.25), darken(p["hover_red"], 0.25)],
-            "text_color": [lighten(p["button_fg"], 0.25), darken(p["button_fg"], 0.25)],
-            "text_color_disabled": [lighten(p["text"], 0.25), darken(p["text"], 0.25)]
-        },
-        "CTkComboBox": {
-            "corner_radius": 6,
-            "border_width": 2,
-            "fg_color": [lighten(p["bg"]), p["bg"]],
-            "border_color": [lighten(p["border"]), p["border"]],
-            "button_color": [lighten(p["border"]), p["border"]],
-            "button_hover_color": [lighten(p["hover_red"]), p["hover_red"]],
-            "text_color": [lighten(p["text"]), p["text"]],
-            "text_color_disabled": [lighten(p["text"]), p["text"]]
-        },
-        "CTkScrollbar": {
-            "corner_radius": 1000,
-            "border_spacing": 4,
-            "fg_color": "transparent",
-            "button_color": [lighten(p["border"]), p["border"]],
-            "button_hover_color": [lighten(p["hover_red"]), p["hover_red"]]
-        },
-        "CTkSegmentedButton": {
-            "corner_radius": 6,
-            "border_width": 2,
-            "fg_color": [lighten(p["border"]), p["border"]],
-            "selected_color": [lighten(p["button_bg"]), p["button_bg"]],
-            "selected_hover_color": [lighten(p["hover_red"]), p["hover_red"]],
-            "unselected_color": [lighten(p["border"]), p["border"]],
-            "unselected_hover_color": [lighten(p["hover_red"]), p["hover_red"]],
-            "text_color": [lighten(p["button_fg"]), p["button_fg"]],
-            "text_color_disabled": [lighten(p["text"]), p["text"]]
-        },
-        "CTkTextbox": {
-            "corner_radius": 6,
-            "border_width": 0,
-            "fg_color": [lighten(p["bg"]), p["bg"]],
-            "border_color": [lighten(p["border"]), p["border"]],
-            "text_color": [lighten(p["text"]), p["text"]],
-            "scrollbar_button_color": [lighten(p["border"]), p["border"]],
-            "scrollbar_button_hover_color": [lighten(p["hover_red"]), p["hover_red"]]
-        },
-        "CTkScrollableFrame": {
-            "label_fg_color": [lighten(p["text"]), p["text"]]
-        },
-        "DropdownMenu": {
-            "fg_color": [lighten(p["bg"]), p["bg"]],
-            "hover_color": [lighten(p["button_bg"]), p["button_bg"]],
-            "text_color": [lighten(p["text"]), p["text"]]
-        },
-        "CTkFont": {
-            "macOS": {"family": "SF Display", "size": 13, "weight": "normal"},
-            "Windows": {"family": "Roboto", "size": 13, "weight": "normal"},
-            "Linux": {"family": "Roboto", "size": 13, "weight": "normal"}
-        }
-    }
 
 
 def load_palette(filename="resources/themes/default.json"):
@@ -196,6 +21,7 @@ def load_palette(filename="resources/themes/default.json"):
         "button_bg": "#1a1c1e",
         "button_fg": "#f3f4f5",
         "button_active_bg": "#EA5660",
+        "button_disabled_color": "#999999",
         "border": "#232629",
         "progress_trough": "#151718",
         "progress_bar": "#7C0008",
@@ -214,8 +40,10 @@ def load_palette(filename="resources/themes/default.json"):
         data = None
 
     if data is None:
-        # create file with both "palette" and CTk theme
-        ctk = build_ctk_theme_from_palette(default)
+        # download file with both "palette" and CTk theme
+        link = f"https://raw.githubusercontent.com/PizzaPost/songComparator/master/resources/themes/default.json"
+        urllib.request.urlretrieve(link, f"resources/themes/{default}.json")
+        ctk=json.load(open(f"resources/themes/{default}.json", "r", encoding="utf-8"))
         # store palette under "palette" key and also the CTk theme keys
         out = {"palette": default}
         out.update(ctk)
@@ -229,7 +57,9 @@ def load_palette(filename="resources/themes/default.json"):
         # ensure file also contains CTk fields or adds them
         missing_ctk = any(k.startswith("CTk") or k == "CTk" for k in data.keys())
         if not missing_ctk:
-            ctk = build_ctk_theme_from_palette(palette)
+            link = f"https://raw.githubusercontent.com/PizzaPost/songComparator/master/resources/themes/default.json"
+            urllib.request.urlretrieve(link, f"resources/themes/{default}.json")
+            ctk = json.load(open(f"resources/themes/{default}.json", "r", encoding="utf-8"))
             data.update(ctk)
             with open(filename, "w", encoding="utf-8") as f:
                 json.dump(data, f, indent=2)
@@ -406,7 +236,7 @@ def set_color(widget, palette):
                 highlightthickness=0,
                 padx=8,
                 pady=4,
-                disabledforeground=palette.get("text", "gray60")
+                disabledforeground=palette.get("palette", "button_disabled_color")
             )
             widget.configure(**cbtn_kwargs)
         except Exception:
@@ -445,3 +275,14 @@ def set_color(widget, palette):
 
     for child in widget.winfo_children():
         set_color(child, palette)
+
+def get_colors(path="resources/themes/default.json"):
+    with open(path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+    return data
+
+def hex_to_rgb(hex_color):
+    hex_color = hex_color.strip().lstrip("#")
+    if len(hex_color) != 6:
+        raise ValueError(f"Invalid hex color: {hex_color!r}")
+    return tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
