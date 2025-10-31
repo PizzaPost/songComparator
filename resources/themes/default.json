@@ -5,7 +5,7 @@
     "text": "#e6e6e6",
     "dark_red": "#7C0008",
     "light_red": "#EA5660",
-    "button_bg": "#1a1c1e",
+    "button_bg": "#303438",
     "button_fg": "#f3f4f5",
     "button_active_bg": "#EA5660",
     "border": "#232629",
@@ -46,11 +46,11 @@
     "border_width": 0,
     "fg_color": [
       "#848A86",
-      "#1a1c1e"
+      "#303438"
     ],
     "fg_color_disabled": [
       "#848A86",
-      "#1a1c1e"
+      "#303438"
     ],
     "hover_color": [
       "#BA444E",
@@ -82,7 +82,7 @@
     "border_width": 2,
     "fg_color": [
       "#848A86",
-      "#1a1c1e"
+      "#303438"
     ],
     "border_color": [
       "#AA3F49",
@@ -102,7 +102,7 @@
     "border_width": 3,
     "fg_color": [
       "#848A86",
-      "#1a1c1e"
+      "#303438"
     ],
     "border_color": [
       "#AA3F49",
@@ -131,7 +131,7 @@
     "button_length": 0,
     "fg_color": [
       "#848A86",
-      "#1a1c1e"
+      "#303438"
     ],
     "progress_color": [
       "#a34c52",
@@ -160,7 +160,7 @@
     "border_width_unchecked": 3,
     "fg_color": [
       "#848A86",
-      "#1a1c1e"
+      "#303438"
     ],
     "border_color": [
       "#AA3F49",
@@ -202,7 +202,7 @@
     "button_length": 0,
     "fg_color": [
       "#848A86",
-      "#1a1c1e"
+      "#303438"
     ],
     "progress_color": [
       "#a34c52",
@@ -229,7 +229,7 @@
     "corner_radius": 6,
     "fg_color": [
       "#848A86",
-      "#1a1c1e"
+      "#303438"
     ],
     "button_color": [
       "#a34c52",
@@ -253,7 +253,7 @@
     "border_width": 2,
     "fg_color": [
       "#848A86",
-      "#1a1c1e"
+      "#303438"
     ],
     "border_color": [
       "#AA3F49",
@@ -294,7 +294,7 @@
     "border_width": 2,
     "fg_color": [
       "#848A86",
-      "#1a1c1e"
+      "#303438"
     ],
     "selected_color": [
       "#B5555D",
@@ -326,7 +326,7 @@
     "border_width": 0,
     "fg_color": [
       "#848A86",
-      "#1a1c1e"
+      "#303438"
     ],
     "border_color": [
       "#AA3F49",
@@ -354,7 +354,7 @@
   "DropdownMenu": {
     "fg_color": [
       "#848A86",
-      "#1a1c1e"
+      "#303438"
     ],
     "hover_color": [
       "#BA444E",
