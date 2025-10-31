@@ -42,8 +42,8 @@ def load_palette(filename="resources/themes/default.json"):
     if data is None:
         # download file with both "palette" and CTk theme
         link = f"https://raw.githubusercontent.com/PizzaPost/songComparator/master/resources/themes/default.json"
-        urllib.request.urlretrieve(link, f"resources/themes/{default}.json")
-        ctk=json.load(open(f"resources/themes/{default}.json", "r", encoding="utf-8"))
+        urllib.request.urlretrieve(link, filename)
+        ctk=json.load(open(filename, "r", encoding="utf-8"))
         # store palette under "palette" key and also the CTk theme keys
         out = {"palette": default}
         out.update(ctk)
