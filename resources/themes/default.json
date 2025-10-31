@@ -15,13 +15,13 @@
   },
   "CTk": {
     "fg_color": [
-      "#3F3F3F",
+      "#A0A0A0",
       "#070707"
     ]
   },
   "CTkToplevel": {
     "fg_color": [
-      "#3F3F3F",
+      "#A0A0A0",
       "#070707"
     ]
   },
@@ -45,11 +45,11 @@
     "corner_radius": 6,
     "border_width": 0,
     "fg_color": [
-      "#373B3F",
+      "#848A86",
       "#1a1c1e"
     ],
     "fg_color_disabled": [
-      "#373B3F",
+      "#848A86",
       "#1a1c1e"
     ],
     "hover_color": [
@@ -81,7 +81,7 @@
     "corner_radius": 6,
     "border_width": 2,
     "fg_color": [
-      "#373B3F",
+      "#848A86",
       "#1a1c1e"
     ],
     "border_color": [
@@ -101,7 +101,7 @@
     "corner_radius": 6,
     "border_width": 3,
     "fg_color": [
-      "#373B3F",
+      "#848A86",
       "#1a1c1e"
     ],
     "border_color": [
@@ -130,7 +130,7 @@
     "border_width": 3,
     "button_length": 0,
     "fg_color": [
-      "#373B3F",
+      "#848A86",
       "#1a1c1e"
     ],
     "progress_color": [
@@ -159,7 +159,7 @@
     "border_width_checked": 6,
     "border_width_unchecked": 3,
     "fg_color": [
-      "#373B3F",
+      "#848A86",
       "#1a1c1e"
     ],
     "border_color": [
@@ -201,7 +201,7 @@
     "border_width": 6,
     "button_length": 0,
     "fg_color": [
-      "#373B3F",
+      "#848A86",
       "#1a1c1e"
     ],
     "progress_color": [
@@ -228,7 +228,7 @@
   "CTkOptionMenu": {
     "corner_radius": 6,
     "fg_color": [
-      "#373B3F",
+      "#848A86",
       "#1a1c1e"
     ],
     "button_color": [
@@ -252,7 +252,7 @@
     "corner_radius": 6,
     "border_width": 2,
     "fg_color": [
-      "#373B3F",
+      "#848A86",
       "#1a1c1e"
     ],
     "border_color": [
@@ -293,7 +293,7 @@
     "corner_radius": 6,
     "border_width": 2,
     "fg_color": [
-      "#373B3F",
+      "#848A86",
       "#1a1c1e"
     ],
     "selected_color": [
@@ -325,7 +325,7 @@
     "corner_radius": 6,
     "border_width": 0,
     "fg_color": [
-      "#373B3F",
+      "#848A86",
       "#1a1c1e"
     ],
     "border_color": [
@@ -353,7 +353,7 @@
   },
   "DropdownMenu": {
     "fg_color": [
-      "#373B3F",
+      "#848A86",
       "#1a1c1e"
     ],
     "hover_color": [
