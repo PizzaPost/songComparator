@@ -4,9 +4,6 @@ import urllib
 from tkinter import ttk
 
 
-
-
-
 def load_palette(filename="resources/themes/default.json"):
     """Loads the palette from a JSON file.
     Returns a flat palette dict for classic tkinter use.
@@ -43,7 +40,7 @@ def load_palette(filename="resources/themes/default.json"):
         # download file with both "palette" and CTk theme
         link = f"https://raw.githubusercontent.com/PizzaPost/songComparator/master/resources/themes/default.json"
         urllib.request.urlretrieve(link, filename)
-        ctk=json.load(open(filename, "r", encoding="utf-8"))
+        ctk = json.load(open(filename, "r", encoding="utf-8"))
         # store palette under "palette" key and also the CTk theme keys
         out = {"palette": default}
         out.update(ctk)
@@ -276,13 +273,15 @@ def set_color(widget, palette):
     for child in widget.winfo_children():
         set_color(child, palette)
 
+
 def get_colors(path="resources/themes/default.json"):
     with open(path, "r", encoding="utf-8") as f:
         data = json.load(f)
     return data
 
+
 def hex_to_rgb(hex_color):
     hex_color = hex_color.strip().lstrip("#")
     if len(hex_color) != 6:
         raise ValueError(f"Invalid hex color: {hex_color!r}")
-    return tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
+    return tuple(int(hex_color[i:i + 2], 16) for i in (0, 2, 4))

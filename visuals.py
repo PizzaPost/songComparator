@@ -1,4 +1,6 @@
-import pygame, data
+import pygame
+
+import data
 
 
 class Button:
