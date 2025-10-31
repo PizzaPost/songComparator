@@ -117,7 +117,8 @@ def installer():
 
         if not os.path.exists("resources/settings.json"):
             with open("resources/settings.json", "w") as f:
-                json.dump({"theme": "default", "appearance_mode": "system", "language": "English", "font": "resources/fonts/NotoSans.ttf", "master_volume": 100,
+                json.dump({"theme": "default", "appearance_mode": "system", "language": "English",
+                           "font": "resources/fonts/NotoSans.ttf", "master_volume": 100,
                            "track_volume": 100, "gui_volume": 100, "effects_volume": 100,
                            "enabled_audio": [True, True, True, True]}, f, indent=4)
             f.close()
@@ -286,15 +287,14 @@ def start_installation(tk):
 
     def run_now():
         """Runs the main program."""
+        tk.destroy()
         try:
             import main
-            tk.withdraw()
             main.run()
         except Exception as e:
             tkinter.messagebox.showerror("Run error" if not lang else lang["error"]["run_error_title"],
                                          f"Could not start program:\n{e}" if not lang else lang["error"][
                                              "run_error_description1"].format(str(e)))
-        tk.destroy()
 
     def update_ui():
         """Updates the installer GUI."""
