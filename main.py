@@ -32,7 +32,7 @@ def run():
     base_color = colors.hex_to_rgb(color_palette["CTkButton"]["fg_color"][0 if settings_json["appearance_mode"] == "Light" else 1])
     hover_color =colors.hex_to_rgb(color_palette["CTkButton"]["hover_color"][0 if settings_json["appearance_mode"] == "Light" else 1])
     click_color =colors.hex_to_rgb(color_palette["palette"]["button_active_bg"])
-    disabled_color =colors.hex_to_rgb(color_palette["palette"]["button_active_bg"])
+    disabled_color =colors.hex_to_rgb(color_palette["CTkButton"]["fg_color_disabled"][0 if settings_json["appearance_mode"] == "Light" else 1])
     manager = visuals.ButtonManager(button_font)
     manager2 = visuals.ButtonManager(button_font)
     manager3 = visuals.ButtonManager(emojiFont)
@@ -66,8 +66,9 @@ def run():
     paused_by_esc = False
     track_paused = None
     replay = False
+    bg_color=colors.hex_to_rgb(color_palette["CTk"]["fg_color"][0 if settings_json["appearance_mode"] == "Light" else 1])
     while running:
-        pg.fill(colors.hex_to_rgb(color_palette["CTk"]["fg_color"][0 if settings_json["appearance_mode"] == "Light" else 1]))
+        pg.fill(bg_color)
         width, height = pg.get_size()
 
         # start up animation

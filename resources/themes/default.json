@@ -48,6 +48,10 @@
       "#373B3F",
       "#1a1c1e"
     ],
+    "fg_color_disabled": [
+      "#373B3F",
+      "#1a1c1e"
+    ],
     "hover_color": [
       "#BA444E",
       "#a33c43"

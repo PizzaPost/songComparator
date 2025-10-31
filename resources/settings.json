@@ -2,7 +2,7 @@
     "theme": "default",
     "appearance_mode": "Dark",
     "language": "English",
-    "font": "C:\\Users\\Phil\\AppData\\Local\\Microsoft\\Windows\\Fonts\\ChalkboardSE-Light-01.ttf",
+    "font": "resources/fonts/NotoSans.ttf",
     "master_volume": 100,
     "track_volume": 100,
     "gui_volume": 100,

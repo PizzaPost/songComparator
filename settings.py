@@ -92,7 +92,7 @@ def open_settings():
                                       lang["settings"]["warning1"], text_color="red")
     if len(themes) <= 1:
         themes_dropdown.configure(state="disabled")
-    dark_mode = customtkinter.CTkOptionMenu(frame2, values=["System", "Dark", "Light"])
+    dark_mode = customtkinter.CTkOptionMenu(frame2, values=["Dark", "Light"])
     dark_mode.set(data["appearance_mode"])
     warning2 = customtkinter.CTkLabel(frame2,
                                       text="⚠️ This feature may not be available for every theme ⚠️" if not lang else
