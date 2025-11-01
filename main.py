@@ -80,6 +80,7 @@ def run():
     replay = False
     bg_color = colors.hex_to_rgb(
         color_palette["CTk"]["fg_color"][0 if settings_json["appearance_mode"] == "Light" else 1])
+    current_progressbar_width = 0
     while running:
         pg.fill(bg_color)
         width, height = pg.get_size()
@@ -331,20 +332,27 @@ def run():
                     currentMenu = "voting"
                     rating_widgets = visuals.setup_voting_widgets(width, height, main_font, lang)
 
-            # draw video progressbar
+            # video overlay
+            if video:
+                current_second = video.get_pos()
+                total_seconds = video.frame_count / video.frame_rate
+                progressbar_width_goal = width * video.frame / video.frame_count
+                progressbar_with_difference = progressbar_width_goal - current_progressbar_width
+                current_progressbar_width += progressbar_with_difference * 0.05
+            elif coverActive:
+                current_second = pygame.mixer.music.get_pos()
+                total_seconds = data.get_track_length(track)
+                progressbar_width_goal = width * current_second / total_seconds
+                progressbar_with_difference = progressbar_width_goal - current_progressbar_width
+                current_progressbar_width += progressbar_with_difference * 0.05
             if mouse_move_timeout > 0 and currentMenu == "watching" and not start_mouse_move_timeout:
                 mouse_move_timeout -= 12
             if mouse_move_timeout > 0 and currentMenu == "watching":
                 pygame.mouse.set_visible(True)
                 if video:
-                    current_second = video.get_pos()
-                    total_seconds = video.frame_count / video.frame_rate
-                    video_progressbar_fg = pygame.Surface((int(width * video.frame / video.frame_count), 10))
+                    video_progressbar_fg = pygame.Surface((int(current_progressbar_width), 10))
                 elif coverActive:
-                    current_second = pygame.mixer.music.get_pos()
-                    total_seconds = data.get_track_length(track)
-                    video_progressbar_fg = pygame.Surface(
-                        (int(width * current_second / total_seconds), 10))
+                    video_progressbar_fg = pygame.Surface((int(current_progressbar_width), 10))
                     current_second = current_second / 1000
                     total_seconds = total_seconds / 1000
                 video_progressbar_bg = pygame.Surface((width - video_progressbar_fg.get_width(), 10))
@@ -353,8 +361,7 @@ def run():
                 video_progressbar_bg.set_alpha(mouse_move_timeout)
                 video_progressbar_fg.set_alpha(mouse_move_timeout)
                 # FUTURE:
-                # display the artist
-                # display extra notes
+                # notes
                 # queue
                 pg.blit(video_progressbar_bg, (video_progressbar_fg.get_width(), 0))
                 pg.blit(video_progressbar_fg, (0, 0))
