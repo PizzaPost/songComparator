@@ -57,7 +57,8 @@
     "lyrics_quality": "Textqualität",
     "beat_quality": "Beatqualität",
     "beat_taste": "Beatgeschmack",
-    "replay": "Wiederholen"
+    "replay": "Wiederholen",
+    "rate_song_info": "Bitte bewerte das Lied."
   },
   "misc": {
     "yes": "Ja",

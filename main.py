@@ -59,8 +59,8 @@ def run():
     icon_glow_width_half = icon_glow.get_width() // 2
     icon_glow_height_half = icon_glow.get_height() // 2
     currentMenu = "main"
-    intro = True  # reset to True when finished coding
-    fadein = 0  # reset to 0 when finished coding
+    intro = False  # reset to True when finished coding
+    fadein = 255  # reset to 0 when finished coding
     y_intro = height // 2 - icon_white_height_half
     init_y_intro = y_intro
     animation_state = 0
@@ -81,6 +81,7 @@ def run():
     bg_color = colors.hex_to_rgb(
         color_palette["CTk"]["fg_color"][0 if settings_json["appearance_mode"] == "Light" else 1])
     current_progressbar_width = 0
+    show_need_to_rate_label = 0
     while running:
         pg.fill(bg_color)
         width, height = pg.get_size()
@@ -167,31 +168,38 @@ def run():
                                 (".mp4", ".webm", ".mov", ".avi", ".mkv", ".flv", ".m4v")) or isStream else False
                             currentMenu = "watching"
                     elif text == ("Submit" if not lang else lang["voting"]["submit"]):
-                        playedSongOnce = False
-                        if wasSingleTrack:
-                            track = None
-                            video = None
-                            currentMenu = "main"
-                        else:
-                            video = None
-                            try:
-                                for x, i in enumerate(playlist):
-                                    if track == i["track"]:
-                                        track = playlist[x + 1]["track"]
-                                        coverIndex = x + 1
-                                        break
-                            except IndexError:
+                        if not ratings.__contains__(0):
+                            playedSongOnce = False
+                            if wasSingleTrack:
                                 track = None
                                 video = None
                                 currentMenu = "main"
-                        # (if) search in playlists
-                        '''if '''
-                        """     Pls add your logic here"""
-                        '''else:
-                            title=data.removeExtension(track)'''
+                            else:
+                                video = None
+                                try:
+                                    for x, i in enumerate(playlist):
+                                        if track == i["track"]:
+                                            track = playlist[x + 1]["track"]
+                                            coverIndex = x + 1
+                                            break
+                                except IndexError:
+                                    track = None
+                                    video = None
+                                    currentMenu = "main"
+                            # (if) search in playlists
+                            '''if '''
+                            """     Pls add your logic here"""
+                            '''else:
+                                title=data.removeExtension(track)'''
 
-                        title = track  # dummy code
-                        data.save_voting(ratings, title)
+                            title = track  # dummy code
+                            data.save_voting(ratings, title)
+                        else:
+                            if show_need_to_rate_label < 1:
+                                text = main_font.render(
+                                    "Please rate the song" if not lang else lang["voting"]["rate_song_info"], True,
+                                    (155, 50, 50))
+                                show_need_to_rate_label = height // 10 + text.get_height()
                     elif text == ("Replay" if not lang else lang["voting"]["replay"]):
                         replay = True
                 elif id == "playlist":
@@ -230,24 +238,12 @@ def run():
                                 track_paused = True
                             else:
                                 track_paused = False
-                        # I don't really know if it should be possible to skip forward
-                        # elif event.key == pygame.K_l:
-                        #     remaining_length = video.frame_count - video.frame
-                        #     if video.duration > (video.frame / video.frame_count) * video.duration + 10:
-                        #         seek_amount = min(10, remaining_length)
-                        #         video.seek(seek_amount)
                         elif event.key == pygame.K_LEFT:
                             video.seek(-5)
                         elif event.key == pygame.K_UP:
                             video.set_volume(video.get_volume() + 0.1)
                         elif event.key == pygame.K_DOWN:
                             video.set_volume(max(0.1, video.get_volume() - 0.1))
-                        # I don't really know if it should be possible to skip forward
-                        # elif event.key == pygame.K_RIGHT:
-                        #     remaining_length = video.frame_count - video.frame
-                        #     if video.duration > (video.frame / video.frame_count) * video.duration + 5:
-                        #         seek_amount = min(5, remaining_length)
-                        #         video.seek(seek_amount)
                     elif coverActive:
                         if event.key == pygame.K_j:
                             current_pos = pygame.mixer.music.get_pos()
@@ -260,12 +256,6 @@ def run():
                             else:
                                 pygame.mixer.music.unpause()
                                 track_paused = False
-                        # I don't really know if it should be possible to skip forward
-                        # elif event.key == pygame.K_l:  # BUGGED!!!
-                        #     current_pos = pygame.mixer.music.get_pos()
-                        #     track_length = data.get_track_length(track)
-                        #     new_pos = min(current_pos + 10000, track_length)
-                        #     pygame.mixer.music.set_pos(new_pos / 1000)
                         elif event.key == pygame.K_LEFT:
                             current_pos = pygame.mixer.music.get_pos()
                             new_pos = max(0, current_pos - 5000)
@@ -274,12 +264,6 @@ def run():
                             pygame.mixer.music.set_volume(pygame.mixer.music.get_volume() + 0.1)
                         elif event.key == pygame.K_DOWN:
                             pygame.mixer.music.set_volume(max(0.1, pygame.mixer.music.get_volume() - 0.1))
-                        # I don't really know if it should be possible to skip forward
-                        # elif event.key == pygame.K_RIGHT:  # BUGGED!!!
-                        #     current_pos = pygame.mixer.music.get_pos()
-                        #     track_length = data.get_track_length(track)
-                        #     new_pos = min(current_pos + 5000, track_length)
-                        #     pygame.mixer.music.set_pos(new_pos / 1000)"""
                 # track mouse controls
                 elif event.type == pygame.MOUSEBUTTONUP:
                     mouse_pos = pygame.mouse.get_pos()
@@ -376,7 +360,8 @@ def run():
                 pg.blit(text, (width / 2 - text.get_width() / 2, 15))
                 cog_button.set_alpha(mouse_move_timeout)
             else:
-                pygame.mouse.set_visible(False)
+                if currentMenu == "watching":
+                    pygame.mouse.set_visible(False)
             if start_mouse_move_timeout or track_paused:
                 start_mouse_move_timeout = True
                 mouse_move_timeout += 12
@@ -420,7 +405,11 @@ def run():
                 manager.layout(center_x=voting_viewport.centerx, center_y=voting_viewport.centery,
                                max_width=voting_viewport.w)
                 ratings = visuals.show_voting_screen(pg, rating_widgets)
-
+                if show_need_to_rate_label > 0:
+                    text = main_font.render("Please rate the song.", True, (155, 50, 50))
+                    pg.blit(text, (width // 2 - text.get_width() // 2,
+                                   height // 10 - (height // 10 - show_need_to_rate_label) - text.get_height()))
+                    show_need_to_rate_label -= 1
             # sets the next video or cover
             if (not video and track and not playedSongOnce) or replay:
                 track_data = data.details(track, True, True)

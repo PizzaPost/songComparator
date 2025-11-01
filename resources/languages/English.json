@@ -57,7 +57,8 @@
     "lyrics_quality": "Lyrics Quality",
     "beat_quality": "Beat Quality",
     "beat_taste": "Beat Taste",
-    "replay": "Replay"
+    "replay": "Replay",
+    "rate_song_info": "Please rate the song."
   },
   "misc": {
     "yes": "Yes",
