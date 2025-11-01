@@ -335,6 +335,7 @@ def run():
             if mouse_move_timeout > 0 and currentMenu == "watching" and not start_mouse_move_timeout:
                 mouse_move_timeout -= 12
             if mouse_move_timeout > 0 and currentMenu == "watching":
+                pygame.mouse.set_visible(True)
                 if video:
                     current_second = video.get_pos()
                     total_seconds = video.frame_count / video.frame_rate
@@ -365,7 +366,10 @@ def run():
                 text.set_alpha(mouse_move_timeout)
                 pg.blit(text, (width - text.get_width() - 15, 15))
                 cog_button.set_alpha(mouse_move_timeout)
+            else:
+                pygame.mouse.set_visible(False)
             if start_mouse_move_timeout or track_paused:
+                start_mouse_move_timeout = True
                 mouse_move_timeout += 12
                 if mouse_move_timeout >= 2400:
                     start_mouse_move_timeout = False
@@ -373,6 +377,7 @@ def run():
             if currentMenu != "watching":
                 mouse_move_timeout = 0
                 cog_button.reset_alpha()
+                pygame.mouse.set_visible(True)
 
             # main menu logic
             if currentMenu == "main":
