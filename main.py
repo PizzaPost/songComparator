@@ -353,7 +353,6 @@ def run():
                 video_progressbar_bg.set_alpha(mouse_move_timeout)
                 video_progressbar_fg.set_alpha(mouse_move_timeout)
                 # FUTURE:
-                # display the title
                 # display the artist
                 # display extra notes
                 # queue
@@ -365,6 +364,9 @@ def run():
                 text = main_font.render(str(round(total_seconds)), True, (255, 255, 255))
                 text.set_alpha(mouse_move_timeout)
                 pg.blit(text, (width - text.get_width() - 15, 15))
+                text = main_font.render(f"{track_data["title"]} - {track_data["artist"]}", True, (255, 255, 255))
+                text.set_alpha(mouse_move_timeout)
+                pg.blit(text, (width / 2 - text.get_width() / 2, 15))
                 cog_button.set_alpha(mouse_move_timeout)
             else:
                 pygame.mouse.set_visible(False)
@@ -414,6 +416,7 @@ def run():
 
             # sets the next video or cover
             if (not video and track and not playedSongOnce) or replay:
+                track_data = data.details(track, True, True)
                 replay = False
                 currentMenu = "watching"
                 manager.clear()
