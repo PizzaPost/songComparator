@@ -142,6 +142,18 @@ class Button:
             surface.blit(self.surf_base, self.rect.topleft)
         return False
 
+    def set_alpha(self, alpha):
+        self.surf_base.set_alpha(alpha)
+        self.surf_hover.set_alpha(alpha)
+        self.surf_click.set_alpha(alpha)
+        self.surf_disabled.set_alpha(alpha)
+
+    def reset_alpha(self):
+        self.surf_base.set_alpha(255)
+        self.surf_hover.set_alpha(255)
+        self.surf_click.set_alpha(255)
+        self.surf_disabled.set_alpha(255)
+
 
 class ButtonManager:
     """Manages multiple Buttons, automatic wrapping layout, vertical scrolling,

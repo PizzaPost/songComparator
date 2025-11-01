@@ -40,8 +40,9 @@ def run():
     manager = visuals.ButtonManager(button_font)
     manager2 = visuals.ButtonManager(button_font)
     manager3 = visuals.ButtonManager(emojiFont)
-    manager3.add_button("⚙️", "menu", base_color=base_color, hover_color=hover_color, click_color=click_color,
-                        disabled_color=disabled_color)
+    cog_button = manager3.add_button("⚙️", "menu", base_color=base_color, hover_color=hover_color,
+                                     click_color=click_color,
+                                     disabled_color=disabled_color)
     full_screen_viewport = pygame.Rect(0, 0, width, height)
     title_button_viewport = pygame.Rect(width - 200, height - 200, 200, 200)
     title_viewport = pygame.Rect(0, 100, width, height - 100)
@@ -136,7 +137,6 @@ def run():
                         else:
                             randomPlaylist = data.randomPlaylist()
                             playlist = data.readPlaylist(randomPlaylist)
-                            trackDetails = playlist[0]
                             track = playlist[0]["track"]
                             isVideo = playlist[0].get("isVideo", True)
                             isStream = True if playlist[0].get("url") else False
@@ -336,24 +336,35 @@ def run():
                 mouse_move_timeout -= 12
             if mouse_move_timeout > 0 and currentMenu == "watching":
                 if video:
+                    current_second = video.get_pos()
+                    total_seconds = video.frame_count / video.frame_rate
                     video_progressbar_fg = pygame.Surface((int(width * video.frame / video.frame_count), 10))
                 elif coverActive:
+                    current_second = pygame.mixer.music.get_pos()
+                    total_seconds = data.get_track_length(track)
                     video_progressbar_fg = pygame.Surface(
-                        (int(width * pygame.mixer.music.get_pos() / data.get_track_length(track)), 10))
+                        (int(width * current_second / total_seconds), 10))
+                    current_second = current_second / 1000
+                    total_seconds = total_seconds / 1000
                 video_progressbar_bg = pygame.Surface((width - video_progressbar_fg.get_width(), 10))
                 video_progressbar_bg.fill((111, 105, 157))
                 video_progressbar_fg.fill((51, 45, 97))
                 video_progressbar_bg.set_alpha(mouse_move_timeout)
                 video_progressbar_fg.set_alpha(mouse_move_timeout)
                 # FUTURE:
-                # current second
-                # duration
                 # display the title
                 # display the artist
                 # display extra notes
                 # queue
                 pg.blit(video_progressbar_bg, (video_progressbar_fg.get_width(), 0))
                 pg.blit(video_progressbar_fg, (0, 0))
+                text = main_font.render(str(round(current_second)), True, (255, 255, 255))
+                text.set_alpha(mouse_move_timeout)
+                pg.blit(text, (15, 15))
+                text = main_font.render(str(round(total_seconds)), True, (255, 255, 255))
+                text.set_alpha(mouse_move_timeout)
+                pg.blit(text, (width - text.get_width() - 15, 15))
+                cog_button.set_alpha(mouse_move_timeout)
             if start_mouse_move_timeout or track_paused:
                 mouse_move_timeout += 12
                 if mouse_move_timeout >= 2400:
@@ -361,6 +372,7 @@ def run():
                     mouse_move_timeout = 2400
             if currentMenu != "watching":
                 mouse_move_timeout = 0
+                cog_button.reset_alpha()
 
             # main menu logic
             if currentMenu == "main":
