@@ -199,7 +199,7 @@ def displayName(track: dict):
     return ((artist + " - ") if artist else "") + (title if title else "")
 
 
-def save_voting(ratings: list, trackData, replays):
+def save_voting(ratings: list, trackData, total_seconds, replays):
     """Saves the votings in every category for the last played track."""
     print(trackData, replays)
 

@@ -30,7 +30,6 @@ def calculate_stats():
     # two stars
     # one star
     # replay count
-    # sessions
     # time spent (total (listening+voting+misc)
     # time spent voting
     # time spent listening

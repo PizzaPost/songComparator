@@ -381,7 +381,7 @@ def run():
                                         track = None
                                         video = None
                                         currentMenu = "main"
-                                data.save_voting(ratings, track, replays)
+                                data.save_voting(ratings, track, total_seconds, replays)
                         elif text == "🔁":
                             replay = True
                             replays += 1
