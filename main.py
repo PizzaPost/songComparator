@@ -56,7 +56,6 @@ def run():
     icon_glow = pygame.image.load("resources/assets/icon_glow.png")
     icon_glow = pygame.transform.smoothscale_by(icon_glow, 3)
     icon_glow = pygame.transform.smoothscale(icon_glow, (icon_glow.get_width() // 4, icon_glow.get_height() // 4))
-    icon_glow_height = icon_glow.get_height()
     icon_glow_width_half = icon_glow.get_width() // 2
     icon_glow_height_half = icon_glow.get_height() // 2
     currentMenu = "main"
@@ -84,6 +83,7 @@ def run():
     current_progressbar_width = 0
     # need to rate info font
     ntri_font = pygame.font.Font(settings_json["font"], 24)
+    replays = 0
     while running:
         pg.fill(bg_color)
         width, height = pg.get_size()
@@ -381,16 +381,10 @@ def run():
                                         track = None
                                         video = None
                                         currentMenu = "main"
-                                # (if) search in playlists
-                                '''if '''
-                                """     Pls add your logic here"""
-                                '''else:
-                                    title=data.removeExtension(track)'''
-
-                                title = track  # dummy code
-                                data.save_voting(ratings, title)
+                                data.save_voting(ratings, track, replays)
                         elif text == "🔁":
                             replay = True
+                            replays += 1
                 manager4.clear()
                 manager4.add_button("🔁", "menu", base_color=base_color,
                                     hover_color=hover_color, click_color=click_color, disabled_color=disabled_color)
@@ -418,6 +412,8 @@ def run():
             # sets the next video or cover
             if (not video and track and not playedSongOnce) or replay:
                 track_data = data.details(track, True, True)
+                if not replay:
+                    replays = 0
                 replay = False
                 currentMenu = "watching"
                 manager.clear()
@@ -426,6 +422,7 @@ def run():
                         coverActive = False
                         video = pyvidplayer2.Video(data.trackfolder + track, youtube=isStream)
                         video.resize((width, height))
+                        video.seek(66)
                 else:
                     current_pos = pygame.mixer.music.get_pos()
                     track_length = data.get_track_length(track)
