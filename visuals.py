@@ -51,6 +51,9 @@ class Button:
 
         # rect stores position and size in content coordinates (managed by ButtonManager)
         self.rect = pygame.Rect(0, 0, self.w, self.h)
+        self.x = 0
+        self.y = 0
+
         self.enabled = True
 
         # surfaces and mask prepared for fast rendering and pixel-precise hit detection
@@ -90,6 +93,8 @@ class Button:
             x (int): X position
             y (int): Y position
         """
+        self.x = int(x)
+        self.y = int(y)
         self.rect.topleft = (int(x), int(y))
 
     def set_enabled(self, state: bool = True):
@@ -181,6 +186,8 @@ class ButtonManager:
         self.scroll_speed = scroll_speed
         self._content_height = 0
         self._max_scroll = 0
+        self.x = 0
+        self.y = 0
 
     def add_button(self, text, id, **kwargs):
         """Create and add a new Button to the manager.
@@ -236,6 +243,8 @@ class ButtonManager:
         ----------
             rect (pygame.Rect): viewport rectangle in screen coordinates
         """
+        self.x = rect.x
+        self.y = rect.y
         self.viewport = rect.copy()
         self.scroll_y = max(0, min(self.scroll_y, getattr(self, "_max_scroll", 0)))
 

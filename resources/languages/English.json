@@ -52,12 +52,10 @@
     "track": "Track"
   },
   "voting": {
-    "submit": "Submit",
     "relatability": "Relatability",
     "lyrics_quality": "Lyrics Quality",
     "beat_quality": "Beat Quality",
     "beat_taste": "Beat Taste",
-    "replay": "Replay",
     "rate_song_info": "Please rate the song."
   },
   "misc": {

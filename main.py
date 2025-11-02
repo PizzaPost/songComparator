@@ -40,6 +40,7 @@ def run():
     manager = visuals.ButtonManager(button_font)
     manager2 = visuals.ButtonManager(button_font)
     manager3 = visuals.ButtonManager(emojiFont)
+    manager4 = visuals.ButtonManager(emojiFont)
     cog_button = manager3.add_button("⚙️", "menu", base_color=base_color, hover_color=hover_color,
                                      click_color=click_color,
                                      disabled_color=disabled_color)
@@ -81,7 +82,8 @@ def run():
     bg_color = colors.hex_to_rgb(
         color_palette["CTk"]["fg_color"][0 if settings_json["appearance_mode"] == "Light" else 1])
     current_progressbar_width = 0
-    show_need_to_rate_label = 0
+    # need to rate info font
+    ntri_font = pygame.font.Font(settings_json["font"], 24)
     while running:
         pg.fill(bg_color)
         width, height = pg.get_size()
@@ -167,41 +169,6 @@ def run():
                             isVideo = True if track.endswith(
                                 (".mp4", ".webm", ".mov", ".avi", ".mkv", ".flv", ".m4v")) or isStream else False
                             currentMenu = "watching"
-                    elif text == ("Submit" if not lang else lang["voting"]["submit"]):
-                        if not ratings.__contains__(0):
-                            playedSongOnce = False
-                            if wasSingleTrack:
-                                track = None
-                                video = None
-                                currentMenu = "main"
-                            else:
-                                video = None
-                                try:
-                                    for x, i in enumerate(playlist):
-                                        if track == i["track"]:
-                                            track = playlist[x + 1]["track"]
-                                            coverIndex = x + 1
-                                            break
-                                except IndexError:
-                                    track = None
-                                    video = None
-                                    currentMenu = "main"
-                            # (if) search in playlists
-                            '''if '''
-                            """     Pls add your logic here"""
-                            '''else:
-                                title=data.removeExtension(track)'''
-
-                            title = track  # dummy code
-                            data.save_voting(ratings, title)
-                        else:
-                            if show_need_to_rate_label < 1:
-                                text = main_font.render(
-                                    "Please rate the song" if not lang else lang["voting"]["rate_song_info"], True,
-                                    (155, 50, 50))
-                                show_need_to_rate_label = height // 10 + text.get_height()
-                    elif text == ("Replay" if not lang else lang["voting"]["replay"]):
-                        replay = True
                 elif id == "playlist":
                     playlist = bdetails
                     track = playlist[0]["track"]
@@ -391,25 +358,63 @@ def run():
 
             # voting menu logic
             if currentMenu == "voting":
-                manager.clear()
-                manager.add_button("Replay" if not lang else lang["voting"]["replay"], "menu", base_color=base_color,
-                                   hover_color=hover_color, click_color=click_color, disabled_color=disabled_color)
-                button = manager.add_button("Submit" if not lang else lang["voting"]["submit"], "menu",
-                                            base_color=base_color, hover_color=hover_color, click_color=click_color,
-                                            disabled_color=disabled_color)
+                ratings = visuals.show_voting_screen(pg, rating_widgets)
+                id, text, bdetails = manager4.draw_and_handle(pg, mouse_1_up)
+                if text:
+                    if id == "menu":
+                        if text == "✅":
+                            if not ratings.__contains__(0):
+                                playedSongOnce = False
+                                if wasSingleTrack:
+                                    track = None
+                                    video = None
+                                    currentMenu = "main"
+                                else:
+                                    video = None
+                                    try:
+                                        for x, i in enumerate(playlist):
+                                            if track == i["track"]:
+                                                track = playlist[x + 1]["track"]
+                                                coverIndex = x + 1
+                                                break
+                                    except IndexError:
+                                        track = None
+                                        video = None
+                                        currentMenu = "main"
+                                # (if) search in playlists
+                                '''if '''
+                                """     Pls add your logic here"""
+                                '''else:
+                                    title=data.removeExtension(track)'''
+
+                                title = track  # dummy code
+                                data.save_voting(ratings, title)
+                        elif text == "🔁":
+                            replay = True
+                manager4.clear()
+                manager4.add_button("🔁", "menu", base_color=base_color,
+                                    hover_color=hover_color, click_color=click_color, disabled_color=disabled_color)
+                submit_button = manager4.add_button("✅", "menu",
+                                                    base_color=base_color, hover_color=hover_color,
+                                                    click_color=click_color,
+                                                    disabled_color=disabled_color)
                 space_rect_border_v = width - last_rect.x - last_rect.width
                 space_rect_border_h = height - (last_rect.y + last_rect.height)
-                voting_viewport = pygame.Rect(width - space_rect_border_v, height - space_rect_border_h - button.h,
-                                              space_rect_border_v, button.h)
-                manager.set_viewport(voting_viewport)
-                manager.layout(center_x=voting_viewport.centerx, center_y=voting_viewport.centery,
-                               max_width=voting_viewport.w)
-                ratings = visuals.show_voting_screen(pg, rating_widgets)
-                if show_need_to_rate_label > 0:
-                    text = main_font.render("Please rate the song.", True, (155, 50, 50))
-                    pg.blit(text, (width // 2 - text.get_width() // 2,
-                                   height // 10 - (height // 10 - show_need_to_rate_label) - text.get_height()))
-                    show_need_to_rate_label -= 1
+                voting_viewport = pygame.Rect(width - space_rect_border_v,
+                                              height - space_rect_border_h - submit_button.h,
+                                              space_rect_border_v, submit_button.h)
+                manager4.set_viewport(voting_viewport)
+                manager4.layout(center_x=voting_viewport.centerx, center_y=voting_viewport.centery,
+                                max_width=voting_viewport.w)
+                if ratings.__contains__(0):
+                    text = ntri_font.render("Please rate the song." if not lang else lang["voting"]["rate_song_info"],
+                                            True, (155, 50, 50))
+                    pg.blit(text, (submit_button.x + (submit_button.w // 2) - text.get_width() // 2 + manager4.x,
+                                   height - (height - (
+                                           manager4.y + submit_button.y + submit_button.h)) + text.get_height() // 2))
+                    manager4.set_enabled("✅", False)
+                else:
+                    manager4.set_enabled("✅")
             # sets the next video or cover
             if (not video and track and not playedSongOnce) or replay:
                 track_data = data.details(track, True, True)
