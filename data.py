@@ -6,15 +6,16 @@ import random
 
 import mutagen
 
-extensions = (
-    {}
-)  # we will use custom file extensions (undercover json files) - find them below
+extensions = {}
+# we will use custom file extensions (undercover json files) - find them below
 # we use the following file structure:
 # root/
 #   resources/
 #     covers/
 #       <image files (.jpg, .jpeg, .png, .gif, .svg, .webp)>
 coverfolder = "resources/covers/"
+#     data/
+datafolder = "resources/data/"
 #     details/
 detailsfolder = "resources/details/"
 #       <song comparator song/track details files (.scd, .scsd, .sctd)>
@@ -37,7 +38,6 @@ def randomPlaylist() -> str:
     str
         The name of a random song comparator playlist file.
     """
-    playlistfolder = "resources/playlists/"
     playlistfiles = os.listdir(playlistfolder)
     playlistfiles = [
         f
@@ -236,13 +236,13 @@ def listPlaylistFolder():
 
 
 def load_data(filename: str = "default"):
-    if os.path.exists(f"resources/data/{filename}.json"):
-        with open(f"resources/data/{filename}.json", "r", encoding="utf-8") as f:
+    if os.path.exists(f"{datafolder}{filename}.json"):
+        with open(f"{datafolder}{filename}.json", "r", encoding="utf-8") as f:
             data = json.load(f)
             f.close()
         return data
     else:
-        with open(f"resources/data/{filename}.json", "w") as f:
+        with open(f"{datafolder}{filename}.json", "w") as f:
             json.dump({}, f, indent=4)
             f.close()
         return {}
@@ -251,7 +251,7 @@ def load_data(filename: str = "default"):
 def set_value(key: str, value, filename: str = "default"):
     data = load_data(filename)
     data[key] = value
-    with open(f"resources/data/{filename}.json", "w", encoding="utf-8") as f:
+    with open(f"{datafolder}{filename}.json", "w", encoding="utf-8") as f:
         json.dump(data, f, indent=4)
         f.close()
 
@@ -264,7 +264,7 @@ def get_value(key: str, filename: str = "default"):
 def add_value(key: str, amount: int, filename: str = "default"):
     data = load_data(filename)
     data[key] = data.get(key, 0) + amount
-    with open(f"resources/data/{filename}.json", "w", encoding="utf-8") as f:
+    with open(f"{datafolder}{filename}.json", "w", encoding="utf-8") as f:
         json.dump(data, f, indent=4)
         f.close()
 
@@ -272,6 +272,6 @@ def add_value(key: str, amount: int, filename: str = "default"):
 def change_bool(key: str, filename: str = "default"):
     data = load_data(filename)
     data[key] = not data.get(key)
-    with open(f"resources/data/{filename}.json", "w", encoding="utf-8") as f:
+    with open(f"{datafolder}{filename}.json", "w", encoding="utf-8") as f:
         json.dump(data, f, indent=4)
         f.close()
