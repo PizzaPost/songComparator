@@ -422,7 +422,6 @@ def run():
                         coverActive = False
                         video = pyvidplayer2.Video(data.trackfolder + track, youtube=isStream)
                         video.resize((width, height))
-                        video.seek(66)
                 else:
                     current_pos = pygame.mixer.music.get_pos()
                     track_length = data.get_track_length(track)

@@ -465,15 +465,14 @@ def calc_cover(cover: str, width, height, coverFound=True):
     return scaledCover, coverRect
 
 
-star = pygame.image.load("resources/assets/star.png")
-star_highlighted = pygame.image.load("resources/assets/star_highlighted.png")
-star_filled = pygame.image.load("resources/assets/star_filled.png")
-
-
 class StarRating:
     """Manages the state, event handling, and drawing for the rating screen."""
 
     def __init__(self, x, y, label, font):
+        self.star = pygame.image.load("resources/assets/star.png")
+        self.star_highlighted = pygame.image.load("resources/assets/star_highlighted.png")
+        self.star_filled = pygame.image.load("resources/assets/star_filled.png")
+
         self.x = x
         self.y = y
         self.label = label
@@ -482,8 +481,8 @@ class StarRating:
         self.rating = 0
         self.hover_rating = 0
         # create rectangles for collision detection
-        star_width = star.get_width()
-        self.star_rects = [star.get_rect(topleft=(self.x + star_width * i, self.y)) for i in range(5)]
+        star_width = self.star.get_width()
+        self.star_rects = [self.star.get_rect(topleft=(self.x + star_width * i, self.y)) for i in range(5)]
 
     def handle_event(self, event):
         """Processes mouse events to update the widget state."""
@@ -504,16 +503,16 @@ class StarRating:
         """Draws the label and stars based on the current state."""
         # draw the label text
         text_surface = self.font.render(self.label, True, (255, 255, 255))
-        surface.blit(text_surface, (self.x - 350, self.y + (star.get_height() - text_surface.get_height()) // 2))
+        surface.blit(text_surface, (self.x - 350, self.y + (self.star.get_height() - text_surface.get_height()) // 2))
         # draw the 5 stars
         for i in range(5):
             star_index = i + 1
-            star_to_draw = star  # Default texture: star
+            star_to_draw = self.star  # Default texture: star
             # clicked state takes visual priority over the hover state
             if star_index <= self.rating:
-                star_to_draw = star_filled
+                star_to_draw = self.star_filled
             elif star_index <= self.hover_rating:
-                star_to_draw = star_highlighted
+                star_to_draw = self.star_highlighted
             surface.blit(star_to_draw, self.star_rects[i].topleft)
         return self.rating
 

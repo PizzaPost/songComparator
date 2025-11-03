@@ -53,52 +53,51 @@ palette = None
 def installer():
     """installs the program"""
     global finished_steps, trying
-    try:
-        while trying:
-            try:
-                # checks other modules
-                import pyvidplayer2
-                finished_steps = 4
-                import pygame
-                finished_steps = 5
-                import customtkinter
-                finished_steps = 6
-                import yt_dlp
-                finished_steps = 7
-                import PIL
-                finished_steps = 8
-                import matplotlib
-                finished_steps = 9
+    while trying:
+        try:
+            # checks other modules
+            import pyvidplayer2
+            finished_steps = 4
+            import pygame
+            finished_steps = 5
+            import customtkinter
+            finished_steps = 6
+            import yt_dlp
+            finished_steps = 7
+            import PIL
+            finished_steps = 8
+            import matplotlib
+            finished_steps = 9
 
-                # checks custom modules
-                import data
-                finished_steps = 10
-                import main
-                finished_steps = 11
-                import misc
-                finished_steps = 12
-                import settings
-                finished_steps = 13
-                import stats
-                finished_steps = 14
-                import visuals
-                finished_steps = 15
-                import window
-                finished_steps = 16
+            # checks custom modules
+            import data
+            finished_steps = 10
+            import main
+            finished_steps = 11
+            import misc
+            finished_steps = 12
+            import settings
+            finished_steps = 13
+            import stats
+            finished_steps = 14
+            import visuals
+            finished_steps = 15
+            import window
+            finished_steps = 16
 
-                trying = False
-            except ImportError as e:
-                if not e.name in custom_modules:
-                    if e.name == "yt_dlp":
-                        os.system(f"pip install yt-dlp")
-                    elif e.name == "PIL":
-                        os.system(f"pip install pillow")
-                    else:
-                        os.system(f"pip install {e.name}")
+            trying = False
+        except ImportError as e:
+            if not e.name in custom_modules:
+                if e.name == "yt_dlp":
+                    os.system(f"pip install yt-dlp")
+                elif e.name == "PIL":
+                    os.system(f"pip install pillow")
                 else:
-                    link = f"https://raw.githubusercontent.com/PizzaPost/songComparator/master/{e.name}.py"
-                    urllib.request.urlretrieve(link, f"{e.name}.py")
-
+                    os.system(f"pip install {e.name}")
+            else:
+                link = f"https://raw.githubusercontent.com/PizzaPost/songComparator/master/{e.name}.py"
+                urllib.request.urlretrieve(link, f"{e.name}.py")
+    try:
         # create the necessary folders
         os.makedirs("resources/covers", exist_ok=True)
         finished_steps += 1
