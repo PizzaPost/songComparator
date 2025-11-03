@@ -59,8 +59,8 @@ def run():
     icon_glow_width_half = icon_glow.get_width() // 2
     icon_glow_height_half = icon_glow.get_height() // 2
     currentMenu = "main"
-    intro = False  # reset to True when finished coding
-    fadein = 255  # reset to 0 when finished coding
+    intro = True
+    fadein = 0
     y_intro = height // 2 - icon_white_height_half
     init_y_intro = y_intro
     animation_state = 0
