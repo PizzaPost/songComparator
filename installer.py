@@ -36,11 +36,11 @@ except ImportError:
 import colors
 
 finished_steps = 1
-number_of_steps = 35
+number_of_steps = 38
 done_event = threading.Event()
 necessary_files = ["resources/assets/icon.png", "resources/assets/icon_white.png", "resources/assets/mute.png",
-                   "resources/assets/star.png", "resources/assets/star_filled.png", "resources/assets/icon_glow.png"
-                                                                                    "resources/assets/star_highlighted.png",
+                   "resources/assets/star.png", "resources/assets/star_filled.png", "resources/assets/icon_glow.png",
+                   "resources/assets/star_highlighted.png",
                    "resources/assets/tnf.png",
                    "resources/languages/Deutsch.json", "resources/languages/English.json",
                    "resources/fonts/NotoEmoji.ttf", "resources/fonts/NotoSans.ttf"]
