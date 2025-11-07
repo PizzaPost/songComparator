@@ -17,6 +17,7 @@ try:
     import threading
     import shutil
     import math
+    import sys
 except ImportError as e:
     if e.name != "tkinter.messagebox":
         tkinter.messagebox.showerror(
@@ -38,6 +39,7 @@ import colors
 finished_steps = 1
 number_of_steps = 38
 done_event = threading.Event()
+final_done_event = threading.Event()
 necessary_files = ["resources/assets/icon.png", "resources/assets/icon_white.png", "resources/assets/mute.png",
                    "resources/assets/star.png", "resources/assets/star_filled.png", "resources/assets/icon_glow.png",
                    "resources/assets/star_highlighted.png",
@@ -48,11 +50,14 @@ custom_modules = ["colors", "data", "main", "misc", "settings", "stats", "visual
 official_modules = ["pyvidplayer2", "pygame", "customtkinter", "yt-dlp", "pillow", "matplotlib"]
 trying = True
 palette = None
+failed_to_install_pywin_things = False
+event_trigger = 0
+create_desktop_shortcut = None
 
 
 def installer():
     """installs the program"""
-    global finished_steps, trying
+    global finished_steps, trying, failed_to_install_pywin_things
     while trying:
         try:
             # checks other modules
@@ -68,22 +73,27 @@ def installer():
             finished_steps = 8
             import matplotlib
             finished_steps = 9
+            if not failed_to_install_pywin_things:
+                from win32com.client import Dispatch
+                finished_steps = 10
+            import winshell
+            finished_steps = 11
 
             # checks custom modules
             import data
-            finished_steps = 10
-            import main
-            finished_steps = 11
-            import misc
             finished_steps = 12
-            import settings
+            import main
             finished_steps = 13
-            import stats
+            import misc
             finished_steps = 14
-            import visuals
+            import settings
             finished_steps = 15
-            import window
+            import stats
             finished_steps = 16
+            import visuals
+            finished_steps = 17
+            import window
+            finished_steps = 18
 
             trying = False
         except ImportError as e:
@@ -92,6 +102,10 @@ def installer():
                     os.system(f"pip install yt-dlp")
                 elif e.name == "PIL":
                     os.system(f"pip install pillow")
+                elif e.name in ("win32com", "pywintypes", "winshell"):
+                    if not failed_to_install_pywin_things:
+                        os.system(f"pip install pywin32")
+                        failed_to_install_pywin_things = True
                 else:
                     os.system(f"pip install {e.name}")
             else:
@@ -141,6 +155,28 @@ def installer():
 
 palette = colors.load_palette(color_path)
 finished_steps += 1
+
+
+def create_shortcut(desktop_shortcut_value):
+    if desktop_shortcut_value:
+        path_to_hear = os.path.dirname(os.path.abspath(__file__)).replace("/installer.py", "")
+        script = path_to_hear + "\main.py"
+        pythonw = os.path.join(os.path.dirname(sys.executable), "pythonw.exe")
+        if not os.path.exists(pythonw):
+            pythonw = sys.executable
+        import winshell
+        from win32com.client import Dispatch
+        shortcut_path = os.path.join(winshell.desktop(), "Song Comparator.lnk")
+        shell = Dispatch("WScript.Shell")
+        shortcut = shell.CreateShortcut(shortcut_path)
+        shortcut.TargetPath = pythonw
+        shortcut.Arguments = f'"{script}" --quiet'
+        shortcut.WorkingDirectory = os.path.dirname(script)
+        shortcut.IconLocation = fr"{path_to_hear}\resources\assets\icon.ico"
+        shortcut.Description = "Launch Song Comparator"
+        shortcut.Hotkey = ""
+        shortcut.Save()
+    final_done_event.set()
 
 
 def uninstaller(tk):
@@ -302,12 +338,31 @@ def start_installation(tk):
 
     def update_ui():
         """Updates the installer GUI."""
-        installation_text2.config(
-            text=f"Finished Steps: {finished_steps}/{number_of_steps}" if not lang else lang["installer"][
-                "finished_steps"].format(
-                finished_steps, number_of_steps))
-        loading_bar["value"] = finished_steps
-        if done_event.is_set():
+        global event_trigger
+        if not done_event.is_set():
+            installation_text2.config(
+                text=f"Finished Steps: {finished_steps}/{number_of_steps}" if not lang else lang["installer"][
+                    "finished_steps"].format(
+                    finished_steps, number_of_steps))
+            loading_bar["value"] = finished_steps
+        if done_event.is_set() and event_trigger == 0:
+            event_trigger = 1
+            for widget in tk.winfo_children():
+                widget.destroy()
+            frame = tkinter.Frame(tk)
+            desktop_shortcut_checkbox = tkinter.Checkbutton(frame, text="Create desktop shortcut" if not lang else
+            lang["installer"]["create_shortcut"], variable=create_desktop_shortcut)
+            finalize_installation_button = tkinter.Button(frame,
+                                                          text="Finish" if not lang else lang["installer"]["finish"],
+                                                          command=lambda: create_shortcut(
+                                                              create_desktop_shortcut.get()))
+            for widget in tk.winfo_children():
+                colors.set_color(widget, palette)
+            frame.pack(padx=20, pady=20)
+            desktop_shortcut_checkbox.grid(row=0, column=0, padx=20, pady=20)
+            finalize_installation_button.grid(row=1, column=0)
+        if final_done_event.is_set() and event_trigger == 1:
+            event_trigger = 2
             tk.protocol("WM_DELETE_WINDOW", lambda: tk.destroy())
             tk.title("Installation Complete" if not lang else lang["installer"]["installation_complete"])
             for widget in tk.winfo_children():
@@ -333,14 +388,14 @@ def start_installation(tk):
 
 def start_gui():
     """Starts the installer GUI."""
-    global finished_steps
+    global finished_steps, create_desktop_shortcut
     # downloads the icon
-    file = "resources/assets/icon.ico"
-    if not os.path.exists(file):
+    icon_path = "resources/assets/icon.ico"
+    if not os.path.exists(icon_path):
         try:
             os.makedirs("resources/assets", exist_ok=True)
             link = f"https://raw.githubusercontent.com/PizzaPost/songComparator/master/{file}"
-            urllib.request.urlretrieve(link, file)
+            urllib.request.urlretrieve(link, icon_path)
             finished_steps += 1
         except Exception as e:
             tkinter.messagebox.showerror(
@@ -349,8 +404,9 @@ def start_gui():
                     "installation_error_description1"].format(str(e)))
             exit(0)
     tk = tkinter.Tk()
+    create_desktop_shortcut = tkinter.BooleanVar(value=False)
     tk.title("Installer" if not lang else lang["installer"]["title"])
-    tk.iconbitmap(file)
+    tk.iconbitmap(icon_path)
     tk.geometry(f"400x185+{tk.winfo_screenwidth() // 2 - 208}+{tk.winfo_screenheight() // 2 - 88}")
     tk.resizable(False, False)
     tk.attributes("-topmost", True)

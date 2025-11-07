@@ -15,7 +15,9 @@
     "please_wait": "Bitte warte bis die Installation abgeschlossen ist.",
     "installation_complete": "Installation abgeschlossen",
     "run_now": "Möchtest du das Programm jetzt starten?",
-    "install": "installieren"
+    "install": "installieren",
+    "create_shortcut": "Desktop-Verknüpfung erstellen",
+    "finish": "Fertigstellen"
   },
   "uninstaller": {
     "title": "Deinstallierungsprogramm",

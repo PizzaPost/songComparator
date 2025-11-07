@@ -15,7 +15,9 @@
     "please_wait": "Please wait until installation is complete.",
     "installation_complete": "Installation Complete",
     "run_now": "Do you want to run the program?",
-    "install": "install"
+    "install": "install",
+    "create_shortcut": "create desktop shortcut",
+    "finish": "Finish"
   },
   "uninstaller": {
     "title": "Uninstaller",
