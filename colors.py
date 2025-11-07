@@ -222,20 +222,12 @@ def set_color(widget, palette):
 
     if cls == "Checkbutton":
         try:
-            cbtn_kwargs = dict(
-                bg=palette["bg"],
-                fg=palette["text"],
-                activebackground=palette["button_bg"],
-                activeforeground=palette["button_active_bg"],
-                selectcolor=palette["button_bg"],
-                bd=0,
-                relief="flat",
-                highlightthickness=0,
-                padx=8,
-                pady=4,
-                disabledforeground=palette.get("palette", "button_disabled_color")
-            )
-            widget.configure(**cbtn_kwargs)
+            widget.configure(background=palette["bg"],
+                             foreground=palette["text"],
+                             activebackground=palette["bg"],
+                             activeforeground=palette["button_active_bg"],
+                             selectcolor=palette["bg"],
+                             bd=0)
         except Exception:
             pass
 

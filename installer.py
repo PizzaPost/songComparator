@@ -34,8 +34,6 @@ try:
 except ImportError:
     link = f"https://raw.githubusercontent.com/PizzaPost/songComparator/master/colors.py"
     urllib.request.urlretrieve(link, f"colors.py")
-import colors
-
 finished_steps = 1
 number_of_steps = 38
 done_event = threading.Event()
@@ -160,7 +158,7 @@ finished_steps += 1
 def create_shortcut(desktop_shortcut_value):
     if desktop_shortcut_value:
         path_to_hear = os.path.dirname(os.path.abspath(__file__)).replace("/installer.py", "")
-        script = path_to_hear + "\main.py"
+        script = os.path.join(path_to_hear, "main.py")
         pythonw = os.path.join(os.path.dirname(sys.executable), "pythonw.exe")
         if not os.path.exists(pythonw):
             pythonw = sys.executable
