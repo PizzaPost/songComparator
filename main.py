@@ -1,5 +1,6 @@
 import math
 import os
+import time
 import tkinter
 
 import pygame
@@ -84,6 +85,8 @@ def run():
     # need to rate info font
     ntri_font = pygame.font.Font(settings_json["font"], 24)
     replays = 0
+    watchStart = 0
+    watchEnd = 0
     while running:
         pg.fill(bg_color)
         width, height = pg.get_size()
@@ -169,6 +172,7 @@ def run():
                             isVideo = True if track.endswith(
                                 (".mp4", ".webm", ".mov", ".avi", ".mkv", ".flv", ".m4v")) or isStream else False
                             currentMenu = "watching"
+                            watchStart = time.time()
                 elif id == "playlist":
                     playlist = bdetails
                     track = playlist[0]["track"]
@@ -274,6 +278,7 @@ def run():
                     video.draw(pg, (0, 0))
                     if video.frame == video.frame_count:
                         currentMenu = "voting"
+                        watchEnd = time.time()
                         rating_widgets = visuals.setup_voting_widgets(width, height, main_font, lang)
             elif coverActive and currentMenu == "watching":
                 pg.blit(scaledCover, coverRect)
@@ -281,6 +286,7 @@ def run():
                 track_length = data.get_track_length(track)
                 if current_pos >= track_length - 50:
                     currentMenu = "voting"
+                    watchEnd = time.time()
                     rating_widgets = visuals.setup_voting_widgets(width, height, main_font, lang)
 
             # video overlay
@@ -381,7 +387,9 @@ def run():
                                         track = None
                                         video = None
                                         currentMenu = "main"
-                                data.save_voting(ratings, track, total_seconds, replays)
+                                timeDiff = watchEnd - watchStart
+                                total_listened_seconds = timeDiff + (total_listened_seconds := 0)
+                                data.save_voting(ratings, track_data, total_listened_seconds, replays)
                         elif text == "🔁":
                             replay = True
                             replays += 1
@@ -416,6 +424,7 @@ def run():
                     replays = 0
                 replay = False
                 currentMenu = "watching"
+                watchStart = time.time()
                 manager.clear()
                 if isVideo:
                     if not video or not video.active:

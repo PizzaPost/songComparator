@@ -201,7 +201,7 @@ def displayName(track: dict):
 
 def save_voting(ratings: list, trackData, total_seconds, replays):
     """Saves the votings in every category for the last played track."""
-    print(trackData, replays)
+    print(ratings, trackData, total_seconds, replays)
 
 
 def get_track_length(track):
