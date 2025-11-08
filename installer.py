@@ -157,8 +157,8 @@ finished_steps += 1
 
 def create_shortcut(desktop_shortcut_value):
     if desktop_shortcut_value:
-        path_to_hear = os.path.dirname(os.path.abspath(__file__)).replace("/installer.py", "")
-        script = os.path.join(path_to_hear, "main.py")
+        path_to_here = os.path.dirname(os.path.abspath(__file__)).replace("/installer.py", "")
+        script = os.path.join(path_to_here, "main.py")
         pythonw = os.path.join(os.path.dirname(sys.executable), "pythonw.exe")
         if not os.path.exists(pythonw):
             pythonw = sys.executable
@@ -170,7 +170,7 @@ def create_shortcut(desktop_shortcut_value):
         shortcut.TargetPath = pythonw
         shortcut.Arguments = f'"{script}" --quiet'
         shortcut.WorkingDirectory = os.path.dirname(script)
-        shortcut.IconLocation = fr"{path_to_hear}\resources\assets\icon.ico"
+        shortcut.IconLocation = fr"{path_to_here}\resources\assets\icon.ico"
         shortcut.Description = "Launch Song Comparator"
         shortcut.Hotkey = ""
         shortcut.Save()
