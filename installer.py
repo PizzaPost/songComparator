@@ -18,6 +18,7 @@ try:
     import shutil
     import math
     import sys
+    import time
 except ImportError as e:
     if e.name != "tkinter.messagebox":
         tkinter.messagebox.showerror(
