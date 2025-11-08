@@ -114,6 +114,17 @@ def run():
                     pygame.time.delay(17)
                 intro = False
                 data.add_value("sessions", 1)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
+                        fade_surface = pygame.Surface((width, height))
+                        fade_surface.set_alpha(255)
+                        fade_surface.fill((0, 0, 0))
+                        pg.blit(fade_surface, (0, 0))
+                        intro = False
+                        data.add_value("sessions", 1)
 
         # main app
         else:
@@ -311,9 +322,12 @@ def run():
                 video_progressbar_fg.fill((51, 45, 97))
                 video_progressbar_bg.set_alpha(mouse_move_timeout)
                 video_progressbar_fg.set_alpha(mouse_move_timeout)
-                # FUTURE:
-                # notes
-                # queue
+                if track_data.__contains__("pre_notes"):
+                    notes = track_data["pre_notes"]
+                    for x, line in enumerate(reversed(notes)):
+                        text = main_font.render(str(line), True, (255, 255, 255))
+                        text.set_alpha(mouse_move_timeout)
+                        pg.blit(text, (15, height - 15 - (x + 1) * text.get_height()))
                 pg.blit(video_progressbar_bg, (video_progressbar_fg.get_width(), 0))
                 pg.blit(video_progressbar_fg, (0, 0))
                 text = main_font.render(str(round(current_second)), True, (255, 255, 255))
@@ -359,6 +373,11 @@ def run():
             # voting menu logic
             if currentMenu == "voting":
                 ratings = visuals.show_voting_screen(pg, rating_widgets)
+                if track_data.__contains__("after_notes"):
+                    notes = track_data["after_notes"]
+                    for x, line in enumerate(notes):
+                        text = main_font.render(str(line), True, (255, 255, 255))
+                        pg.blit(text, (manager4.x + 30, 15 + x * text.get_height()))
                 id, text, bdetails = manager4.draw_and_handle(pg, mouse_1_up)
                 if text:
                     if id == "menu":
