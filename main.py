@@ -87,6 +87,10 @@ def run():
     replays = 0
     watchStart = 0
     watchEnd = 0
+    global_volume_modifier = settings_json["master_volume"]
+    track_volume_modifier = settings_json["track_volume"] * (global_volume_modifier / 100) / 100
+    gui_volume_modifier = settings_json["gui_volume"] * (global_volume_modifier / 100) / 100
+    effects_volume_modifier = settings_json["effects_volume"] * (global_volume_modifier / 100) / 100
     while running:
         pg.fill(bg_color)
         width, height = pg.get_size()
@@ -450,12 +454,14 @@ def run():
                         coverActive = False
                         video = pyvidplayer2.Video(data.trackfolder + track, youtube=isStream)
                         video.resize((width, height))
+                        video.set_volume(track_volume_modifier)
                 else:
                     current_pos = pygame.mixer.music.get_pos()
                     track_length = data.get_track_length(track)
                     if ((current_pos <= track_length - 50) and not playedSongOnce and not currentMenu == "voting"
                             and playlist and coverIndex):
                         pygame.mixer.music.load(data.trackfolder + track)
+                        pygame.mixer.music.set_volume(track_volume_modifier)
                         pygame.mixer.music.play()
                         coverActive = True
                         cover = playlist[coverIndex]["cover"]
@@ -463,6 +469,7 @@ def run():
                         playedSongOnce = True
                     else:
                         pygame.mixer.music.load(data.trackfolder + track)
+                        pygame.mixer.music.set_volume(track_volume_modifier)
                         pygame.mixer.music.play()
                         coverActive = True
                         details = data.details(track, True, True)
