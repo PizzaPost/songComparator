@@ -91,11 +91,19 @@ def run():
     track_volume_modifier = settings_json["track_volume"] * (global_volume_modifier / 100) / 100
     gui_volume_modifier = settings_json["gui_volume"] * (global_volume_modifier / 100) / 100
     effects_volume_modifier = settings_json["effects_volume"] * (global_volume_modifier / 100) / 100
+    add_new_date = True
     while running:
         pg.fill(bg_color)
         width, height = pg.get_size()
 
         # start up animation
+        current_date = time.localtime()
+        current_date = current_date.tm_mday, current_date.tm_mon, current_date.tm_year
+        dates_used = data.get_value("dates_used")
+        if dates_used:
+            last_used_date = dates_used[-1]
+            if last_used_date == list(current_date):
+                add_new_date = False
         if intro:
             animation_state += 1
             pg.blit(icon_white, (width // 2 - icon_white_width_half, height // 2 - icon_white_height_half))
@@ -121,6 +129,8 @@ def run():
                     pygame.time.delay(17)
                 intro = False
                 data.add_value("sessions", 1)
+                if add_new_date:
+                    data.add_value_to_list("dates_used", current_date)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
@@ -132,6 +142,8 @@ def run():
                         pg.blit(fade_surface, (0, 0))
                         intro = False
                         data.add_value("sessions", 1)
+                        if add_new_date:
+                            data.add_value_to_list("dates_used", current_date)
 
         # main app
         else:

@@ -269,6 +269,15 @@ def add_value(key: str, amount: int, filename: str = "default"):
         f.close()
 
 
+def add_value_to_list(key: str, value, filename: str = "default"):
+    data = load_data(filename)
+    data.setdefault(key, [])
+    data[key].append(value)
+    with open(f"{datafolder}{filename}.json", "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=4)
+        f.close()
+
+
 def change_bool(key: str, filename: str = "default"):
     data = load_data(filename)
     data[key] = not data.get(key)
