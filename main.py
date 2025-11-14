@@ -1,3 +1,4 @@
+import logging
 import math
 import os
 import time
@@ -11,6 +12,23 @@ import data
 import misc
 import settings
 import visuals
+
+logging.basicConfig(level=logging.INFO, format="[%(asctime)s] %(message)s", datefmt="%H:%M:%S")
+log = logging.getLogger()
+log.info("initializing variables")
+last_log = None
+
+
+def save_log(msg, type: str = None):
+    global last_log
+    if msg != last_log:
+        if type is None:
+            log.info(msg)
+        elif type == "warning":
+            log.warning(msg)
+        elif type == "error":
+            log.error(msg)
+    last_log = msg
 
 
 def run():
@@ -92,18 +110,20 @@ def run():
     gui_volume_modifier = settings_json["gui_volume"] * (global_volume_modifier / 100) / 100
     effects_volume_modifier = settings_json["effects_volume"] * (global_volume_modifier / 100) / 100
     add_new_date = True
+    current_date = time.localtime()
+    current_date = current_date.tm_mday, current_date.tm_mon, current_date.tm_year
+    dates_used = data.get_value("dates_used")
+    if dates_used:
+        last_used_date = dates_used[-1]
+        if last_used_date == list(current_date):
+            add_new_date = False
+    save_log("initialized variables")
+    save_log("starting startup animation")
     while running:
         pg.fill(bg_color)
         width, height = pg.get_size()
 
         # start up animation
-        current_date = time.localtime()
-        current_date = current_date.tm_mday, current_date.tm_mon, current_date.tm_year
-        dates_used = data.get_value("dates_used")
-        if dates_used:
-            last_used_date = dates_used[-1]
-            if last_used_date == list(current_date):
-                add_new_date = False
         if intro:
             animation_state += 1
             pg.blit(icon_white, (width // 2 - icon_white_width_half, height // 2 - icon_white_height_half))
@@ -128,9 +148,13 @@ def run():
                     pygame.display.update()
                     pygame.time.delay(17)
                 intro = False
+                save_log("finished startup animation")
+                save_log("adding values to data")
                 data.add_value("sessions", 1)
                 if add_new_date:
                     data.add_value_to_list("dates_used", current_date)
+                save_log("finished adding values to data")
+                save_log("start fade-in animation")
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
@@ -141,9 +165,13 @@ def run():
                         fade_surface.fill((0, 0, 0))
                         pg.blit(fade_surface, (0, 0))
                         intro = False
+                        save_log("finished startup animation")
+                        save_log("adding values to data")
                         data.add_value("sessions", 1)
                         if add_new_date:
                             data.add_value_to_list("dates_used", current_date)
+                        save_log("finished adding values to data")
+                        save_log("start fade-in animation")
 
         # main app
         else:
@@ -155,6 +183,7 @@ def run():
                     settings_window = None
             id, text, bdetails = manager.draw_and_handle(pg, mouse_1_up)
             if text:
+                save_log(f"clicked text: {text}, id: {id}")
                 manager.disable_all()
                 if id == "menu":
                     manager.clear()
@@ -214,7 +243,7 @@ def run():
                     isStream = True if trackDetails.get("url") else False
                     wasSingleTrack = True
                 else:
-                    print(f"{text} pressed and could not be matched to any id.")
+                    save_log(f"Unknown button text pressed: {text}, id: {id}", "warning")
 
             # handle events
             mouse_1_up = False
@@ -230,23 +259,29 @@ def run():
                     if video:
                         if event.key == pygame.K_j:
                             video.seek(-10)
+                            save_log("seeking back 10 seconds in video mode")
                         elif event.key == pygame.K_k or event.key == pygame.K_SPACE:
                             video.toggle_pause()
                             if video.paused:
                                 track_paused = True
                             else:
                                 track_paused = False
+                            save_log(f"toggled pause in video mode to: {video.paused} through keyboard")
                         elif event.key == pygame.K_LEFT:
                             video.seek(-5)
+                            save_log("seeking back 5 seconds in video mode")
                         elif event.key == pygame.K_UP:
                             video.set_volume(video.get_volume() + 0.1)
+                            save_log(f"adjusted volume in video mode to {video.get_volume()}")
                         elif event.key == pygame.K_DOWN:
                             video.set_volume(max(0.1, video.get_volume() - 0.1))
+                            save_log(f"adjusted volume in video mode to {video.get_volume()}")
                     elif coverActive:
                         if event.key == pygame.K_j:
                             current_pos = pygame.mixer.music.get_pos()
                             new_pos = max(0, current_pos - 10000)
                             pygame.mixer.music.set_pos(new_pos / 1000)
+                            save_log(f"seeking back 10 seconds in cover mode")
                         elif event.key == pygame.K_k or event.key == pygame.K_SPACE:
                             if pygame.mixer.music.get_busy():
                                 pygame.mixer.music.pause()
@@ -254,14 +289,19 @@ def run():
                             else:
                                 pygame.mixer.music.unpause()
                                 track_paused = False
+                            save_log(
+                                f"toggled pause in cover mode to: {not pygame.mixer.music.get_busy()} through keyboard")
                         elif event.key == pygame.K_LEFT:
                             current_pos = pygame.mixer.music.get_pos()
                             new_pos = max(0, current_pos - 5000)
                             pygame.mixer.music.set_pos(new_pos / 1000)
+                            save_log(f"seeking back 5 seconds in cover mode")
                         elif event.key == pygame.K_UP:
                             pygame.mixer.music.set_volume(pygame.mixer.music.get_volume() + 0.1)
+                            save_log(f"adjusted volume in cover mode to {video.get_volume()}")
                         elif event.key == pygame.K_DOWN:
                             pygame.mixer.music.set_volume(max(0.1, pygame.mixer.music.get_volume() - 0.1))
+                            save_log(f"adjusted volume in cover mode to {video.get_volume()}")
                 # track mouse controls
                 elif event.type == pygame.MOUSEBUTTONUP:
                     mouse_pos = pygame.mouse.get_pos()
@@ -278,6 +318,7 @@ def run():
                                     track_paused = True
                                 else:
                                     track_paused = False
+                                save_log(f"toggled pause in video mode to: {video.get_paused()} through mouse")
                             elif coverActive:
                                 if pygame.mixer.music.get_busy():
                                     pygame.mixer.music.pause()
@@ -285,10 +326,13 @@ def run():
                                 else:
                                     pygame.mixer.music.unpause()
                                     track_paused = False
+                                save_log(
+                                    f"toggled pause in cover mode to: {not pygame.mixer.music.get_busy()} through mouse")
                 # video progressbar
                 elif event.type == pygame.MOUSEMOTION:
                     if currentMenu == "watching":
                         start_mouse_move_timeout = True
+                        save_log("mouse moved while watching")
                 temp = False
                 if video:
                     if video.paused:
@@ -332,7 +376,9 @@ def run():
             if mouse_move_timeout > 0 and currentMenu == "watching" and not start_mouse_move_timeout:
                 mouse_move_timeout -= 12
             if mouse_move_timeout > 0 and currentMenu == "watching":
-                pygame.mouse.set_visible(True)
+                if not pygame.mouse.get_visible():
+                    pygame.mouse.set_visible(True)
+                    save_log("showing mouse")
                 if video:
                     video_progressbar_fg = pygame.Surface((int(current_progressbar_width), 10))
                 elif coverActive:
@@ -363,18 +409,20 @@ def run():
                 pg.blit(text, (width / 2 - text.get_width() / 2, 15))
                 cog_button.set_alpha(mouse_move_timeout)
             else:
-                if currentMenu == "watching":
+                if currentMenu == "watching" and pygame.mouse.get_visible():
                     pygame.mouse.set_visible(False)
+                    save_log("hiding mouse")
             if start_mouse_move_timeout or track_paused:
                 start_mouse_move_timeout = True
                 mouse_move_timeout += 12
                 if mouse_move_timeout >= 2400:
                     start_mouse_move_timeout = False
                     mouse_move_timeout = 2400
-            if currentMenu != "watching":
+            if currentMenu != "watching" and not pygame.mouse.get_visible():
                 mouse_move_timeout = 0
                 cog_button.reset_alpha()
                 pygame.mouse.set_visible(True)
+                save_log("showing mouse")
 
             # main menu logic
             if currentMenu == "main":
@@ -402,8 +450,10 @@ def run():
                         pg.blit(text, (manager4.x + 30, 15 + x * text.get_height()))
                 id, text, bdetails = manager4.draw_and_handle(pg, mouse_1_up)
                 if text:
+                    save_log(f"clicked text: {text}, id: {id}")
                     if id == "menu":
                         if text == "✅":
+                            save_log(f"saving votings")
                             if not ratings.__contains__(0):
                                 playedSongOnce = False
                                 if wasSingleTrack:
@@ -425,9 +475,12 @@ def run():
                                 timeDiff = watchEnd - watchStart
                                 total_listened_seconds = timeDiff + (total_listened_seconds := 0)
                                 data.save_voting(ratings, track_data, total_listened_seconds, replays)
+                                save_log(f"saved votings")
                         elif text == "🔁":
                             replay = True
                             replays += 1
+                        else:
+                            save_log(f"Unknown button text pressed: {text}, id: {id}", "warning")
                 manager4.clear()
                 manager4.add_button("🔁", "menu", base_color=base_color,
                                     hover_color=hover_color, click_color=click_color, disabled_color=disabled_color)
@@ -454,6 +507,7 @@ def run():
                     manager4.set_enabled("✅")
             # sets the next video or cover
             if (not video and track and not playedSongOnce) or replay:
+                save_log("setting up next video or cover")
                 track_data = data.details(track, True, True)
                 if not replay:
                     replays = 0
@@ -467,6 +521,7 @@ def run():
                         video = pyvidplayer2.Video(data.trackfolder + track, youtube=isStream)
                         video.resize((width, height))
                         video.set_volume(track_volume_modifier)
+                        save_log("finished setting up video")
                 else:
                     current_pos = pygame.mixer.music.get_pos()
                     track_length = data.get_track_length(track)
@@ -479,6 +534,7 @@ def run():
                         cover = playlist[coverIndex]["cover"]
                         scaledCover, coverRect = visuals.calc_cover(cover, width, height)
                         playedSongOnce = True
+                        save_log("finished setting up cover type: 1")
                     else:
                         pygame.mixer.music.load(data.trackfolder + track)
                         pygame.mixer.music.set_volume(track_volume_modifier)
@@ -497,15 +553,19 @@ def run():
                             cover = None
                         scaledCover, coverRect = visuals.calc_cover(cover, width, height, coverFound)
                         playedSongOnce = True
+                        save_log("finished setting up cover type: 2")
             if currentMenu == "main" or mouse_move_timeout > 0:
                 manager3.set_viewport(title_button_viewport)
                 manager3.layout(center_x=title_button_viewport.centerx, center_y=title_button_viewport.centery,
                                 max_width=title_button_viewport.w)
                 id, text, bdetails = manager3.draw_and_handle(pg, mouse_1_up)
                 if id == "menu":
+                    save_log(f"clicked text: {text}, id: {id}")
                     if text == "⚙️":
                         escaped = True
                         manager3.set_enabled("⚙️", False)
+                    else:
+                        save_log(f"Unknown button text pressed: {text}, id: {id}", "warning")
             if escaped:
                 if video or coverActive:
                     if not track_paused:
@@ -533,6 +593,7 @@ def run():
                                 max_width=title_viewport.w)
                 id, text, bdetails = manager2.draw_and_handle(pg, mouse_1_up)
                 if id == "esc_menu":
+                    save_log(f"clicked text: {text}, id: {id}")
                     if text == "Back":
                         escaped = False
                         manager3.set_enabled("⚙️")
@@ -545,23 +606,29 @@ def run():
                             frame._parent_canvas.yview_moveto(0)
                     elif text == "Calculate Data":
                         tkinter.messagebox.showinfo("Calculate Data", "This feature is not yet implemented")
+                    else:
+                        save_log(f"Unknown button text pressed: {text}, id: {id}", "warning")
             else:
                 if paused_by_esc:
                     if video:
                         video.resume()
+                        save_log("unpaused video by escape")
                     elif coverActive:
                         pygame.mixer.music.unpause()
+                        save_log("unpaused cover by escape")
                     paused_by_esc = False
                     track_paused = False
 
             # quit app logic
             if keys[pygame.K_ESCAPE]:
+                save_log("pressing escape")
                 esc += 1
                 pg.fill((255, 0, 0), (0, height - 50, width // 200 * esc, 50))
             else:
                 esc = 0
             if esc == 215:
                 running = False
+                save_log("closing app through escape")
             # intro fade-in
             if fadein < 255:
                 fade_surface = pygame.Surface((width, height))
@@ -571,6 +638,8 @@ def run():
                 pygame.display.update()
                 pygame.time.delay(17)
                 fadein += 3
+                if fadein == 255:
+                    save_log("finished fade-in animation")
         pygame.display.update()
         clock.tick(120)
     pygame.quit()
