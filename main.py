@@ -518,7 +518,10 @@ def run():
                 if isVideo:
                     if not video or not video.active:
                         coverActive = False
-                        video = pyvidplayer2.Video(data.trackfolder + track, youtube=isStream)
+                        if isStream:
+                            video = pyvidplayer2.Video(track, youtube=True)
+                        else:
+                            video = pyvidplayer2.Video(data.trackfolder + track, youtube=False)
                         video.resize((width, height))
                         video.set_volume(track_volume_modifier)
                         save_log("finished setting up video")
