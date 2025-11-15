@@ -35,3 +35,8 @@ def load_settings():
         data = json.load(f)
     f.close()
     return data
+
+
+def isLogEnabled():
+    settings_json = load_settings()
+    return settings_json["logging"]

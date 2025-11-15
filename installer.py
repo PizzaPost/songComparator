@@ -19,6 +19,7 @@ try:
     import math
     import sys
     import time
+    import logging
 except ImportError as e:
     if e.name != "tkinter.messagebox":
         tkinter.messagebox.showerror(
@@ -136,7 +137,7 @@ def installer():
                 json.dump({"theme": "default", "appearance_mode": "system", "language": "English",
                            "font": "resources/fonts/NotoSans.ttf", "master_volume": 100,
                            "track_volume": 100, "gui_volume": 100, "effects_volume": 100,
-                           "enabled_audio": [True, True, True, True]}, f, indent=4)
+                           "enabled_audio": [True, True, True, True], "logging": False}, f, indent=4)
             f.close()
         finished_steps += 1
 

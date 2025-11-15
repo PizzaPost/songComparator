@@ -12,5 +12,6 @@
         true,
         true,
         true
-    ]
+    ],
+    "logging": false
 }

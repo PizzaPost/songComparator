@@ -13,23 +13,30 @@ import misc
 import settings
 import visuals
 
-logging.basicConfig(level=logging.INFO, format="[%(asctime)s] %(message)s", datefmt="%H:%M:%S")
-log = logging.getLogger()
-log.info("initializing variables")
-last_log = None
+if misc.isLogEnabled():
+    logging.basicConfig(level=logging.INFO, format="[%(asctime)s] %(message)s", datefmt="%H:%M:%S")
+    log = logging.getLogger()
+    log.info("Song Comparator Log:")
+    log.info("(You can disable this in the settings.)")
+    log.info("")
+    log.info("Info: initializing variables")
+    last_log = None
+    logging=True
+else:
+    logging=False
 
 
 def save_log(msg, type: str = None):
-    global last_log
-    if msg != last_log:
-        if type is None:
-            log.info(msg)
-        elif type == "warning":
-            log.warning(msg)
-        elif type == "error":
-            log.error(msg)
-    last_log = msg
-
+    if logging:
+        global last_log
+        if msg != last_log:
+            if type is None or type == "info":
+                log.info(f"Info: {msg}")
+            elif type == "warning":
+                log.warning(f"Warning: {msg}")
+            elif type == "error":
+                log.error(f"Error: {msg}")
+        last_log = msg
 
 def run():
     settings_json = misc.load_settings()
