@@ -47,7 +47,10 @@
     "effects_volume_label": "Effects:",
     "close": "Close",
     "submit_info": "Changed will be displayed after a restarting.",
-    "font_specifier_info": "Select a specific version."
+    "font_specifier_info": "Select a specific version.",
+    "advanced": "Advanced",
+    "enabled": "Enabled",
+    "disabled": "Disabled"
   },
   "program": {
     "playlist": "Playlist",

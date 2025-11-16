@@ -305,12 +305,12 @@
       "#B5424C"
     ],
     "unselected_color": [
-      "#a34c52",
-      "#7C0008"
+      "#808080",
+      "#404040"
     ],
     "unselected_hover_color": [
-      "#be767b",
-      "#a33c43"
+      "#999999",
+      "#595959"
     ],
     "text_color": [
       "#f6f6f7",

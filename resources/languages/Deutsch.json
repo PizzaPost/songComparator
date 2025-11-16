@@ -47,7 +47,10 @@
     "effects_volume_label": "Effekte:",
     "close": "Schließen",
     "submit_info": "Änderungen werden nach einem Neustart angezeigt.",
-    "font_specifier_info": "Wähle eine bestimmte Version aus."
+    "font_specifier_info": "Wähle eine bestimmte Version aus.",
+    "advanced": "Erweitert",
+    "enabled": "Aktiviert",
+    "disabled": "Deaktiviert"
   },
   "program": {
     "playlist": "Wiedergabeliste",

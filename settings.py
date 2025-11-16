@@ -13,7 +13,7 @@ import misc
 def submit_settings(tk, lang, theme, appearance_mode, language, font_dropdown, font_specifier, font_list, master_volume,
                     track_volume, gui_volume,
                     effects_volume,
-                    enabled_audio):
+                    enabled_audio, logging):
     selected_font_name = font_dropdown.get()
     font = "resources/fonts/NotoSans.ttf"
     if selected_font_name == "NotoSans (default)":
@@ -29,7 +29,9 @@ def submit_settings(tk, lang, theme, appearance_mode, language, font_dropdown, f
         json.dump({"theme": theme, "appearance_mode": appearance_mode, "language": language, "font": font,
                    "master_volume": int(master_volume), "track_volume": int(track_volume),
                    "gui_volume": int(gui_volume), "effects_volume": int(effects_volume),
-                   "enabled_audio": enabled_audio}, f, indent=4)
+                   "enabled_audio": enabled_audio,
+                   "logging": True if logging == ("Enabled" if not lang else lang["settings"]["enabled"]) else False},
+                  f, indent=4)
     f.close()
     tkinter.messagebox.showinfo(
         "Info",
@@ -66,6 +68,8 @@ def open_settings():
     tk.geometry(f"650x370+{tk.winfo_screenwidth() // 2 - 325}+{tk.winfo_screenheight() // 2 - 185}")
     tk.resizable(False, False)
     tk.attributes("-topmost", True)
+
+    logging_var = tkinter.StringVar(value="Enabled" if data["logging"] else "Disabled")
 
     frame = customtkinter.CTkScrollableFrame(tk)
     frame2 = customtkinter.CTkFrame(frame)
@@ -178,6 +182,14 @@ def open_settings():
     effects_volume_percentage = customtkinter.CTkLabel(frame2,
                                                        text=f"{"   " if value < 100 else ""}{"  " if value < 10 else ""}{value}%")
     seperator5 = customtkinter.CTkLabel(frame2, text="")
+    advanced_heading = customtkinter.CTkLabel(frame2, text="Advanced" if not lang else lang["settings"]["advanced"],
+                                              font=(font, 24, "bold"))
+    logging_label = customtkinter.CTkLabel(frame2, text="Logger")
+    logging_button = customtkinter.CTkSegmentedButton(frame2,
+                                                      values=["Enabled" if not lang else lang["settings"]["enabled"],
+                                                              "Disabled" if not lang else lang["settings"]["disabled"]],
+                                                      variable=logging_var)
+    seperator6 = customtkinter.CTkLabel(frame2, text="")
     submit = customtkinter.CTkButton(frame3, text="Submit" if not lang else lang["settings"]["submit"],
                                      command=lambda: submit_settings(tk, lang, themes_dropdown.get(), dark_mode.get(),
                                                                      language_dropdown.get(), font_dropdown,
@@ -191,7 +203,8 @@ def open_settings():
                                                                       False if gui_volume.cget(
                                                                           "state") == "disabled" else True,
                                                                       False if effects_volume.cget(
-                                                                          "state") == "disabled" else True]))
+                                                                          "state") == "disabled" else True],
+                                                                     logging_button.get()))
     close = customtkinter.CTkButton(frame3, text="Close" if not lang else lang["settings"]["close"],
                                     command=lambda: close_settings(tk, False))
 
@@ -232,8 +245,12 @@ def open_settings():
     effects_volume.grid(row=15, column=2, padx=5, sticky="e")
     effects_volume_percentage.grid(row=14, column=3, padx=5, sticky="e")
     seperator5.grid(row=16)
-    submit.grid(row=17, column=0, columnspan=2, padx=15, pady=5, sticky="n")
-    close.grid(row=17, column=2, columnspan=2, padx=15, pady=5, sticky="n")
+    advanced_heading.grid(row=17, column=0, pady=5, sticky="w")
+    logging_label.grid(row=18, column=0, padx=5, sticky="w")
+    logging_button.grid(row=18, column=0, padx=5, sticky="e")
+    seperator6.grid(row=19)
+    submit.grid(row=20, column=0, columnspan=2, padx=15, pady=5, sticky="n")
+    close.grid(row=20, column=2, columnspan=2, padx=15, pady=5, sticky="n")
     update_slider_colors([master_volume, track_volume, gui_volume, effects_volume], theme_colors)
     tk.update()
     return tk, frame

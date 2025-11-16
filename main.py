@@ -172,7 +172,7 @@ def run():
                         fade_surface.fill((0, 0, 0))
                         pg.blit(fade_surface, (0, 0))
                         intro = False
-                        save_log("finished startup animation")
+                        save_log("skipping startup animation")
                         save_log("adding values to data")
                         data.add_value("sessions", 1)
                         if add_new_date:
