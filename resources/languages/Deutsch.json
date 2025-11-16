@@ -66,5 +66,8 @@
   "misc": {
     "yes": "Ja",
     "no": "Nein"
+  },
+  "startup": {
+    "skip": "Drücke die LEERTASTE um das Intro zu überspringen."
   }
 }

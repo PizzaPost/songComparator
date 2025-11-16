@@ -21,9 +21,9 @@ if misc.isLogEnabled():
     log.info("")
     log.info("Info: initializing variables")
     last_log = None
-    logging=True
+    logging = True
 else:
-    logging=False
+    logging = False
 
 
 def save_log(msg, type: str = None):
@@ -37,6 +37,7 @@ def save_log(msg, type: str = None):
             elif type == "error":
                 log.error(f"Error: {msg}")
         last_log = msg
+
 
 def run():
     settings_json = misc.load_settings()
@@ -55,6 +56,10 @@ def run():
     coverRect = None
     button_font = pygame.font.Font(settings_json["font"], 48)
     emojiFont = pygame.font.Font("resources/fonts/NotoEmoji.ttf", 48)
+    main_font = pygame.font.Font(settings_json["font"], 42)
+    # need to rate info font
+    ntri_font = pygame.font.Font(settings_json["font"], 24)
+    note_font = pygame.font.Font(settings_json["font"], 18)
     color_palette = colors.get_colors(f"resources/themes/{settings_json["theme"]}.json")
     base_color = colors.hex_to_rgb(
         color_palette["CTkButton"]["fg_color"][0 if settings_json["appearance_mode"] == "Light" else 1])
@@ -90,7 +95,6 @@ def run():
     y_intro = height // 2 - icon_white_height_half
     init_y_intro = y_intro
     animation_state = 0
-    main_font = pygame.font.Font(settings_json["font"], 42)
     rating_widgets = visuals.setup_voting_widgets(width, height, main_font, lang)
     mouse_1_up = False
     wasSingleTrack = False
@@ -107,8 +111,6 @@ def run():
     bg_color = colors.hex_to_rgb(
         color_palette["CTk"]["fg_color"][0 if settings_json["appearance_mode"] == "Light" else 1])
     current_progressbar_width = 0
-    # need to rate info font
-    ntri_font = pygame.font.Font(settings_json["font"], 24)
     replays = 0
     watchStart = 0
     watchEnd = 0
@@ -132,6 +134,9 @@ def run():
 
         # start up animation
         if intro:
+            text = note_font.render("Press SPACE to skip the intro." if not lang else lang["startup"]["skip"], True,
+                                    (50, 50, 50))
+            pg.blit(text, (width // 2 - text.get_width() // 2, height - text.get_height() * 3))
             animation_state += 1
             pg.blit(icon_white, (width // 2 - icon_white_width_half, height // 2 - icon_white_height_half))
             glow_range = 60

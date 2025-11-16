@@ -66,5 +66,8 @@
   "misc": {
     "yes": "Yes",
     "no": "No"
+  },
+  "startup": {
+    "skip": "Press SPACE to skip the intro."
   }
 }
