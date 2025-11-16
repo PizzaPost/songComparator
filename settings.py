@@ -72,6 +72,7 @@ def open_settings():
     tk.geometry(f"650x370+{tk.winfo_screenwidth() // 2 - 325}+{tk.winfo_screenheight() // 2 - 185}")
     tk.resizable(False, False)
     tk.attributes("-topmost", True)
+    tk.attributes("-alpha", 0)
 
     logging_var = tkinter.StringVar(value="Enabled" if data["logging"] else "Disabled")
 

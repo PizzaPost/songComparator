@@ -128,6 +128,8 @@ def run():
     save_log("initialized variables")
     save_log("starting startup animation")
     settings_window, frame = settings.open_settings()
+    settings_window.attributes("-alpha", 1)
+    pygame.event.set_grab(True)
     while running:
         pg.fill(bg_color)
         width, height = pg.get_size()
