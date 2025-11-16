@@ -104,7 +104,6 @@ def run():
     mouse_move_timeout = 0
     start_mouse_move_timeout = False
     escaped = False
-    settings_window = None
     paused_by_esc = False
     track_paused = None
     replay = False
@@ -128,6 +127,7 @@ def run():
             add_new_date = False
     save_log("initialized variables")
     save_log("starting startup animation")
+    settings_window, frame = settings.open_settings()
     while running:
         pg.fill(bg_color)
         width, height = pg.get_size()
@@ -613,9 +613,7 @@ def run():
                         escaped = False
                         manager3.set_enabled("⚙️")
                     elif text == "Settings":
-                        if settings_window is None:
-                            settings_window, frame = settings.open_settings()
-                        else:
+                        if settings_window:
                             settings_window.deiconify()
                             settings_window.focus()
                             frame._parent_canvas.yview_moveto(0)

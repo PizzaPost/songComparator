@@ -7,6 +7,7 @@ import customtkinter
 import matplotlib.font_manager
 from customtkinter import CTkImage
 
+import main
 import misc
 
 
@@ -14,6 +15,7 @@ def submit_settings(tk, lang, theme, appearance_mode, language, font_dropdown, f
                     track_volume, gui_volume,
                     effects_volume,
                     enabled_audio, logging):
+    main.save_log("submitting settings")
     selected_font_name = font_dropdown.get()
     font = "resources/fonts/NotoSans.ttf"
     if selected_font_name == "NotoSans (default)":
@@ -37,6 +39,7 @@ def submit_settings(tk, lang, theme, appearance_mode, language, font_dropdown, f
         "Info",
         "Changed will be displayed after a restarting." if not lang else lang["settings"]["submit_info"])
     close_settings(tk, True)
+    main.save_log("finished submitting settings")
 
 
 def update_font_specifier(lang, font_specifier, selected, font_list, startup=False, font_path=None):
@@ -53,6 +56,7 @@ def update_font_specifier(lang, font_specifier, selected, font_list, startup=Fal
 
 
 def open_settings():
+    main.save_log("starting settings")
     lang = misc.load_language(misc.load_settings())
     with open("resources/settings.json", "r") as f:
         data = json.load(f)
@@ -253,6 +257,8 @@ def open_settings():
     close.grid(row=20, column=2, columnspan=2, padx=15, pady=5, sticky="n")
     update_slider_colors([master_volume, track_volume, gui_volume, effects_volume], theme_colors)
     tk.update()
+    tk.withdraw()
+    main.save_log("opened settings successfully")
     return tk, frame
 
 
@@ -298,6 +304,7 @@ def close_settings(tk, saved):
     if saved or tkinter.messagebox.askyesno("Close",
                                             "Are you sure you want to close the settings without saving?"):
         tk.withdraw()
+        main.save_log("closed settings without saving" if not saved else "closed settings with saving")
 
 
 if __name__ == "__main__":
