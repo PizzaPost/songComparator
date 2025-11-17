@@ -2,6 +2,7 @@ def calculateStats(*args):
     return {
         "sessionCount": sessionCount,
         "daysUsed": daysUsed,
+        "timeTotal": timeTotal,
         "longestSessionLength": longestSessionLength,
         "averageSessionLength": averageSessionLength,
         "averageRating": averageRating,
@@ -30,10 +31,9 @@ def calculateStats(*args):
         "twoStars": twoStars,
         "oneStar": oneStar,
         "replays": replays,
-        "timeTotal": timeTotal,
         "timeVoting": timeVoting,
         "timeListening": timeListening,
         "averageTimeListened": averageTimeListened,
         "averageTrackLength": averageTrackLength,
-        "averageTimeVoting": averageTimeVoting,
+        "averageTimeVoting": averageTimeVoting
     }

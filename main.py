@@ -113,6 +113,7 @@ def run():
     replays = 0
     watchStart = 0
     watchEnd = 0
+    voteStart = 0
     global_volume_modifier = settings_json["master_volume"]
     track_volume_modifier = settings_json["track_volume"] * (global_volume_modifier / 100) / 100
     gui_volume_modifier = settings_json["gui_volume"] * (global_volume_modifier / 100) / 100
@@ -365,6 +366,7 @@ def run():
                     if video.frame == video.frame_count:
                         currentMenu = "voting"
                         watchEnd = time.time()
+                        voteStart = watchEnd
                         rating_widgets = visuals.setup_voting_widgets(width, height, main_font, lang)
             elif coverActive and currentMenu == "watching":
                 pg.blit(scaledCover, coverRect)
@@ -373,6 +375,7 @@ def run():
                 if current_pos >= track_length - 50:
                     currentMenu = "voting"
                     watchEnd = time.time()
+                    voteStart = watchEnd
                     rating_widgets = visuals.setup_voting_widgets(width, height, main_font, lang)
 
             # video overlay
@@ -473,7 +476,9 @@ def run():
                                 playedSongOnce = False
                                 timeDiff = watchEnd - watchStart
                                 total_listened_seconds = timeDiff + (total_listened_seconds := 0)
-                                data.saveTrackVoting(ratings, track_data, total_listened_seconds, replays)
+                                timeDiff = time.time() - voteStart
+                                total_voted_seconds = timeDiff + (total_voted_seconds := 0)
+                                data.saveTrackVoting(ratings=ratings, trackData=track_data, timeListening=total_listened_seconds, replays=replays, trackLength=data.get_track_length(track), timeVoting=total_voted_seconds)
                                 save_log(f"saved votings")
                                 save_log(f"resetting track")
                                 if wasSingleTrack:
@@ -496,6 +501,8 @@ def run():
                         elif text == "🔁":
                             timeDiff = watchEnd - watchStart
                             total_listened_seconds = timeDiff + (total_listened_seconds := 0)
+                            timeDiff = time.time() - voteStart
+                            total_voted_seconds = timeDiff + (total_voted_seconds := 0)
                             replay = True
                             replays += 1
                         else:
