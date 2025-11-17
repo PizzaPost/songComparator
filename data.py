@@ -209,7 +209,7 @@ def saveTrackVoting(**args):
         raise KeyError("Track dictionary does not contain 'track' or 'url' key")
     trackName = removeExtension(trackName)
     with open(f"{datafolder}{trackName}.scv", "w", encoding="utf-8") as f:
-        data = {key: value for key, value in args}
+        data = {key: value for key, value in args.items()}
         json.dump(data, f, indent=4)
 
 
