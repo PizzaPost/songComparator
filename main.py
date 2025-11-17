@@ -130,6 +130,7 @@ def run():
     settings_window, frame = settings.open_settings()
     settings_window.attributes("-alpha", 1)
     pygame.event.set_grab(True)
+    pygame.event.set_grab(False)
     while running:
         pg.fill(bg_color)
         width, height = pg.get_size()
@@ -164,7 +165,7 @@ def run():
                 intro = False
                 save_log("finished startup animation")
                 save_log("adding values to data")
-                data.add_value("sessions", 1)
+                data.add_value("session_count", 1)
                 if add_new_date:
                     data.add_value_to_list("dates_used", current_date)
                 save_log("finished adding values to data")
@@ -181,7 +182,7 @@ def run():
                         intro = False
                         save_log("skipping startup animation")
                         save_log("adding values to data")
-                        data.add_value("sessions", 1)
+                        data.add_value("session_count", 1)
                         if add_new_date:
                             data.add_value_to_list("dates_used", current_date)
                         save_log("finished adding values to data")
