@@ -130,6 +130,7 @@ def run():
     settings_window, frame = settings.open_settings()
     settings_window.attributes("-alpha", 1)
     pygame.event.set_grab(True)
+    pygame.event.set_grab(False)
     while running:
         pg.fill(bg_color)
         width, height = pg.get_size()
