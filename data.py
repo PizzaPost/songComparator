@@ -6,6 +6,8 @@ import random
 
 import mutagen
 
+import stats
+
 extensions = {}
 # we will use custom file extensions (undercover json files) - find them below
 # we use the following file structure:
@@ -199,9 +201,16 @@ def displayName(track: dict):
     return ((artist + " - ") if artist else "") + (title if title else "")
 
 
-def save_voting(ratings: list, trackData, total_seconds, replays):
-    """Saves the votings in every category for the last played track."""
-    print(ratings, trackData, total_seconds, replays)
+def saveTrackVoting(**args):
+    """Saves the voting for a given track."""
+    trackData = args.get("trackData") or dict()
+    trackName = trackData.get("track") or trackData.get("url")
+    if trackName is None:
+        raise KeyError("Track dictionary does not contain 'track' or 'url' key")
+    trackName = removeExtension(trackName)
+    with open(f"{datafolder}{trackName}.scv", "w", encoding="utf-8") as f:
+        data = {key: value for key, value in args}
+        json.dump(data, f, indent=4)
 
 
 def get_track_length(track):

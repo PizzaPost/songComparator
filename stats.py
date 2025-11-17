@@ -1,39 +1,39 @@
-def calculate_stats():
-    pass
-    # sessions
-    # days used
-    # longest session
-    # avg session length
-    # avg rating
-    # avg relatability
-    # avg lyrics quality
-    # avg beat quality
-    # avg beat taste
-    # best track in relatability
-    # best track in lyrics quality
-    # best track in beat quality
-    # best track in beat taste
-    # worst track in relatability
-    # worst track in lyrics quality
-    # worst track in beat quality
-    # worst track in beat taste
-    # artist rankings (stars)
-    # artist ranking (relatability)
-    # artist ranking (lyrics quality)
-    # artist ranking (beat quality)
-    # artist ranking (beat taste)
-    # most picked rating
-    # total tracks rated
-    # five stars
-    # four stars
-    # three stars
-    # two stars
-    # one star
-    # replay count
-    # time spent (total (listening+voting+misc)
-    # time spent voting
-    # time spent listening
-    # avg time spent listening
-    # avg song length
-    # avg time spent voting
-    # avg track length
+def calculateStats(*args):
+    return {
+        "sessionCount": sessionCount,
+        "daysUsed": daysUsed,
+        "longestSessionLength": longestSessionLength,
+        "averageSessionLength": averageSessionLength,
+        "averageRating": averageRating,
+        "averageRelatability": averageRelatability,
+        "averageLyricsQuality": averageLyricsQuality,
+        "averageBeatQuality": averageBeatQuality,
+        "averageBeatTaste": averageBeatTaste,
+        "mostRelatable": mostRelatable,
+        "bestLyrics": bestLyrics,
+        "bestBeat": bestBeat,
+        "tastiest": tastiest,
+        "leastRelatable": leastRelatable,
+        "worstLyrics": worstLyrics,
+        "worstBeat": worstBeat,
+        "mostDisgusting": mostDisgusting,
+        "mostStarredArtists": mostStarredArtists,
+        "mostRelatableArtists": mostRelatableArtists,
+        "bestLyricsArtists": bestLyricsArtists,
+        "bestProducedArtists": bestProducedArtists,
+        "tastiestArtist": tastiestArtist,
+        "mostCommonRating": mostCommonRating,
+        "tracksRated": tracksRated,
+        "fiveStars": fiveStars,
+        "fourStars": fourStars,
+        "threeStars": threeStars,
+        "twoStars": twoStars,
+        "oneStar": oneStar,
+        "replays": replays,
+        "timeTotal": timeTotal,
+        "timeVoting": timeVoting,
+        "timeListening": timeListening,
+        "averageTimeListened": averageTimeListened,
+        "averageTrackLength": averageTrackLength,
+        "averageTimeVoting": averageTimeVoting,
+    }

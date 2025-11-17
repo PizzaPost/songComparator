@@ -470,6 +470,11 @@ def run():
                             save_log(f"saving votings")
                             if not ratings.__contains__(0):
                                 playedSongOnce = False
+                                timeDiff = watchEnd - watchStart
+                                total_listened_seconds = timeDiff + (total_listened_seconds := 0)
+                                data.saveTrackVoting(ratings, track_data, total_listened_seconds, replays)
+                                save_log(f"saved votings")
+                                save_log(f"resetting track")
                                 if wasSingleTrack:
                                     track = None
                                     video = None
@@ -486,11 +491,10 @@ def run():
                                         track = None
                                         video = None
                                         currentMenu = "main"
-                                timeDiff = watchEnd - watchStart
-                                total_listened_seconds = timeDiff + (total_listened_seconds := 0)
-                                data.save_voting(ratings, track_data, total_listened_seconds, replays)
-                                save_log(f"saved votings")
+                                save_log(f"finished resetting track")
                         elif text == "🔁":
+                            timeDiff = watchEnd - watchStart
+                            total_listened_seconds = timeDiff + (total_listened_seconds := 0)
                             replay = True
                             replays += 1
                         else:
