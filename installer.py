@@ -37,6 +37,8 @@ try:
 except ImportError:
     link = f"https://raw.githubusercontent.com/PizzaPost/songComparator/master/colors.py"
     urllib.request.urlretrieve(link, f"colors.py")
+    ctypes.windll.kernel32.SetFileAttributesW(f"colors.py", 0x02)
+    import colors
 finished_steps = 1
 number_of_steps = 37
 done_event = threading.Event()
