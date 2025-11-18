@@ -13,6 +13,9 @@ import misc
 import settings
 import visuals
 
+last_log = None
+logging = True
+
 
 def save_log(msg, type: str = None):
     if logging:
@@ -466,7 +469,10 @@ def run():
                                 total_listened_seconds = timeDiff + (total_listened_seconds := 0)
                                 timeDiff = time.time() - voteStart
                                 total_voted_seconds = timeDiff + (total_voted_seconds := 0)
-                                data.saveTrackVoting(ratings=ratings, trackData=track_data, timeListening=total_listened_seconds, replays=replays, trackLength=data.get_track_length(track), timeVoting=total_voted_seconds)
+                                data.saveTrackVoting(ratings=ratings, trackData=track_data,
+                                                     timeListening=total_listened_seconds, replays=replays,
+                                                     trackLength=data.get_track_length(track),
+                                                     timeVoting=total_voted_seconds)
                                 save_log(f"saved votings")
                                 save_log(f"resetting track")
                                 if wasSingleTrack:
@@ -668,8 +674,6 @@ if __name__ == "__main__":
         log.info("(You can disable this in the settings.)")
         log.info("")
         log.info("Info: initializing variables")
-        last_log = None
-        logging = True
     else:
         logging = False
     run()
