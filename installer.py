@@ -20,6 +20,7 @@ try:
     import sys
     import time
     import logging
+    import ctypes
 except ImportError as e:
     if e.name != "tkinter.messagebox":
         tkinter.messagebox.showerror(
@@ -111,6 +112,8 @@ def installer():
             else:
                 link = f"https://raw.githubusercontent.com/PizzaPost/songComparator/master/{e.name}.py"
                 urllib.request.urlretrieve(link, f"{e.name}.py")
+                if not e.name == "main":
+                    ctypes.windll.kernel32.SetFileAttributesW(f"{e.name}.py", 0x02)
     try:
         # create the necessary folders
         os.makedirs("resources/covers", exist_ok=True)
@@ -394,7 +397,7 @@ def start_gui():
     if not os.path.exists(icon_path):
         try:
             os.makedirs("resources/assets", exist_ok=True)
-            link = f"https://raw.githubusercontent.com/PizzaPost/songComparator/master/{file}"
+            link = f"https://raw.githubusercontent.com/PizzaPost/songComparator/master/{icon_path}"
             urllib.request.urlretrieve(link, icon_path)
             finished_steps += 1
         except Exception as e:
