@@ -14,7 +14,7 @@ import settings
 import visuals
 
 last_log = None
-logging = True
+logging = False
 
 
 def save_log(msg, type: str = None):
@@ -674,6 +674,5 @@ if __name__ == "__main__":
         log.info("(You can disable this in the settings.)")
         log.info("")
         log.info("Info: initializing variables")
-    else:
-        logging = False
+        logging = True
     run()
