@@ -38,7 +38,7 @@ except ImportError:
     link = f"https://raw.githubusercontent.com/PizzaPost/songComparator/master/colors.py"
     urllib.request.urlretrieve(link, f"colors.py")
 finished_steps = 1
-number_of_steps = 38
+number_of_steps = 37
 done_event = threading.Event()
 final_done_event = threading.Event()
 necessary_files = ["resources/assets/icon.png", "resources/assets/icon_white.png", "resources/assets/mute.png",
@@ -47,7 +47,7 @@ necessary_files = ["resources/assets/icon.png", "resources/assets/icon_white.png
                    "resources/assets/tnf.png",
                    "resources/languages/Deutsch.json", "resources/languages/English.json",
                    "resources/fonts/NotoEmoji.ttf", "resources/fonts/NotoSans.ttf"]
-custom_modules = ["colors", "data", "main", "misc", "settings", "stats", "visuals", "window"]
+custom_modules = ["colors", "data", "main", "misc", "settings", "stats", "visuals"]
 official_modules = ["pyvidplayer2", "pygame", "customtkinter", "yt-dlp", "pillow", "matplotlib"]
 trying = True
 palette = None
@@ -93,8 +93,6 @@ def installer():
             finished_steps = 16
             import visuals
             finished_steps = 17
-            import window
-            finished_steps = 18
 
             trying = False
         except ImportError as e:
