@@ -137,7 +137,7 @@ def installer():
 
         if not os.path.exists("resources/settings.json"):
             with open("resources/settings.json", "w") as f:
-                json.dump({"theme": "default", "appearance_mode": "system", "language": "English",
+                json.dump({"theme": "default", "appearance_mode": "Dark", "language": "English",
                            "font": "resources/fonts/NotoSans.ttf", "master_volume": 100,
                            "track_volume": 100, "gui_volume": 100, "effects_volume": 100,
                            "enabled_audio": [True, True, True, True], "logging": False}, f, indent=4)
