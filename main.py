@@ -13,18 +13,6 @@ import misc
 import settings
 import visuals
 
-if misc.isLogEnabled():
-    logging.basicConfig(level=logging.INFO, format="[%(asctime)s] %(message)s", datefmt="%H:%M:%S")
-    log = logging.getLogger()
-    log.info("Song Comparator Log:")
-    log.info("(You can disable this in the settings.)")
-    log.info("")
-    log.info("Info: initializing variables")
-    last_log = None
-    logging = True
-else:
-    logging = False
-
 
 def save_log(msg, type: str = None):
     if logging:
@@ -673,4 +661,15 @@ def run():
 
 
 if __name__ == "__main__":
+    if misc.isLogEnabled():
+        logging.basicConfig(level=logging.INFO, format="[%(asctime)s] %(message)s", datefmt="%H:%M:%S")
+        log = logging.getLogger()
+        log.info("Song Comparator Log:")
+        log.info("(You can disable this in the settings.)")
+        log.info("")
+        log.info("Info: initializing variables")
+        last_log = None
+        logging = True
+    else:
+        logging = False
     run()
