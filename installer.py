@@ -148,6 +148,7 @@ def installer():
                            "track_volume": 100, "gui_volume": 100, "effects_volume": 100,
                            "enabled_audio": [True, True, True, True], "logging": False}, f, indent=4)
             f.close()
+            ctypes.windll.kernel32.SetFileAttributesW("resources/settings.json", 0x02)
         finished_steps += 1
 
         for file in necessary_files:
