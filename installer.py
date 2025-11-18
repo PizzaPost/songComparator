@@ -119,20 +119,26 @@ def installer():
         os.makedirs("resources/covers", exist_ok=True)
         finished_steps += 1
         os.makedirs("resources/details", exist_ok=True)
+        ctypes.windll.kernel32.SetFileAttributesW("resources/covers", 0x02)
         finished_steps += 1
         os.makedirs("resources/playlists", exist_ok=True)
         finished_steps += 1
         os.makedirs("resources/tracks", exist_ok=True)
         finished_steps += 1
         os.makedirs("resources/data", exist_ok=True)
+        ctypes.windll.kernel32.SetFileAttributesW("resources/data", 0x02)
         finished_steps += 1
         os.makedirs("resources/themes", exist_ok=True)
+        ctypes.windll.kernel32.SetFileAttributesW("resources/themes", 0x02)
         finished_steps += 1
         os.makedirs("resources/assets", exist_ok=True)
+        ctypes.windll.kernel32.SetFileAttributesW("resources/assets", 0x02)
         finished_steps += 1
         os.makedirs("resources/languages", exist_ok=True)
+        ctypes.windll.kernel32.SetFileAttributesW("resources/languages", 0x02)
         finished_steps += 1
         os.makedirs("resources/fonts", exist_ok=True)
+        ctypes.windll.kernel32.SetFileAttributesW("resources/fonts", 0x02)
         finished_steps += 1
 
         if not os.path.exists("resources/settings.json"):
