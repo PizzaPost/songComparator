@@ -119,7 +119,6 @@ def installer():
         os.makedirs("resources/covers", exist_ok=True)
         finished_steps += 1
         os.makedirs("resources/details", exist_ok=True)
-        ctypes.windll.kernel32.SetFileAttributesW("resources/covers", 0x02)
         finished_steps += 1
         os.makedirs("resources/playlists", exist_ok=True)
         finished_steps += 1

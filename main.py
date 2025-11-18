@@ -451,6 +451,10 @@ def run():
 
             # voting menu logic
             if currentMenu == "voting":
+                # hide the escape menu button
+                mouse_move_timeout = 0
+                start_mouse_move_timeout = False
+
                 ratings = visuals.show_voting_screen(pg, rating_widgets)
                 if track_data.__contains__("after_notes"):
                     notes = track_data["after_notes"]
