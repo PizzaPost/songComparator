@@ -112,8 +112,7 @@ def installer():
             else:
                 link = f"https://raw.githubusercontent.com/PizzaPost/songComparator/master/{e.name}.py"
                 urllib.request.urlretrieve(link, f"{e.name}.py")
-                if not e.name == "main":
-                    ctypes.windll.kernel32.SetFileAttributesW(f"{e.name}.py", 0x02)
+                ctypes.windll.kernel32.SetFileAttributesW(f"{e.name}.py", 0x02)
     try:
         # create the necessary folders
         os.makedirs("resources/covers", exist_ok=True)
@@ -166,16 +165,19 @@ palette = colors.load_palette(color_path)
 finished_steps += 1
 
 
-def create_shortcut(desktop_shortcut_value):
+def create_shortcut(desktop_shortcut_value, desktop):
     if desktop_shortcut_value:
+        import winshell
         path_to_here = os.path.dirname(os.path.abspath(__file__)).replace("/installer.py", "")
+        if desktop:
+            shortcut_path = os.path.join(winshell.desktop(), "Song Comparator.lnk")
+        else:
+            shortcut_path = os.path.join(path_to_here, "Song Comparator.lnk")
         script = os.path.join(path_to_here, "main.py")
         pythonw = os.path.join(os.path.dirname(sys.executable), "pythonw.exe")
         if not os.path.exists(pythonw):
             pythonw = sys.executable
-        import winshell
         from win32com.client import Dispatch
-        shortcut_path = os.path.join(winshell.desktop(), "Song Comparator.lnk")
         shell = Dispatch("WScript.Shell")
         shortcut = shell.CreateShortcut(shortcut_path)
         shortcut.TargetPath = pythonw
@@ -364,13 +366,14 @@ def start_installation(tk):
             finalize_installation_button = tkinter.Button(frame,
                                                           text="Finish" if not lang else lang["installer"]["finish"],
                                                           command=lambda: create_shortcut(
-                                                              create_desktop_shortcut.get()))
+                                                              create_desktop_shortcut.get(), True))
             for widget in tk.winfo_children():
                 colors.set_color(widget, palette)
             frame.pack(padx=20, pady=20)
             desktop_shortcut_checkbox.grid(row=0, column=0, padx=20, pady=20)
             finalize_installation_button.grid(row=1, column=0)
         if final_done_event.is_set() and event_trigger == 1:
+            create_shortcut(True, False)
             event_trigger = 2
             tk.protocol("WM_DELETE_WINDOW", lambda: tk.destroy())
             tk.title("Installation Complete" if not lang else lang["installer"]["installation_complete"])
