@@ -1,8 +1,5 @@
 {
   "error": {
-    "module_not_found": "Modul '{0}' nicht gefunden. Bitte installiere es mit 'pip install {0}'.",
-    "module_not_found_title": "Modul '{0}' nicht gefunden",
-    "module_not_found_description": "Bitte installiere es mit 'pip install {0}'.",
     "installation_error_title": "Installationsfehler",
     "installation_error_description1": "Fehler beim Download des Icons für den Installer:\n{0}",
     "run_error_title": "Ausführungsfehler",

@@ -1,36 +1,33 @@
-# checks default installed modules
-try:
-    import json
+import platform
+import tkinter.messagebox
 
-    try:
-        import misc
-
-        lang = misc.load_language(misc.load_settings())
-        color_path = f"resources/themes/{misc.load_settings()["theme"]}.json"
-    except ImportError:
-        lang = None
-        color_path = "resources/themes/default.json"
-    import tkinter.ttk
-    import tkinter.messagebox
-    import os
-    import urllib.request
-    import threading
-    import shutil
-    import math
-    import sys
-    import time
-    import logging
-    import ctypes
-except ImportError as e:
-    if e.name != "tkinter.messagebox":
-        tkinter.messagebox.showerror(
-            f"Error: '{e.name}' not found." if not lang else lang["error"]["module_not_found_title"].format(e.name),
-            f"Please install it using 'pip install {e.name}'." if not lang else lang["error"][
-                "module_not_found_description"].format(e.name))
-    else:
-        print(f"Error: '{e.name}' not found. Please install it using 'pip install {e.name}'." if not lang else
-              lang["error"]["module_not_found"].format(e.name))
+# os check
+current_os = platform.system()
+supported_os = ["Windows", "Linux", "Darwin"]
+if current_os not in supported_os:
+    tkinter.messagebox.showerror("Unsupported OS",
+                                 f"Oh looks like you're using {current_os}. This program is only supported on Windows, Linux and macOS.")
     exit()
+
+import json
+
+try:
+    import misc
+
+    lang = misc.load_language(misc.load_settings())
+    color_path = f"resources/themes/{misc.load_settings()["theme"]}.json"
+except ImportError:
+    lang = None
+    color_path = "resources/themes/default.json"
+import tkinter.ttk
+import os
+import urllib.request
+import threading
+import shutil
+import sys
+
+if current_os == "Windows":
+    import ctypes
 
 try:
     import colors
@@ -39,6 +36,7 @@ except ImportError:
     urllib.request.urlretrieve(link, f"colors.py")
     ctypes.windll.kernel32.SetFileAttributesW(f"colors.py", 0x02)
     import colors
+
 finished_steps = 1
 number_of_steps = 37
 done_event = threading.Event()
@@ -167,26 +165,57 @@ finished_steps += 1
 
 def create_shortcut(desktop_shortcut_value, desktop):
     if desktop_shortcut_value:
-        import winshell
         path_to_here = os.path.dirname(os.path.abspath(__file__)).replace("/installer.py", "")
+        script_path = os.path.join(path_to_here, "main.py")
         if desktop:
-            shortcut_path = os.path.join(winshell.desktop(), "Song Comparator.lnk")
+            if current_os == "Windows":
+                import winshell
+                target_folder = winshell.desktop()
+            else:
+                target_folder = os.path.join(os.path.expanduser("~"), "Desktop")
         else:
-            shortcut_path = os.path.join(path_to_here, "Song Comparator.lnk")
-        script = os.path.join(path_to_here, "main.py")
-        pythonw = os.path.join(os.path.dirname(sys.executable), "pythonw.exe")
-        if not os.path.exists(pythonw):
-            pythonw = sys.executable
-        from win32com.client import Dispatch
-        shell = Dispatch("WScript.Shell")
-        shortcut = shell.CreateShortcut(shortcut_path)
-        shortcut.TargetPath = pythonw
-        shortcut.Arguments = f'"{script}" --quiet'
-        shortcut.WorkingDirectory = os.path.dirname(script)
-        shortcut.IconLocation = fr"{path_to_here}\resources\assets\icon.ico"
-        shortcut.Description = "Launch Song Comparator"
-        shortcut.Hotkey = ""
-        shortcut.Save()
+            target_folder = path_to_here
+        if current_os == "Windows":
+            import winshell
+            from win32com.client import Dispatch
+            shortcut_path = os.path.join(target_folder, "Song Comparator.lnk")
+            python_dir = os.path.dirname(sys.executable)
+            pythonw = os.path.join(python_dir, "pythonw.exe")
+            if not os.path.exists(pythonw):
+                pythonw = sys.executable
+            shell = Dispatch("WScript.Shell")
+            shortcut = shell.CreateShortcut(shortcut_path)
+            shortcut.TargetPath = pythonw
+            shortcut.Arguments = f'"{script_path}" --quiet'
+            shortcut.WorkingDirectory = path_to_here
+            shortcut.IconLocation = os.path.join(path_to_here, "resources", "assets", "icon.ico")
+            shortcut.Description = "Launch Song Comparator"
+            shortcut.Save()
+        elif current_os == "Linux":
+            desktop_filename = os.path.join(target_folder, "SongComparator.desktop")
+            icon_path = os.path.join(path_to_here, "resources", "assets", "icon.png")
+            desktop_entry = f"""[Desktop Entry]
+                                Type=Application
+                                Name=Song Comparator
+                                Comment=Launch Song Comparator
+                                Exec={sys.executable} "{script_path}"
+                                Path={path_to_here}
+                                Icon={icon_path}
+                                Terminal=false
+                                Categories=Audio;Video;
+                            """
+            with open(desktop_filename, "w") as f:
+                f.write(desktop_entry)
+            os.chmod(desktop_filename, 0o755)
+        elif current_os == "Darwin":
+            shortcut_path = os.path.join(target_folder, "Song Comparator.command")
+            command_content = f"""#!/bin/bash
+                                cd "{path_to_here}"
+                                "{sys.executable}" "{script_path}"
+                                """
+            with open(shortcut_path, "w") as f:
+                f.write(command_content)
+            os.chmod(shortcut_path, 0o755)
     final_done_event.set()
 
 
