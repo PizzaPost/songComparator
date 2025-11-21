@@ -200,7 +200,7 @@ def create_shortcut(desktop_shortcut_value, desktop):
             shortcut.Description = "Launch Song Comparator"
             shortcut.Save()
         elif current_os == "Linux":
-            desktop_filename = os.path.join(target_folder, "SongComparator.desktop")
+            shortcut_path = os.path.join(target_folder, "SongComparator.desktop")
             icon_path = os.path.join(path_to_here, "resources", "assets", "icon.png")
             desktop_entry = f"""[Desktop Entry]
                                 Type=Application
@@ -212,9 +212,9 @@ def create_shortcut(desktop_shortcut_value, desktop):
                                 Terminal=false
                                 Categories=Audio;Video;
                             """
-            with open(desktop_filename, "w") as f:
+            with open(shortcut_path, "w") as f:
                 f.write(desktop_entry)
-            os.chmod(desktop_filename, 0o755)
+            os.chmod(shortcut_path, 0o755)
         elif current_os == "Darwin":
             shortcut_path = os.path.join(target_folder, "Song Comparator.command")
             command_content = f"""#!/bin/bash
@@ -317,13 +317,18 @@ def uninstaller(tk):
                     os.remove("visuals.py")
                     if current_os == "Windows":
                         os.remove("Song Comparator.lnk")
+                    elif current_os == "Linux":
+                        os.remove("Song Comparator.desktop")
                     elif current_os == "Darwin":
                         os.remove("Song Comparator.command")
                     if current_os == "Windows":
                         import winshell
                         target_folder = winshell.desktop()
                         shortcut_path = os.path.join(target_folder, "Song Comparator.lnk")
-                    else:
+                    elif current_os == "Linux":
+                        target_folder = os.path.join(os.path.expanduser("~"), "Desktop")
+                        shortcut_path = os.path.join(target_folder, "Song Comparator.desktop")
+                    elif current_os == "Darwin":
                         target_folder = os.path.join(os.path.expanduser("~"), "Desktop")
                         shortcut_path = os.path.join(target_folder, "Song Comparator.command")
                     if os.path.exists(fr"{shortcut_path}"):
