@@ -51,7 +51,7 @@ def run():
     # need to rate info font
     ntri_font = pygame.font.Font(settings_json["font"], 24)
     note_font = pygame.font.Font(settings_json["font"], 18)
-    color_palette = colors.get_colors(f"resources/themes/{settings_json["theme"]}.json")
+    color_palette = colors.get_colors(f"resources/themes/{settings_json['theme']}.json")
     base_color = colors.hex_to_rgb(
         color_palette["CTkButton"]["fg_color"][0 if settings_json["appearance_mode"] == "Light" else 1])
     hover_color = colors.hex_to_rgb(

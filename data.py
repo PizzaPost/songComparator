@@ -6,8 +6,6 @@ import random
 
 import mutagen
 
-import stats
-
 extensions = {}
 # we will use custom file extensions (undercover json files) - find them below
 # we use the following file structure:
@@ -15,20 +13,20 @@ extensions = {}
 #   resources/
 #     covers/
 #       <image files (.jpg, .jpeg, .png, .gif, .svg, .webp)>
-coverfolder = "resources/covers/"
+coverfolder = os.path.join("resources", "covers")
 #     data/
-datafolder = "resources/data/"
+datafolder = os.path.join("resources", "data")
 #     details/
-detailsfolder = "resources/details/"
+detailsfolder = os.path.join("resources", "details")
 #       <song comparator song/track details files (.scd, .scsd, .sctd)>
 extensions["details"] = [".scd", ".scsd", ".sctd"]
 #     playlists/
-playlistfolder = "resources/playlists/"
+playlistfolder = os.path.join("resources", "playlists")
 #       <song comparator playlist files (.scpl, .scp)>
 extensions["playlists"] = [".scp", ".scpl"]
 #     tracks/
 #       <audio/video files (.mp3, .mp4, .m4a, .ogg, .wav)>
-trackfolder = "resources/tracks/"
+trackfolder = os.path.join("resources", "tracks")
 
 
 def randomPlaylist() -> str:
@@ -67,7 +65,7 @@ def readPlaylist(filename: str) -> list:
     tracks = []
     found = False
     for extension in extensions["playlists"]:
-        playlistfile = playlistfolder + filename + extension
+        playlistfile = os.path.join(playlistfolder, filename + extension)
         if os.path.exists(playlistfile):
             with open(playlistfile, "r") as f:
                 tracks = json.load(f)
@@ -104,13 +102,13 @@ def details(filename: str, searchContents: bool = False, searchPlaylists: bool =
         if _filename == "":
             continue
         for extension in extensions["details"]:
-            detailsfile = detailsfolder + _filename + extension
+            detailsfile = os.path.join(detailsfolder, _filename + extension)
             if os.path.exists(detailsfile):
                 details = readJSON(detailsfile)
                 return details
     if searchContents:
         for detail in os.listdir(detailsfolder):
-            d = readJSON(detailsfolder + detail)
+            d = readJSON(os.path.join(detailsfolder, detail))
             if d["track"] == filename:
                 details = d
     if searchPlaylists:
@@ -183,7 +181,7 @@ def trackSource(track: dict, trackFolder: str = trackfolder) -> tuple[str, bool,
         raise KeyError("Track dictionary does not contain 'track' or 'url' key")
     stream = source == track.get("url")
     isVideo = track.get("type") == 1
-    source = trackFolder + source
+    source = os.path.join(trackFolder, source)
     return source, stream, isVideo
 
 
