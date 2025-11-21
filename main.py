@@ -545,7 +545,7 @@ def run():
                         if isStream:
                             video = pyvidplayer2.Video(track, youtube=True)
                         else:
-                            video = pyvidplayer2.Video(data.trackfolder + track, youtube=False)
+                            video = pyvidplayer2.Video(os.path.join(data.trackfolder, track), youtube=False)
                         video.resize((width, height))
                         video.set_volume(track_volume_modifier)
                         save_log("finished setting up video")
@@ -554,7 +554,7 @@ def run():
                     track_length = data.get_track_length(track)
                     if ((current_pos <= track_length - 50) and not playedSongOnce and not currentMenu == "voting"
                             and playlist and coverIndex):
-                        pygame.mixer.music.load(data.trackfolder + track)
+                        pygame.mixer.music.load(os.path.join(data.trackfolder, track))
                         pygame.mixer.music.set_volume(track_volume_modifier)
                         pygame.mixer.music.play()
                         coverActive = True
@@ -563,7 +563,7 @@ def run():
                         playedSongOnce = True
                         save_log("finished setting up cover type: 1")
                     else:
-                        pygame.mixer.music.load(data.trackfolder + track)
+                        pygame.mixer.music.load(os.path.join(data.trackfolder, track))
                         pygame.mixer.music.set_volume(track_volume_modifier)
                         pygame.mixer.music.play()
                         coverActive = True
