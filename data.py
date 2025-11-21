@@ -67,12 +67,12 @@ def readPlaylist(filename: str) -> list:
     for extension in extensions["playlists"]:
         playlistfile = os.path.join(playlistfolder, filename + extension)
         if os.path.exists(playlistfile):
-            with open(playlistfile, "r") as f:
+            with open(playlistfile, "r", encoding="utf-8") as f:
                 tracks = json.load(f)
                 found = True
             break
     if not found:
-        playlistfile = playlistfolder + filename
+        playlistfile = os.path.join(playlistfolder, filename)
         if os.path.exists(playlistfile):
             tracks = readJSON(playlistfile)
     return tracks
@@ -206,7 +206,8 @@ def saveTrackVoting(**args):
     if trackName is None:
         raise KeyError("Track dictionary does not contain 'track' or 'url' key")
     trackName = removeExtension(trackName)
-    with open(f"{datafolder}{trackName}.scv", "w", encoding="utf-8") as f:
+    filepath = os.path.join(datafolder, f"{trackName}.scv")
+    with open(filepath, "w", encoding="utf-8") as f:
         data = {key: value for key, value in args.items()}
         json.dump(data, f, indent=4)
 
@@ -228,9 +229,11 @@ def get_track_length(track):
     -------
         0: int
     """
-    audio = mutagen.File(f"{trackfolder}{track}")
-    if audio is not None:
-        return int(audio.info.length * 1000)  # convert to milliseconds
+    filepath = os.path.join(trackfolder, track)
+    if os.path.exists(filepath):
+        audio = mutagen.File(filepath)
+        if audio is not None:
+            return int(audio.info.length * 1000)
     return 0  # fallback
 
 
@@ -243,13 +246,15 @@ def listPlaylistFolder():
 
 
 def load_data(filename: str = "default"):
-    if os.path.exists(f"{datafolder}{filename}.json"):
-        with open(f"{datafolder}{filename}.json", "r", encoding="utf-8") as f:
+    filepath = os.path.join(datafolder, f"{filename}.json")
+
+    if os.path.exists(filepath):
+        with open(filepath, "r", encoding="utf-8") as f:
             data = json.load(f)
             f.close()
         return data
     else:
-        with open(f"{datafolder}{filename}.json", "w") as f:
+        with open(filepath, "w", encoding="utf-8") as f:
             json.dump({}, f, indent=4)
             f.close()
         return {}
@@ -258,7 +263,8 @@ def load_data(filename: str = "default"):
 def set_value(key: str, value, filename: str = "default"):
     data = load_data(filename)
     data[key] = value
-    with open(f"{datafolder}{filename}.json", "w", encoding="utf-8") as f:
+    filepath = os.path.join(datafolder, f"{filename}.json")
+    with open(filepath, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=4)
         f.close()
 
@@ -271,7 +277,8 @@ def get_value(key: str, filename: str = "default"):
 def add_value(key: str, amount: int, filename: str = "default"):
     data = load_data(filename)
     data[key] = data.get(key, 0) + amount
-    with open(f"{datafolder}{filename}.json", "w", encoding="utf-8") as f:
+    filepath = os.path.join(datafolder, f"{filename}.json")
+    with open(filepath, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=4)
         f.close()
 
@@ -280,7 +287,8 @@ def add_value_to_list(key: str, value, filename: str = "default"):
     data = load_data(filename)
     data.setdefault(key, [])
     data[key].append(value)
-    with open(f"{datafolder}{filename}.json", "w", encoding="utf-8") as f:
+    filepath = os.path.join(datafolder, f"{filename}.json")
+    with open(filepath, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=4)
         f.close()
 
@@ -288,6 +296,7 @@ def add_value_to_list(key: str, value, filename: str = "default"):
 def change_bool(key: str, filename: str = "default"):
     data = load_data(filename)
     data[key] = not data.get(key)
-    with open(f"{datafolder}{filename}.json", "w", encoding="utf-8") as f:
+    filepath = os.path.join(datafolder, f"{filename}.json")
+    with open(filepath, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=4)
         f.close()
