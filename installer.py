@@ -19,6 +19,7 @@ try:
 except ImportError:
     lang = None
     color_path = "resources/themes/default.json"
+finished_steps = 1
 import tkinter.ttk
 import os
 import urllib.request
@@ -29,16 +30,23 @@ import sys
 if current_os == "Windows":
     import ctypes
 
+
+def hide_file(file):
+    if current_os == "Windows":
+        ctypes.windll.kernel32.SetFileAttributesW(file, 0x02)
+    elif current_os == "Darwin":
+        os.system(f'chflags hidden "{file}"')
+
+
 try:
     import colors
 except ImportError:
     link = f"https://raw.githubusercontent.com/PizzaPost/songComparator/master/colors.py"
     urllib.request.urlretrieve(link, f"colors.py")
-    ctypes.windll.kernel32.SetFileAttributesW(f"colors.py", 0x02)
+    hide_file("colors.py")
     import colors
-
-finished_steps = 1
-number_of_steps = 37
+finished_steps += 1
+number_of_steps = 40
 done_event = threading.Event()
 final_done_event = threading.Event()
 necessary_files = ["resources/assets/icon.png", "resources/assets/icon_white.png", "resources/assets/mute.png",
@@ -63,36 +71,36 @@ def installer():
         try:
             # checks other modules
             import pyvidplayer2
-            finished_steps = 4
-            import pygame
             finished_steps = 5
-            import customtkinter
+            import pygame
             finished_steps = 6
-            import yt_dlp
+            import customtkinter
             finished_steps = 7
-            import PIL
+            import yt_dlp
             finished_steps = 8
-            import matplotlib
+            import PIL
             finished_steps = 9
-            if not failed_to_install_pywin_things:
-                from win32com.client import Dispatch
-                finished_steps = 10
-            import winshell
-            finished_steps = 11
+            import matplotlib
+            finished_steps = 10
+            if current_os == "Windows":
+                if not failed_to_install_pywin_things:
+                    from win32com.client import Dispatch
+                import winshell
+            finished_steps = 12
 
             # checks custom modules
             import data
-            finished_steps = 12
-            import main
             finished_steps = 13
-            import misc
+            import main
             finished_steps = 14
-            import settings
+            import misc
             finished_steps = 15
-            import stats
+            import settings
             finished_steps = 16
-            import visuals
+            import stats
             finished_steps = 17
+            import visuals
+            finished_steps = 18
 
             trying = False
         except ImportError as e:
@@ -110,7 +118,7 @@ def installer():
             else:
                 link = f"https://raw.githubusercontent.com/PizzaPost/songComparator/master/{e.name}.py"
                 urllib.request.urlretrieve(link, f"{e.name}.py")
-                ctypes.windll.kernel32.SetFileAttributesW(f"{e.name}.py", 0x02)
+                hide_file(f"{e.name}.py")
     try:
         # create the necessary folders
         os.makedirs("resources/covers", exist_ok=True)
@@ -122,19 +130,19 @@ def installer():
         os.makedirs("resources/tracks", exist_ok=True)
         finished_steps += 1
         os.makedirs("resources/data", exist_ok=True)
-        ctypes.windll.kernel32.SetFileAttributesW("resources/data", 0x02)
+        hide_file("resources/data")
         finished_steps += 1
         os.makedirs("resources/themes", exist_ok=True)
-        ctypes.windll.kernel32.SetFileAttributesW("resources/themes", 0x02)
+        hide_file("resources/themes")
         finished_steps += 1
         os.makedirs("resources/assets", exist_ok=True)
-        ctypes.windll.kernel32.SetFileAttributesW("resources/assets", 0x02)
+        hide_file("resources/assets")
         finished_steps += 1
         os.makedirs("resources/languages", exist_ok=True)
-        ctypes.windll.kernel32.SetFileAttributesW("resources/languages", 0x02)
+        hide_file("resources/languages")
         finished_steps += 1
         os.makedirs("resources/fonts", exist_ok=True)
-        ctypes.windll.kernel32.SetFileAttributesW("resources/fonts", 0x02)
+        hide_file("resources/fonts")
         finished_steps += 1
 
         if not os.path.exists("resources/settings.json"):
@@ -144,7 +152,7 @@ def installer():
                            "track_volume": 100, "gui_volume": 100, "effects_volume": 100,
                            "enabled_audio": [True, True, True, True], "logging": False}, f, indent=4)
             f.close()
-            ctypes.windll.kernel32.SetFileAttributesW("resources/settings.json", 0x02)
+            hide_file("resources/settings.json")
         finished_steps += 1
 
         for file in necessary_files:
@@ -437,13 +445,13 @@ def start_gui():
             os.makedirs("resources/assets", exist_ok=True)
             link = f"https://raw.githubusercontent.com/PizzaPost/songComparator/master/{icon_path}"
             urllib.request.urlretrieve(link, icon_path)
-            finished_steps += 1
         except Exception as e:
             tkinter.messagebox.showerror(
                 "Installation Error" if not lang else lang["error"]["installation_error_title"],
                 f"Failed to Download the Icon for the installer:\n{str(e)}" if not lang else lang["error"][
                     "installation_error_description1"].format(str(e)))
             exit(0)
+    finished_steps += 1
     tk = tkinter.Tk()
     create_desktop_shortcut = tkinter.BooleanVar(value=False)
     tk.title("Installer" if not lang else lang["installer"]["title"])
