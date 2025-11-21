@@ -32,6 +32,7 @@ if current_os == "Windows":
 
 
 def hide_file(file):
+    """Hides a file or directory using OS-specific methods."""
     if current_os == "Windows":
         ctypes.windll.kernel32.SetFileAttributesW(file, 0x02)
     elif current_os == "Darwin":
@@ -331,8 +332,8 @@ def uninstaller(tk):
                     elif current_os == "Darwin":
                         target_folder = os.path.join(os.path.expanduser("~"), "Desktop")
                         shortcut_path = os.path.join(target_folder, "Song Comparator.command")
-                    if os.path.exists(fr"{shortcut_path}"):
-                        os.remove(fr"{shortcut_path}")
+                    if os.path.exists(shortcut_path):
+                        os.remove(shortcut_path)
                 if tracks:
                     tracks = False
                     shutil.rmtree("resources/covers")
