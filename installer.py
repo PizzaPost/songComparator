@@ -1,3 +1,4 @@
+import os
 import platform
 import tkinter.messagebox
 
@@ -15,13 +16,12 @@ try:
     import misc
 
     lang = misc.load_language(misc.load_settings())
-    color_path = f"resources/themes/{misc.load_settings()["theme"]}.json"
+    color_path = os.path.join("resources", "themes", f"{misc.load_settings()["theme"]}.json")
 except ImportError:
     lang = None
-    color_path = "resources/themes/default.json"
+    color_path = os.path.join("resources", "themes", "default.json")
 finished_steps = 1
 import tkinter.ttk
-import os
 import urllib.request
 import threading
 import shutil
@@ -59,7 +59,7 @@ necessary_files = ["resources/assets/icon.png", "resources/assets/icon_white.png
 custom_modules = ["colors", "data", "main", "misc", "settings", "stats", "visuals"]
 official_modules = ["pyvidplayer2", "pygame", "customtkinter", "yt-dlp", "pillow", "matplotlib"]
 trying = True
-palette = None
+palette = colors.load_palette(color_path)
 failed_to_install_pywin_things = False
 event_trigger = 0
 create_desktop_shortcut = None
@@ -122,45 +122,47 @@ def installer():
                 hide_file(f"{e.name}.py")
     try:
         # create the necessary folders
-        os.makedirs("resources/covers", exist_ok=True)
+        os.makedirs(os.path.join("resources", "covers"), exist_ok=True)
         finished_steps += 1
-        os.makedirs("resources/details", exist_ok=True)
+        os.makedirs(os.path.join("resources", "details"), exist_ok=True)
         finished_steps += 1
-        os.makedirs("resources/playlists", exist_ok=True)
+        os.makedirs(os.path.join("resources", "playlists"), exist_ok=True)
         finished_steps += 1
-        os.makedirs("resources/tracks", exist_ok=True)
+        os.makedirs(os.path.join("resources", "tracks"), exist_ok=True)
         finished_steps += 1
-        os.makedirs("resources/data", exist_ok=True)
-        hide_file("resources/data")
+        os.makedirs(os.path.join("resources", "data"), exist_ok=True)
+        hide_file(os.path.join("resources", "data"))
         finished_steps += 1
-        os.makedirs("resources/themes", exist_ok=True)
-        hide_file("resources/themes")
+        os.makedirs(os.path.join("resources", "themes"), exist_ok=True)
+        hide_file(os.path.join("resources", "themes"))
         finished_steps += 1
-        os.makedirs("resources/assets", exist_ok=True)
-        hide_file("resources/assets")
+        os.makedirs(os.path.join("resources", "assets"), exist_ok=True)
+        hide_file(os.path.join("resources", "assets"))
         finished_steps += 1
-        os.makedirs("resources/languages", exist_ok=True)
-        hide_file("resources/languages")
+        os.makedirs(os.path.join("resources", "languages"), exist_ok=True)
+        hide_file(os.path.join("resources", "languages"))
         finished_steps += 1
-        os.makedirs("resources/fonts", exist_ok=True)
-        hide_file("resources/fonts")
+        os.makedirs(os.path.join("resources", "fonts"), exist_ok=True)
+        hide_file(os.path.join("resources", "fonts"))
         finished_steps += 1
 
-        if not os.path.exists("resources/settings.json"):
-            with open("resources/settings.json", "w") as f:
+        settings_path = os.path.join("resources", "settings.json")
+        if not os.path.exists(settings_path):
+            with open(settings_path, "w") as f:
                 json.dump({"theme": "default", "appearance_mode": "Dark", "language": "English",
-                           "font": "resources/fonts/NotoSans.ttf", "master_volume": 100,
+                           "font": os.path.join("resources", "fonts", "NotoSans.ttf"), "master_volume": 100,
                            "track_volume": 100, "gui_volume": 100, "effects_volume": 100,
                            "enabled_audio": [True, True, True, True], "logging": False}, f, indent=4)
             f.close()
-            hide_file("resources/settings.json")
+            hide_file(settings_path)
         finished_steps += 1
 
         for file in necessary_files:
             finished_steps += 1
-            if not os.path.exists(file):
+            local_path = os.path.normpath(file)
+            if not os.path.exists(local_path):
                 link = f"https://raw.githubusercontent.com/PizzaPost/songComparator/master/{file}"
-                urllib.request.urlretrieve(link, file)
+                urllib.request.urlretrieve(link, local_path)
     except Exception as e:
         tkinter.messagebox.showerror("Installation Error" if not lang else lang["error"]["installation_error_title"],
                                      str(e))
@@ -168,13 +170,12 @@ def installer():
         done_event.set()
 
 
-palette = colors.load_palette(color_path)
 finished_steps += 1
 
 
 def create_shortcut(desktop_shortcut_value, desktop):
     if desktop_shortcut_value:
-        path_to_here = os.path.dirname(os.path.abspath(__file__)).replace("/installer.py", "")
+        path_to_here = os.path.dirname(os.path.abspath(__file__))
         script_path = os.path.join(path_to_here, "main.py")
         if desktop:
             if current_os == "Windows":
@@ -305,8 +306,8 @@ def uninstaller(tk):
             try:
                 if assets:
                     assets = False
-                    shutil.rmtree("resources/assets")
-                    shutil.rmtree("resources/languages")
+                    shutil.rmtree(os.path.join("resources", "assets"))
+                    shutil.rmtree(os.path.join("resources", "languages"))
                 if code:
                     code = False
                     os.remove("colors.py")
@@ -319,16 +320,17 @@ def uninstaller(tk):
                     if current_os == "Windows":
                         os.remove("Song Comparator.lnk")
                     elif current_os == "Linux":
-                        os.remove("Song Comparator.desktop")
+                        os.remove("SongComparator.desktop")
                     elif current_os == "Darwin":
                         os.remove("Song Comparator.command")
+                    shortcut_path = ""
                     if current_os == "Windows":
                         import winshell
                         target_folder = winshell.desktop()
                         shortcut_path = os.path.join(target_folder, "Song Comparator.lnk")
                     elif current_os == "Linux":
                         target_folder = os.path.join(os.path.expanduser("~"), "Desktop")
-                        shortcut_path = os.path.join(target_folder, "Song Comparator.desktop")
+                        shortcut_path = os.path.join(target_folder, "SongComparator.desktop")
                     elif current_os == "Darwin":
                         target_folder = os.path.join(os.path.expanduser("~"), "Desktop")
                         shortcut_path = os.path.join(target_folder, "Song Comparator.command")
@@ -336,17 +338,17 @@ def uninstaller(tk):
                         os.remove(shortcut_path)
                 if tracks:
                     tracks = False
-                    shutil.rmtree("resources/covers")
-                    shutil.rmtree("resources/data")
-                    shutil.rmtree("resources/details")
-                    shutil.rmtree("resources/playlists")
-                    shutil.rmtree("resources/tracks")
+                    shutil.rmtree(os.path.join("resources", "covers"))
+                    shutil.rmtree(os.path.join("resources", "data"))
+                    shutil.rmtree(os.path.join("resources", "details"))
+                    shutil.rmtree(os.path.join("resources", "playlists"))
+                    shutil.rmtree(os.path.join("resources", "tracks"))
                 if themes:
                     themes = False
-                    shutil.rmtree("resources/themes")
+                    shutil.rmtree(os.path.join("resources", "themes"))
                 if settings:
                     settings = False
-                    os.remove("resources/settings.json")
+                    os.remove(os.path.join("resources", "settings.json"))
                 if modules:
                     modules = False
                     for module in official_modules:
@@ -456,12 +458,12 @@ def start_installation(tk):
 def start_gui():
     """Starts the installer GUI."""
     global finished_steps, create_desktop_shortcut
-    # downloads the icon
-    icon_path = "resources/assets/icon.ico"
+    icon_rel_path = "resources/assets/icon.ico"
+    icon_path = os.path.normpath(icon_rel_path)
     if not os.path.exists(icon_path):
         try:
-            os.makedirs("resources/assets", exist_ok=True)
-            link = f"https://raw.githubusercontent.com/PizzaPost/songComparator/master/{icon_path}"
+            os.makedirs(os.path.dirname(icon_path), exist_ok=True)
+            link = f"https://raw.githubusercontent.com/PizzaPost/songComparator/master/{icon_rel_path}"
             urllib.request.urlretrieve(link, icon_path)
         except Exception as e:
             tkinter.messagebox.showerror(
