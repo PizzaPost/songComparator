@@ -315,7 +315,19 @@ def uninstaller(tk):
                     os.remove("settings.py")
                     os.remove("stats.py")
                     os.remove("visuals.py")
-                    os.remove("window.py")
+                    if current_os == "Windows":
+                        os.remove("Song Comparator.lnk")
+                    elif current_os == "Darwin":
+                        os.remove("Song Comparator.command")
+                    if current_os == "Windows":
+                        import winshell
+                        target_folder = winshell.desktop()
+                        shortcut_path = os.path.join(target_folder, "Song Comparator.lnk")
+                    else:
+                        target_folder = os.path.join(os.path.expanduser("~"), "Desktop")
+                        shortcut_path = os.path.join(target_folder, "Song Comparator.command")
+                    if os.path.exists(fr"{shortcut_path}"):
+                        os.remove(fr"{shortcut_path}")
                 if tracks:
                     tracks = False
                     shutil.rmtree("resources/covers")
