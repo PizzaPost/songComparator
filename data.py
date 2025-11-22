@@ -231,7 +231,7 @@ def get_track_length(track):
     """
     filepath = os.path.join(trackfolder, track)
     if os.path.exists(filepath):
-        audio = mutagen.File(filepath)
+        audio = mutagen.File(filepath) # type: ignore
         if audio is not None:
             return int(audio.info.length * 1000)
     return 0  # fallback
