@@ -157,7 +157,7 @@ def run():
                 intro = False
                 save_log("finished startup animation")
                 save_log("adding values to data")
-                data.add_value("session_count", 1)
+                sessionStart = time.time()
                 if add_new_date:
                     data.add_value_to_list("dates_used", current_date)
                 save_log("finished adding values to data")
@@ -667,6 +667,9 @@ def run():
                     save_log("finished fade-in animation")
         pygame.display.update()
         clock.tick(120)
+    sessionEnd = time.time()
+    session_length = sessionEnd - sessionStart
+    data.add_value_to_list("session_lengths", session_length)
     pygame.quit()
 
 
