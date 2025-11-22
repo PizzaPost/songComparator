@@ -200,7 +200,8 @@ def displayName(track: dict):
 
 
 def saveTrackVoting(**args):
-    """Saves the voting for a given track."""
+    """Saves the voting for a given track.
+    Overrides any previous voting for the same track stored in the data folder."""
     trackData = args.get("trackData") or dict()
     trackName = trackData.get("track") or trackData.get("url")
     if trackName is None:
@@ -231,7 +232,7 @@ def get_track_length(track):
     """
     filepath = os.path.join(trackfolder, track)
     if os.path.exists(filepath):
-        audio = mutagen.File(filepath)
+        audio = mutagen.File(filepath) # type: ignore
         if audio is not None:
             return int(audio.info.length * 1000)
     return 0  # fallback
