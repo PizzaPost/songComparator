@@ -200,7 +200,8 @@ def displayName(track: dict):
 
 
 def saveTrackVoting(**args):
-    """Saves the voting for a given track."""
+    """Saves the voting for a given track.
+    Overrides any previous voting for the same track stored in the data folder."""
     trackData = args.get("trackData") or dict()
     trackName = trackData.get("track") or trackData.get("url")
     if trackName is None:
