@@ -17,9 +17,9 @@ def submit_settings(tk, lang, theme, appearance_mode, language, font_dropdown, f
                     enabled_audio, logging):
     main.save_log("submitting settings")
     selected_font_name = font_dropdown.get()
-    font = "resources/fonts/NotoSans.ttf"
+    font = os.path.join("resurces", "fonts", "NotoSans.ttf")
     if selected_font_name == "NotoSans (default)":
-        font = "resources/fonts/NotoSans.ttf"
+        font = os.path.join("resurces", "fonts", "NotoSans.ttf")
     else:
         matching_fonts = [f for f in font_list if
                           matplotlib.font_manager.FontProperties(fname=f).get_name() == selected_font_name]
@@ -27,7 +27,8 @@ def submit_settings(tk, lang, theme, appearance_mode, language, font_dropdown, f
             font = matching_fonts[0]
             if font_specifier.get() != "Select a specific version.":
                 font = font_specifier.get()
-    with open("resources/settings.json", "w") as f:
+    misc.unhide_file(os.path.join("resources", "settings.json"))
+    with open(os.path.join("resources", "settings.json"), "w") as f:
         json.dump({"theme": theme, "appearance_mode": appearance_mode, "language": language, "font": font,
                    "master_volume": int(master_volume), "track_volume": int(track_volume),
                    "gui_volume": int(gui_volume), "effects_volume": int(effects_volume),
@@ -35,6 +36,7 @@ def submit_settings(tk, lang, theme, appearance_mode, language, font_dropdown, f
                    "logging": True if logging == ("Enabled" if not lang else lang["settings"]["enabled"]) else False},
                   f, indent=4)
     f.close()
+    misc.hide_file(os.path.join("resources", "settings.json"))
     tkinter.messagebox.showinfo(
         "Info",
         "Changed will be displayed after a restarting." if not lang else lang["settings"]["submit_info"])
@@ -58,7 +60,7 @@ def update_font_specifier(lang, font_specifier, selected, font_list, startup=Fal
 def open_settings():
     main.save_log("starting settings")
     lang = misc.load_language(misc.load_settings())
-    with open("resources/settings.json", "r") as f:
+    with open(os.path.join("resources", "settings.json"), "r") as f:
         data = json.load(f)
     f.close()
     themes = [theme.replace(".json", "") for theme in os.listdir("resources/themes")]
@@ -248,7 +250,7 @@ def open_settings():
     effects_volume_label.grid(row=15, column=0, padx=5, sticky="w")
     effects_volume_mute.grid(row=15, column=1, padx=5, sticky="e")
     effects_volume.grid(row=15, column=2, padx=5, sticky="e")
-    effects_volume_percentage.grid(row=14, column=3, padx=5, sticky="e")
+    effects_volume_percentage.grid(row=15, column=3, padx=5, sticky="e")
     seperator5.grid(row=16)
     advanced_heading.grid(row=17, column=0, pady=5, sticky="w")
     logging_label.grid(row=18, column=0, padx=5, sticky="w")

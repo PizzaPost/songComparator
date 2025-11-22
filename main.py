@@ -38,7 +38,7 @@ def run():
     pg = pygame.display.set_mode()
     width, height = pg.get_size()
     pygame.display.set_caption("Song Comparator")
-    pygame.display.set_icon(pygame.image.load("resources/assets/icon.png"))
+    pygame.display.set_icon(pygame.image.load(os.path.join("resources", "assets", "icon.png")))
     clock = pygame.time.Clock()
     track = None
     video = None
@@ -46,12 +46,12 @@ def run():
     scaledCover = None
     coverRect = None
     button_font = pygame.font.Font(settings_json["font"], 48)
-    emojiFont = pygame.font.Font("resources/fonts/NotoEmoji.ttf", 48)
+    emojiFont = pygame.font.Font(os.path.join("resources", "fonts", "NotoEmoji.ttf"), 48)
     main_font = pygame.font.Font(settings_json["font"], 42)
     # need to rate info font
     ntri_font = pygame.font.Font(settings_json["font"], 24)
     note_font = pygame.font.Font(settings_json["font"], 18)
-    color_palette = colors.get_colors(f"resources/themes/{settings_json['theme']}.json")
+    color_palette = colors.get_colors(os.path.join("resources", "themes", f"{settings_json['theme']}.json"))
     base_color = colors.hex_to_rgb(
         color_palette["CTkButton"]["fg_color"][0 if settings_json["appearance_mode"] == "Light" else 1])
     hover_color = colors.hex_to_rgb(
@@ -59,6 +59,10 @@ def run():
     click_color = colors.hex_to_rgb(color_palette["palette"]["button_active_bg"])
     disabled_color = colors.hex_to_rgb(
         color_palette["CTkButton"]["fg_color_disabled"][0 if settings_json["appearance_mode"] == "Light" else 1])
+    video_progress_bar_bg_color = colors.hex_to_rgb(
+        color_palette["CTkSlider"]["progress_color"][0 if settings_json["appearance_mode"] == "Light" else 1])
+    video_progress_bar_fg_color = colors.hex_to_rgb(
+        color_palette["CTkSlider"]["fg_color"][0 if settings_json["appearance_mode"] == "Light" else 1])
     manager = visuals.ButtonManager(button_font)
     manager2 = visuals.ButtonManager(button_font)
     manager3 = visuals.ButtonManager(emojiFont)
@@ -69,13 +73,13 @@ def run():
     full_screen_viewport = pygame.Rect(0, 0, width, height)
     title_button_viewport = pygame.Rect(width - 200, height - 200, 200, 200)
     title_viewport = pygame.Rect(0, 100, width, height - 100)
-    icon_white = pygame.image.load("resources/assets/icon_white.png")
+    icon_white = pygame.image.load(os.path.join("resources", "assets", "icon_white.png"))
     icon_white = pygame.transform.smoothscale_by(icon_white, 3)
     icon_white = pygame.transform.smoothscale(icon_white, (icon_white.get_width() // 4, icon_white.get_height() // 4))
     icon_white_height = icon_white.get_height()
     icon_white_width_half = icon_white.get_width() // 2
     icon_white_height_half = icon_white.get_height() // 2
-    icon_glow = pygame.image.load("resources/assets/icon_glow.png")
+    icon_glow = pygame.image.load(os.path.join("resources", "assets", "icon_glow.png"))
     icon_glow = pygame.transform.smoothscale_by(icon_glow, 3)
     icon_glow = pygame.transform.smoothscale(icon_glow, (icon_glow.get_width() // 4, icon_glow.get_height() // 4))
     icon_glow_width_half = icon_glow.get_width() // 2
@@ -395,8 +399,8 @@ def run():
                     current_second = current_second / 1000
                     total_seconds = total_seconds / 1000
                 video_progressbar_bg = pygame.Surface((width - video_progressbar_fg.get_width(), 10))
-                video_progressbar_bg.fill((111, 105, 157))
-                video_progressbar_fg.fill((51, 45, 97))
+                video_progressbar_bg.fill(video_progress_bar_bg_color)
+                video_progressbar_fg.fill(video_progress_bar_fg_color)
                 video_progressbar_bg.set_alpha(mouse_move_timeout)
                 video_progressbar_fg.set_alpha(mouse_move_timeout)
                 if track_data.__contains__("pre_notes"):
