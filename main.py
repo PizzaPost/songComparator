@@ -482,6 +482,7 @@ def run():
                                 if wasSingleTrack:
                                     track = None
                                     video = None
+                                    coverActive = False
                                     currentMenu = "main"
                                 else:
                                     video = None
