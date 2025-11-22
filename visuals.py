@@ -1,3 +1,5 @@
+import os
+
 import pygame
 
 import data
@@ -445,7 +447,8 @@ def calc_cover(cover: str, width, height, coverFound=True):
     -------
         tuple: (scaledCoverSurface, coverRect) where coverRect is centered on screen
     """
-    coverImage = pygame.image.load((data.coverfolder + cover if coverFound else "resources/assets/tnf.png"))
+    coverImage = pygame.image.load(
+        (os.path.join(data.coverfolder, cover) if coverFound else os.path.join("resources", "assets", "tnf.png")))
     coverWidth, coverHeight = coverImage.get_size()
     aspectRatio = coverWidth / coverHeight
 

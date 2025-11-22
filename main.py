@@ -569,7 +569,7 @@ def run():
                         coverActive = True
                         details = data.details(track, True, True)
                         if "cover" in details and details["cover"]:
-                            if os.path.exists(f"{data.coverfolder}{details["cover"]}"):
+                            if os.path.exists(f"{os.path.join(data.coverfolder, details["cover"])}"):
                                 coverFound = True
                                 cover = details["cover"]
                             else:
