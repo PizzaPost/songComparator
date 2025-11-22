@@ -178,7 +178,7 @@ def run():
                         intro = False
                         save_log("skipping startup animation")
                         save_log("adding values to data")
-                        data.add_value("session_count", 1)
+                        sessionStart = time.time()
                         if add_new_date:
                             data.add_value_to_list("dates_used", current_date)
                         save_log("finished adding values to data")
