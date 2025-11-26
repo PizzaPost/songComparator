@@ -11,6 +11,7 @@ import colors
 import data
 import misc
 import settings
+import stats
 import visuals
 
 last_log = None
@@ -67,6 +68,7 @@ def run():
     manager2 = visuals.ButtonManager(button_font)
     manager3 = visuals.ButtonManager(emojiFont)
     manager4 = visuals.ButtonManager(emojiFont)
+    manager5 = visuals.ButtonManager(button_font)
     cog_button = manager3.add_button("⚙️", "menu", base_color=base_color, hover_color=hover_color,
                                      click_color=click_color,
                                      disabled_color=disabled_color)
@@ -261,6 +263,7 @@ def run():
             keys = pygame.key.get_pressed()
             for event in pygame.event.get():
                 manager.handle_event(event)
+                manager5.handle_event(event)
                 if event.type == pygame.QUIT:
                     running = False
                 elif event.type == pygame.KEYUP:
@@ -607,35 +610,61 @@ def run():
                         elif coverActive:
                             pygame.mixer.music.pause()
                         track_paused = True
-                esc_menu = pygame.Surface((width, height))
-                esc_menu.set_alpha(200)
-                esc_menu.fill((0, 0, 0))
-                pg.blit(esc_menu, (0, 0))
+                shadow = pygame.Surface((width, height))
+                shadow.set_alpha(200)
+                shadow.fill((0, 0, 0))
+                pg.blit(shadow, (0, 0))
                 manager.set_enabled("Playlist" if not lang else lang["program"]["playlist"], False)
                 manager.set_enabled("Track" if not lang else lang["program"]["track"], False)
                 manager2.clear()
-                manager2.add_button("Back", "esc_menu", base_color=base_color, hover_color=hover_color,
+                manager2.add_button("Back" if not lang else lang["program"]["back"], "esc_menu", base_color=base_color,
+                                    hover_color=hover_color,
                                     click_color=click_color, disabled_color=disabled_color)
-                manager2.add_button("Settings", "esc_menu", base_color=base_color, hover_color=hover_color,
+                manager2.add_button("Settings" if not lang else lang["program"]["settings"], "esc_menu",
+                                    base_color=base_color, hover_color=hover_color,
                                     click_color=click_color, disabled_color=disabled_color)
-                manager2.add_button("Calculate Data", "esc_menu", base_color=base_color, hover_color=hover_color,
+                manager2.add_button("Calculate Data" if not lang else lang["program"]["calculate_data"], "esc_menu",
+                                    base_color=base_color, hover_color=hover_color,
                                     click_color=click_color, disabled_color=disabled_color)
                 manager2.set_viewport(title_viewport)
                 manager2.layout(center_x=title_viewport.centerx, center_y=title_viewport.centery,
                                 max_width=title_viewport.w)
+                if currentMenu == "data_calculation":
+                    manager2.disable_all()
                 id, text, bdetails = manager2.draw_and_handle(pg, mouse_1_up)
+                if currentMenu == "data_calculation":
+                    shadow = pygame.Surface((width, height))
+                    shadow.set_alpha(200)
+                    shadow.fill((0, 0, 0))
+                    pg.blit(shadow, (0, 0))
                 if id == "esc_menu":
                     save_log(f"clicked text: {text}, id: {id}")
-                    if text == "Back":
+                    if text == ("Back" if not lang else lang["program"]["back"]):
                         escaped = False
                         manager3.set_enabled("⚙️")
-                    elif text == "Settings":
+                    elif text == ("Settings" if not lang else lang["program"]["settings"]):
                         if settings_window:
                             settings_window.deiconify()
                             settings_window.focus()
                             frame._parent_canvas.yview_moveto(0)
-                    elif text == "Calculate Data":
-                        tkinter.messagebox.showinfo("Calculate Data", "This feature is not yet implemented")
+                    elif text == ("Calculate Data" if not lang else lang["program"]["calculate_data"]):
+                        currentMenu = "data_calculation"
+                        manager5.clear()
+                        manager5.set_viewport(full_screen_viewport)
+                        all_playlist = [playlist for playlist in os.listdir(data.playlistfolder) if
+                                        playlist.endswith((".scp", ".scpl"))]
+                        for playlist in all_playlist:
+                            for _track in data.readPlaylist(playlist):
+                                if not os.path.exists(os.path.join(data.datafolder,
+                                                                   f"{data.removeExtension(_track.get("track") or _track.get("url"))}.scv")):
+                                    break
+                            manager5.add_button(playlist, "data_calculator_list", base_color=base_color,
+                                                hover_color=hover_color,
+                                                click_color=click_color,
+                                                disabled_color=disabled_color)
+                        manager5.layout(center_x=full_screen_viewport.centerx,
+                                        center_y=full_screen_viewport.centery,
+                                        max_width=full_screen_viewport.w)
                     else:
                         save_log(f"Unknown button text pressed: {text}, id: {id}", "warning")
             else:
@@ -648,6 +677,11 @@ def run():
                         save_log("unpaused cover by escape")
                     paused_by_esc = False
                     track_paused = False
+
+            if currentMenu == "data_calculation":
+                id, text, bdetails = manager5.draw_and_handle(pg, mouse_1_up)
+                if not (statistics := None) and text:
+                    statistics = stats.calculateStats(text)
 
             # quit app logic
             if keys[pygame.K_ESCAPE]:

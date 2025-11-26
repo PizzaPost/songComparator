@@ -51,7 +51,10 @@
   },
   "program": {
     "playlist": "Playlist",
-    "track": "Track"
+    "track": "Track",
+    "back": "Back",
+    "settings": "Settings",
+    "calculate_data": "Calculate Data"
   },
   "voting": {
     "relatability": "Relatability",

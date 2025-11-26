@@ -1,9 +1,10 @@
 import json
 import os
+
 import data
 
 
-def calculateStats():
+def calculateStats(playlist=None):
     with open(os.path.join(data.datafolder, "default.json")) as f:
         default = json.load(f)
         f.close()
@@ -13,8 +14,16 @@ def calculateStats():
     sessionCount = len(session_lengths)
     longestSessionLength = max(session_lengths)
     averageSessionLength = timeTotal / sessionCount
-    
-    trackRatings = [scv for scv in os.listdir(data.datafolder) if scv.endswith(".scv")]
+    if playlist:
+        playlist = data.readPlaylist(playlist)
+        playlist_tracks = []
+        for track in playlist:
+            playlist_tracks.append(track.get("track") or track.get("url"))
+        trackRatings = [scv for scv in os.listdir(data.datafolder) if scv.endswith(".scv") and (
+                data.removeExtension(scv) in [data.removeExtension(_track) for _track in
+                                              playlist_tracks] or scv in playlist_tracks)]
+    else:
+        trackRatings = [scv for scv in os.listdir(data.datafolder) if scv.endswith(".scv")]
     ratings = []
     best = []
     worst = []
@@ -47,44 +56,44 @@ def calculateStats():
                 worst.append(saveTuple)
             elif worst[index][0] > rating:
                 worst[index] = saveTuple
-    
+
     averageRating = sum(ratings) / len(ratings)
     averageRelatability = sum(ratings[::4]) / len(ratings[::4])
     averageLyricsQuality = sum(ratings[1::4]) / len(ratings[1::4])
     averageBeatQuality = sum(ratings[2::4]) / len(ratings[2::4])
     averageBeatTaste = sum(ratings[3::4]) / len(ratings[3::4])
-    
+
     mostRelatable = best[0][1]
     bestLyrics = best[1][1]
     bestBeat = best[2][1]
     tastiest = best[3][1]
-    
+
     leastRelatable = worst[0][1]
     worstLyrics = worst[1][1]
     worstBeat = worst[2][1]
     mostDisgusting = worst[3][1]
-    
+
     mostStarredArtists = sorted(artistStars.items(), key=lambda x: sum(x[1]), reverse=True)[0][0]
     mostRelatableArtists = sorted(artistStars.items(), key=lambda x: x[1][0], reverse=True)[0][0]
     bestLyricsArtists = sorted(artistStars.items(), key=lambda x: x[1][1], reverse=True)[0][0]
     bestProducedArtists = sorted(artistStars.items(), key=lambda x: x[1][2], reverse=True)[0][0]
     tastiestArtist = sorted(artistStars.items(), key=lambda x: x[1][3], reverse=True)[0][0]
-    
+
     mostCommonRating = sorted(set(ratings), key=ratings.count, reverse=True)[0]
-    
+
     tracksRated = len(trackRatings)
     fiveStars = sum(1 for rating in ratings if rating == 5)
     fourStars = sum(1 for rating in ratings if rating == 4)
     threeStars = sum(1 for rating in ratings if rating == 3)
     twoStars = sum(1 for rating in ratings if rating == 2)
     oneStar = sum(1 for rating in ratings if rating == 1)
-    
+
     timeVoting = sum(votingTimes)
     timeListening = sum(listeningTimes)
     averageTimeListened = timeListening / len(listeningTimes)
     averageTimeVoting = timeVoting / len(votingTimes)
-    averageTrackLength = sum(trackLengths) / len(trackLengths) / 1000 # trackLength is in ms, convert to s
-    
+    averageTrackLength = sum(trackLengths) / len(trackLengths) / 1000  # trackLength is in ms, convert to s
+
     return {
         "sessionCount": sessionCount,
         "daysUsed": daysUsed,
@@ -124,6 +133,8 @@ def calculateStats():
         "averageTimeVoting": averageTimeVoting
     }
 
+
 if __name__ == "__main__":
     from pprint import pprint
+
     pprint(calculateStats(), sort_dicts=False, indent=4)
