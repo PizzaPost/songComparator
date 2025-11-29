@@ -128,13 +128,13 @@ def run():
     settings_window, frame = settings.open_settings()
     settings_window.attributes("-alpha", 1)
     pygame.event.set_grab(True)
-    pygame.event.set_grab(False)
     while running:
         pg.fill(bg_color)
         width, height = pg.get_size()
 
         # start up animation
         if intro:
+            pygame.event.set_grab(True)
             text = note_font.render("Press SPACE to skip the intro." if not lang else lang["startup"]["skip"], True,
                                     (50, 50, 50))
             pg.blit(text, (width // 2 - text.get_width() // 2, height - text.get_height() * 3))
@@ -161,6 +161,7 @@ def run():
                     pygame.display.update()
                     pygame.time.delay(17)
                 intro = False
+                pygame.event.set_grab(False)
                 save_log("finished startup animation")
                 save_log("adding values to data")
                 sessionStart = time.time()
@@ -183,6 +184,7 @@ def run():
                         sessionStart = time.time()
                         if add_new_date:
                             data.add_value_to_list("dates_used", current_date)
+                        pygame.event.set_grab(False)
                         save_log("finished adding values to data")
                         save_log("start fade-in animation")
 
@@ -658,7 +660,8 @@ def run():
                                 if not os.path.exists(os.path.join(data.datafolder,
                                                                    f"{data.removeExtension(_track.get("track") or _track.get("url"))}.scv")):
                                     break
-                            manager5.add_button(playlist, "data_calculator_list", base_color=base_color,
+                            manager5.add_button(playlist.replace(".scp", ""), "data_calculator_list",
+                                                base_color=base_color,
                                                 hover_color=hover_color,
                                                 click_color=click_color,
                                                 disabled_color=disabled_color)
@@ -682,7 +685,8 @@ def run():
                 id, text, bdetails = manager5.draw_and_handle(pg, mouse_1_up)
                 if not (statistics := None) and text:
                     statistics = stats.calculateStats(text)
-
+                    save_log(f"Generating stats video for {text}.")
+                    stats.render_wrapped(statistics, text)
             # quit app logic
             if keys[pygame.K_ESCAPE]:
                 save_log("pressing escape")
