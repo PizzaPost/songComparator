@@ -123,12 +123,14 @@ def run():
         last_used_date = dates_used[-1]
         if last_used_date == list(current_date):
             add_new_date = False
+    wrapped_player = None
     save_log("initialized variables")
     save_log("starting startup animation")
     settings_window, frame = settings.open_settings()
     settings_window.attributes("-alpha", 1)
     pygame.event.set_grab(True)
     while running:
+        dt = clock.tick(120) / 1000
         pg.fill(bg_color)
         width, height = pg.get_size()
 
@@ -187,6 +189,22 @@ def run():
                         pygame.event.set_grab(False)
                         save_log("finished adding values to data")
                         save_log("start fade-in animation")
+        elif wrapped_player:
+            is_done = wrapped_player.update(dt)
+            wrapped_player.draw(pg)
+            if is_done:
+                wrapped_player = None
+                currentMenu = "data_calculation"
+                pygame.mouse.set_visible(True)
+                save_log("Finished wrapped playback")
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                    wrapped_player = None
+                    currentMenu = "data_calculation"
+                    pygame.mouse.set_visible(True)
+                    save_log("Cancelled wrapped playback via Escape")
 
         # main app
         else:
@@ -686,7 +704,10 @@ def run():
                 if not (statistics := None) and text:
                     statistics = stats.calculateStats(text)
                     save_log(f"Generating stats video for {text}.")
-                    stats.render_wrapped(statistics, text)
+                    manager5.disable_all()
+                    wrapped_player = stats.WrappedPlayer(width, height, statistics, text)
+                    manager5.enable_all()
+                    pygame.mouse.set_visible(False)
             # quit app logic
             if keys[pygame.K_ESCAPE]:
                 save_log("pressing escape")
@@ -709,7 +730,6 @@ def run():
                 if fadein == 255:
                     save_log("finished fade-in animation")
         pygame.display.update()
-        clock.tick(120)
     sessionEnd = time.time()
     session_length = sessionEnd - sessionStart
     data.add_value_to_list("session_lengths", session_length)

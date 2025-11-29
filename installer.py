@@ -55,7 +55,7 @@ necessary_files = ["resources/assets/icon.png", "resources/assets/icon_white.png
                    "resources/assets/star_highlighted.png",
                    "resources/assets/tnf.png",
                    "resources/languages/Deutsch.json", "resources/languages/English.json",
-                   "resources/fonts/NotoEmoji.ttf", "resources/fonts/NotoSans.ttf"]
+                   "resources/fonts/NotoEmoji.ttf", "resources/fonts/NotoSans.ttf", "resources/fonts/NotoSansBold.ttf"]
 custom_modules = ["colors", "data", "main", "misc", "settings", "stats", "visuals"]
 official_modules = ["pyvidplayer2", "pygame", "customtkinter", "yt-dlp", "pillow", "matplotlib"]
 trying = True
