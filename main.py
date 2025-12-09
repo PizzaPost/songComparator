@@ -426,8 +426,8 @@ def run():
                 video_progressbar_fg.fill(video_progress_bar_fg_color)
                 video_progressbar_bg.set_alpha(mouse_move_timeout)
                 video_progressbar_fg.set_alpha(mouse_move_timeout)
-                if track_data.__contains__("pre_notes"):
-                    notes = track_data["pre_notes"]
+                if track_data.__contains__("pre_notes") or (track_data.get("notes") and len(track_data["notes"]) > 0):
+                    notes = track_data.get("pre_notes") or track_data.get("notes")[0]
                     for x, line in enumerate(reversed(notes)):
                         text = main_font.render(str(line), True, (255, 255, 255))
                         text.set_alpha(mouse_move_timeout)
@@ -483,8 +483,8 @@ def run():
                 start_mouse_move_timeout = False
 
                 ratings = visuals.show_voting_screen(pg, rating_widgets)
-                if track_data.__contains__("after_notes"):
-                    notes = track_data["after_notes"]
+                if track_data.__contains__("after_notes") or (track_data.get("notes") and len(track_data["notes"]) > 1):
+                    notes = track_data.get("after_notes") or track_data.get("notes")[1]
                     for x, line in enumerate(notes):
                         text = main_font.render(str(line), True, (255, 255, 255))
                         pg.blit(text, (manager4.x + 30, 15 + x * text.get_height()))
