@@ -199,6 +199,13 @@ def displayName(track: dict):
     return ((artist + " - ") if artist else "") + (title if title else "")
 
 
+def isRated(track: str):
+    """Checks if a track has already been rated by looking for it's .scv file."""
+    trackName = removeExtension(track)
+    filepath = os.path.join(datafolder, f"{trackName}.scv")
+    return os.path.exists(filepath)
+
+
 def saveTrackVoting(**args):
     """Saves the voting for a given track.
     Overrides any previous voting for the same track stored in the data folder."""
@@ -232,7 +239,7 @@ def get_track_length(track):
     """
     filepath = os.path.join(trackfolder, track)
     if os.path.exists(filepath):
-        audio = mutagen.File(filepath) # type: ignore
+        audio = mutagen.File(filepath)  # type: ignore
         if audio is not None:
             return int(audio.info.length * 1000)
     return 0  # fallback

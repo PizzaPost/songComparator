@@ -69,11 +69,9 @@ def run():
     manager3 = visuals.ButtonManager(emojiFont)
     manager4 = visuals.ButtonManager(emojiFont)
     manager5 = visuals.ButtonManager(button_font)
-    cog_button = manager3.add_button("⚙️", "menu", base_color=base_color, hover_color=hover_color,
-                                     click_color=click_color,
-                                     disabled_color=disabled_color)
     full_screen_viewport = pygame.Rect(0, 0, width, height)
-    title_button_viewport = pygame.Rect(width - 200, height - 200, 200, 200)
+    title_button_viewport1 = pygame.Rect(width - 200, height - 200, 200, 200)
+    title_button_viewport2 = pygame.Rect(width - 200, height - 320, 200, 320)
     title_viewport = pygame.Rect(0, 100, width, height - 100)
     icon_white = pygame.image.load(os.path.join("resources", "assets", "icon_white.png"))
     icon_white = pygame.transform.smoothscale_by(icon_white, 3)
@@ -104,6 +102,10 @@ def run():
     paused_by_esc = False
     track_paused = None
     replay = False
+    track_is_rated = False
+    cog_button = None
+    skip_button = None
+    _just_created_data_calculation = False
     bg_color = colors.hex_to_rgb(
         color_palette["CTk"]["fg_color"][0 if settings_json["appearance_mode"] == "Light" else 1])
     current_progressbar_width = 0
@@ -234,6 +236,7 @@ def run():
                             randomPlaylist = data.randomPlaylist()
                             playlist = data.readPlaylist(randomPlaylist)
                             track = playlist[0]["track"]
+                            track_is_rated = data.isRated(track)
                             isVideo = playlist[0].get("isVideo", True)
                             isStream = True if playlist[0].get("url") else False
                             coverIndex = 0
@@ -256,6 +259,7 @@ def run():
                             tracks = data.listTrackFolder()
                             if len(tracks) == 1:
                                 track = tracks[0]
+                            track_is_rated = data.isRated(track)
                             """Smartly set isStream in the future"""
                             isStream = False
                             isVideo = True if track.endswith(
@@ -265,6 +269,7 @@ def run():
                 elif id == "playlist":
                     playlist = bdetails
                     track = playlist[0]["track"]
+                    track_is_rated = data.isRated(track)
                     isVideo = playlist[0].get("isVideo", True)
                     isStream = True if playlist[0].get("url") else False
                     coverIndex = 0
@@ -272,6 +277,7 @@ def run():
                 elif id == "track":
                     trackDetails = bdetails
                     track = trackDetails["track"]
+                    track_is_rated = data.isRated(track)
                     isVideo = trackDetails.get("isVideo", True)
                     isStream = True if trackDetails.get("url") else False
                     wasSingleTrack = True
@@ -338,6 +344,7 @@ def run():
                             save_log(f"adjusted volume in cover mode to {video.get_volume()}")
                 # track mouse controls
                 elif event.type == pygame.MOUSEBUTTONUP:
+                    _just_created_data_calculation = False
                     mouse_pos = pygame.mouse.get_pos()
                     mouse_over_any_button = (
                             manager.is_mouse_over_any_button(mouse_pos) or
@@ -443,7 +450,6 @@ def run():
                 text = main_font.render(f"{track_data["title"]} - {track_data["artist"]}", True, (255, 255, 255))
                 text.set_alpha(mouse_move_timeout)
                 pg.blit(text, (width / 2 - text.get_width() / 2, 15))
-                cog_button.set_alpha(mouse_move_timeout)
             else:
                 if currentMenu == "watching" and pygame.mouse.get_visible():
                     pygame.mouse.set_visible(False)
@@ -456,7 +462,6 @@ def run():
                     mouse_move_timeout = 2400
             if currentMenu != "watching" and not pygame.mouse.get_visible():
                 mouse_move_timeout = 0
-                cog_button.reset_alpha()
                 pygame.mouse.set_visible(True)
                 save_log("showing mouse")
 
@@ -561,6 +566,7 @@ def run():
             if (not video and track and not playedSongOnce) or replay:
                 save_log("setting up next video or cover")
                 track_data = data.details(track, True, True)
+                track_is_rated = data.isRated(track)
                 if not replay:
                     replays = 0
                 replay = False
@@ -609,18 +615,62 @@ def run():
                         scaledCover, coverRect = visuals.calc_cover(cover, width, height, coverFound)
                         playedSongOnce = True
                         save_log("finished setting up cover type: 2")
-            if currentMenu == "main" or mouse_move_timeout > 0:
-                manager3.set_viewport(title_button_viewport)
-                manager3.layout(center_x=title_button_viewport.centerx, center_y=title_button_viewport.centery,
-                                max_width=title_button_viewport.w)
+            if currentMenu == "main" or (mouse_move_timeout > 0 and track):
+                manager3.clear()
+                if currentMenu == "main":
+                    mouse_move_timeout = 255
+                if currentMenu == "watching" and track_is_rated:
+                    skip_button = manager3.add_button("⏩", "menu", base_color=base_color, hover_color=hover_color,
+                                                      click_color=click_color,
+                                                      disabled_color=disabled_color)
+                    skip_button.set_alpha(mouse_move_timeout)
+                cog_button = manager3.add_button("⚙️", "menu", base_color=base_color, hover_color=hover_color,
+                                                 click_color=click_color,
+                                                 disabled_color=disabled_color)
+                cog_button.set_alpha(mouse_move_timeout)
+                if track_is_rated:
+                    manager3.set_viewport(title_button_viewport2)
+                    manager3.layout(center_x=title_button_viewport2.centerx, center_y=title_button_viewport2.centery,
+                                    max_width=title_button_viewport2.w)
+                else:
+                    manager3.set_viewport(title_button_viewport1)
+                    manager3.layout(center_x=title_button_viewport1.centerx, center_y=title_button_viewport1.centery,
+                                    max_width=title_button_viewport1.w)
                 id, text, bdetails = manager3.draw_and_handle(pg, mouse_1_up)
                 if id == "menu":
                     save_log(f"clicked text: {text}, id: {id}")
                     if text == "⚙️":
                         escaped = True
                         manager3.set_enabled("⚙️", False)
+                    elif text == "⏩":
+                        save_log(f"Skipping track {track}")
+                        if wasSingleTrack:
+                            track = None
+                            video = None
+                            coverActive = False
+                            currentMenu = "main"
+                        else:
+                            video = None
+                            try:
+                                for x, i in enumerate(playlist):
+                                    if track == i["track"]:
+                                        track = playlist[x + 1]["track"]
+                                        coverIndex = x + 1
+                                        break
+                            except IndexError:
+                                track = None
+                                video = None
+                                currentMenu = "main"
+                        track_is_rated = data.isRated(track) if track else False
+                        playedSongOnce = False
+                        save_log(f"finished skipping track")
                     else:
                         save_log(f"Unknown button text pressed: {text}, id: {id}", "warning")
+            else:
+                if cog_button:
+                    cog_button.reset_alpha()
+                if skip_button:
+                    skip_button.reset_alpha()
             if escaped:
                 if video or coverActive:
                     if not track_paused:
@@ -686,6 +736,7 @@ def run():
                         manager5.layout(center_x=full_screen_viewport.centerx,
                                         center_y=full_screen_viewport.centery,
                                         max_width=full_screen_viewport.w)
+                        _just_created_data_calculation = True
                     else:
                         save_log(f"Unknown button text pressed: {text}, id: {id}", "warning")
             else:
@@ -701,13 +752,14 @@ def run():
 
             if currentMenu == "data_calculation":
                 id, text, bdetails = manager5.draw_and_handle(pg, mouse_1_up)
-                if not (statistics := None) and text:
-                    statistics = stats.calculateStats(text)
-                    save_log(f"Generating stats video for {text}.")
-                    manager5.disable_all()
-                    wrapped_player = stats.WrappedPlayer(width, height, statistics, text)
-                    manager5.enable_all()
-                    pygame.mouse.set_visible(False)
+                if not _just_created_data_calculation:
+                    if not (statistics := None) and text:
+                        statistics = stats.calculateStats(text)
+                        save_log(f"Generating stats video for {text}.")
+                        manager5.disable_all()
+                        wrapped_player = stats.WrappedPlayer(width, height, statistics, text)
+                        manager5.enable_all()
+                        pygame.mouse.set_visible(False)
             # quit app logic
             if keys[pygame.K_ESCAPE]:
                 save_log("pressing escape")

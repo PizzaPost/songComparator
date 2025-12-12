@@ -206,7 +206,7 @@ def slide_1_intro(surface, progress, fonts, stats, playlist):
     surface.fill(bg)
     anim_y = 100 * (1 - ease_out_cubic(min(progress * 2, 1)))
     draw_text_centered(surface, "Wrapped" if not lang else lang["stats"]["title"], fonts["mega"],
-                       COLORS["accent_yellow"], width // 2, 200 + anim_y)  # Changed Y from 250 to 200
+                       COLORS["accent_yellow"], width // 2, 200 + anim_y)
     draw_text_centered(surface, playlist, fonts["title"], COLORS["text_black"], width // 2,
                        350 + anim_y)
     stats_txt = [
