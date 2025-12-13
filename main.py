@@ -1,6 +1,7 @@
 import logging
 import math
 import os
+import random
 import time
 import tkinter
 
@@ -126,6 +127,12 @@ def run():
         if last_used_date == list(current_date):
             add_new_date = False
     wrapped_player = None
+    bg_video = None
+    bg_cover = None
+    bg_cover_timer = 0
+    bg_surface = pygame.Surface((width, height))
+    bg_surface.set_alpha(240)
+    bg_surface.fill((0, 0, 0))
     save_log("initialized variables")
     save_log("starting startup animation")
     settings_window, frame = settings.open_settings()
@@ -135,6 +142,47 @@ def run():
         dt = clock.tick(120) / 1000
         pg.fill(bg_color)
         width, height = pg.get_size()
+        if not intro:
+            if len(os.listdir(os.path.join("resources", "tracks"))) > 0 and not (bg_video or bg_cover):
+                videos = os.listdir(os.path.join("resources", "tracks"))
+                while len(videos) > 0:
+                    try:
+                        random_video = videos[random.randint(0, len(videos) - 1)]
+                        bg_video = pyvidplayer2.Video(os.path.join("resources", "tracks", random_video))
+                        bg_video.set_volume(0)
+                        bg_video.play()
+                    except pyvidplayer2.error.VideoStreamError:
+                        videos.remove(random_video)
+                    finally:
+                        videos.clear()
+            if len(os.listdir(os.path.join("resources", "covers"))) > 0 and not (bg_video or bg_cover):
+                covers = os.listdir(os.path.join("resources", "covers"))
+                while len(covers) > 0:
+                    try:
+                        random_cover = covers[random.randint(0, len(covers) - 1)]
+                        bg_cover = pygame.image.load(os.path.join("resources", "covers", random_cover))
+                    except pygame.error:
+                        covers.remove(random_cover)
+                    finally:
+                        covers.clear()
+            if currentMenu in ("main", "trackSelection", "playlistSelection",
+                               "data_calculation") and not wrapped_player:
+                if bg_video:
+                    bg_video_w, bg_video_h = bg_video.current_size
+                    bg_video_x = (width - bg_video_w) // 2
+                    bg_video_y = (height - bg_video_h) // 2
+                    bg_video.draw(pg, (bg_video_x, bg_video_y))
+                    pg.blit(bg_surface, (0, 0))
+                    if bg_video.frame_count == bg_video.frame:
+                        bg_video = None
+                if bg_cover:
+                    rect = bg_cover.get_rect(center=(width // 2, height // 2))
+                    pg.blit(bg_cover, rect)
+                    pg.blit(bg_surface, (0, 0))
+                    bg_cover_timer += 1
+                if bg_cover_timer > 1200:
+                    bg_cover = None
+                    bg_cover_timer = 0
 
         # start up animation
         if intro:
@@ -681,7 +729,7 @@ def run():
                             pygame.mixer.music.pause()
                         track_paused = True
                 shadow = pygame.Surface((width, height))
-                shadow.set_alpha(200)
+                shadow.set_alpha(100)
                 shadow.fill((0, 0, 0))
                 pg.blit(shadow, (0, 0))
                 manager.set_enabled("Playlist" if not lang else lang["program"]["playlist"], False)
@@ -704,7 +752,7 @@ def run():
                 id, text, bdetails = manager2.draw_and_handle(pg, mouse_1_up)
                 if currentMenu == "data_calculation":
                     shadow = pygame.Surface((width, height))
-                    shadow.set_alpha(200)
+                    shadow.set_alpha(100)
                     shadow.fill((0, 0, 0))
                     pg.blit(shadow, (0, 0))
                 if id == "esc_menu":
