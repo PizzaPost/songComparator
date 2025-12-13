@@ -161,7 +161,14 @@ COLORS = {
 lang = misc.load_language(misc.load_settings())
 
 
-def draw_text_centered(surface, text, font, color, center_x, center_y, alpha=255, return_pos=False):
+def draw_text_centered(surface, text, font, color, center_x, center_y, alpha=255, shadow=False, return_pos=False):
+    if shadow:
+        for offset in range(3):
+            text_obj_shadow = font.render(text, True, (100, 100, 100))
+            if alpha < 255:
+                text_obj_shadow.set_alpha(max(alpha - 100, 0))
+            rect_shadow = text_obj_shadow.get_rect(center=(center_x + 3, center_y + offset + 1))
+            surface.blit(text_obj_shadow, rect_shadow)
     text_obj = font.render(text, True, color)
     if alpha < 255:
         text_obj.set_alpha(alpha)
@@ -198,17 +205,22 @@ def draw_horizontal_bar(surface, x, y, w, h, progress, color, bg_color):
     pygame.draw.rect(surface, bg_color, (x, y, w, h), border_radius=h // 2)
     actual_w = w * progress
     if actual_w > 0:
-        pygame.draw.rect(surface, color, (x, y, actual_w, h), border_radius=h // 2)
+        pygame.draw.rect(surface, color, (x, y, min(actual_w + 2, w), h), border_radius=h // 2)
 
 
-def slide_1_intro(surface, progress, fonts, stats, playlist):
+def lerp_color(color_start, color_end, t):
+    return tuple(int(a + (b - a) * t) for a, b in zip(color_start, color_end))
+
+
+def slide_1_intro(surface, progress, fonts, stats, playlist, draw_bg=True):
     bg = COLORS["bg_purple"]
-    surface.fill(bg)
+    if draw_bg:
+        surface.fill(bg)
     anim_y = 100 * (1 - ease_out_cubic(min(progress * 2, 1)))
     draw_text_centered(surface, "Wrapped" if not lang else lang["stats"]["title"], fonts["mega"],
-                       COLORS["accent_yellow"], width // 2, 200 + anim_y)
+                       COLORS["accent_yellow"], width // 2, 200 + anim_y, shadow=True)
     draw_text_centered(surface, playlist, fonts["title"], COLORS["text_black"], width // 2,
-                       350 + anim_y)
+                       350 + anim_y, shadow=True)
     stats_txt = [
         f"{stats["sessionCount"]} Sessions" if not lang else lang["stats"]["sessions"].format(
             str(stats["sessionCount"])),
@@ -224,16 +236,16 @@ def slide_1_intro(surface, progress, fonts, stats, playlist):
         offset_y = (1 - ease) * (height - start_y + 100)
         if local_progress > 0:
             draw_text_centered(surface, line, fonts["header"], COLORS["text_white"],
-                               positions_x[i],
-                               start_y + offset_y)
+                               positions_x[i], start_y + offset_y, shadow=True)
 
 
-def slide_2_sessions(surface, progress, fonts, stats, playlist):
+def slide_2_sessions(surface, progress, fonts, stats, playlist, draw_bg=True):
     bg = COLORS["bg_darkblue"]
-    surface.fill(bg)
+    if draw_bg:
+        surface.fill(bg)
     alpha = get_text_alpha(progress, delay_start=0.0, fade_duration=0.5)
     draw_text_centered(surface, "Deep Dive Sessions" if not lang else lang["stats"]["title2"], fonts["title"],
-                       COLORS["bg_green"], width // 2, 150, alpha=alpha)
+                       COLORS["bg_green"], width // 2, 150, alpha=alpha, shadow=True)
     scale1 = ease_out_cubic(min(1, progress * 1.5))
     center_x1 = width // 4
     center_y1 = 600
@@ -260,12 +272,13 @@ def slide_2_sessions(surface, progress, fonts, stats, playlist):
                            center_x2, center_y2, alpha=alpha2)
 
 
-def slide_3_ratings(surface, progress, fonts, stats, playlist):
+def slide_3_ratings(surface, progress, fonts, stats, playlist, draw_bg=True):
     bg = COLORS["bg_black"]
-    surface.fill(bg)
+    if draw_bg:
+        surface.fill(bg)
     alpha_title = get_text_alpha(progress, delay_start=0.0, fade_duration=0.5)
     draw_text_centered(surface, "Rating Spread" if not lang else lang["stats"]["title3"], fonts["title"],
-                       COLORS["bg_green"], width // 2, 150, alpha=alpha_title)
+                       COLORS["bg_green"], width // 2, 150, alpha=alpha_title, shadow=True)
     ratings = [stats["oneStar"], stats["twoStars"], stats["threeStars"], stats["fourStars"], stats["fiveStars"]]
     labels = ["1", "2", "3", "4", "5"]
     max_val = max(ratings) if max(ratings) > 0 else 1
@@ -298,12 +311,13 @@ def slide_3_ratings(surface, progress, fonts, stats, playlist):
                        width // 2, 1000, alpha=alpha_avg)
 
 
-def slide_4_taste_profile(surface, progress, fonts, stats, playlist):
+def slide_4_taste_profile(surface, progress, fonts, stats, playlist, draw_bg=True):
     bg = COLORS["bg_pink"]
-    surface.fill(bg)
+    if draw_bg:
+        surface.fill(bg)
     alpha_title = get_text_alpha(progress, delay_start=0.0, fade_duration=0.5)
     draw_text_centered(surface, "Your Taste Profile" if not lang else lang["stats"]["title4"], fonts["title"],
-                       COLORS["text_black"], width // 2, 150, alpha=alpha_title)
+                       COLORS["text_black"], width // 2, 150, alpha=alpha_title, shadow=True)
     metrics = [("Relatability" if not lang else lang["voting"]["relatability"], stats["averageRelatability"]),
                ("Lyrics Quality" if not lang else lang["voting"]["lyrics_quality"], stats["averageLyricsQuality"]),
                ("Beat Quality" if not lang else lang["voting"]["beat_quality"], stats["averageBeatQuality"]),
@@ -327,21 +341,22 @@ def slide_4_taste_profile(surface, progress, fonts, stats, playlist):
                                y + bar_h // 2, alpha=alpha_score)
 
 
-def slide_5_peaks_pits(surface, progress, fonts, stats, playlist):
+def slide_5_peaks_pits(surface, progress, fonts, stats, playlist, draw_bg=True):
     bg = COLORS["bg_orange"]
-    surface.fill(bg)
+    if draw_bg:
+        surface.fill(bg)
     alpha_title = get_text_alpha(progress, delay_start=0.0, fade_duration=0.5)
     draw_text_centered(surface, "The Peaks & Pits" if not lang else lang["stats"]["title5"], fonts["title"],
-                       COLORS["text_black"], width // 2, 150, alpha=alpha_title)
+                       COLORS["text_black"], width // 2, 150, alpha=alpha_title, shadow=True)
     x_good = width // 4
     x_bad = width * 3 // 4
     y_header = 300
     alpha_good_header = get_text_alpha(progress, delay_start=0.1, fade_duration=0.5)
     alpha_bad_header = get_text_alpha(progress, delay_start=0.35, fade_duration=0.5)
     draw_text_centered(surface, "--- PEAKS ---" if not lang else lang["stats"]["peaks"], fonts["header"],
-                       COLORS["text_white"], x_good, y_header, alpha=alpha_good_header)
+                       COLORS["text_white"], x_good, y_header, alpha=alpha_good_header, shadow=True)
     draw_text_centered(surface, "--- PITS ---" if not lang else lang["stats"]["pits"], fonts["header"],
-                       COLORS["text_white"], x_bad, y_header, alpha=alpha_bad_header)
+                       COLORS["text_white"], x_bad, y_header, alpha=alpha_bad_header, shadow=True)
     peaks = [
         ("Most Relatable:" if not lang else lang["stats"]["most_relatable1"], stats["mostRelatable"], 0.15),
         ("Best Lyrics:" if not lang else lang["stats"]["best_lyrics1"], stats["bestLyrics"], 0.2),
@@ -370,9 +385,10 @@ def slide_5_peaks_pits(surface, progress, fonts, stats, playlist):
             draw_text_centered(surface, track, fonts["body_bold"], COLORS["text_black"], x_bad, y + 60, alpha=alpha)
 
 
-def slide_6_artist(surface, progress, fonts, stats, playlist):
+def slide_6_artist(surface, progress, fonts, stats, playlist, draw_bg=True):
     bg = COLORS["bg_purple"]
-    surface.fill(bg)
+    if draw_bg:
+        surface.fill(bg)
     artist_data = [("Most Relatable" if not lang else lang["stats"]["most_relatable2"], stats["mostRelatableArtists"]),
                    ("Best Lyrics" if not lang else lang["stats"]["best_lyrics2"], stats["bestLyricsArtists"]),
                    ("Best Produced" if not lang else lang["stats"]["best_produced"], stats["bestProducedArtists"]),
@@ -380,9 +396,9 @@ def slide_6_artist(surface, progress, fonts, stats, playlist):
                    ("Most Starred" if not lang else lang["stats"]["most_starred"], stats["mostStarredArtists"])]
     alpha_title = get_text_alpha(progress, delay_start=0.0, fade_duration=0.5)
     draw_text_centered(surface, "Your Top Artists" if not lang else lang["stats"]["title6"], fonts["title"],
-                       COLORS["accent_yellow"], width // 2, 100, alpha=alpha_title)
+                       COLORS["accent_yellow"], width // 2, 100, alpha=alpha_title, shadow=True)
     draw_text_centered(surface, "Across All Categories" if not lang else lang["stats"]["all_categories"],
-                       fonts["header"], COLORS["text_white"], width // 2, 250, alpha=alpha_title)
+                       fonts["header"], COLORS["text_white"], width // 2, 250, alpha=alpha_title, shadow=True)
     positions = [(width // 4, 400), (width * 3 // 4, 400), (width // 4, 650), (width * 3 // 4, 650), (width // 2, 900)]
     fade_delay_increment = 0.1
     for i, (category, artist) in enumerate(artist_data):
@@ -394,16 +410,16 @@ def slide_6_artist(surface, progress, fonts, stats, playlist):
         draw_text_centered(surface, category, fonts["header"], COLORS["text_black"], x, y,
                            alpha=alpha_category)
         draw_text_centered(surface, artist.upper(), fonts["header_big"], COLORS["text_white"], x, y + 70,
-                           alpha=alpha_artist)
+                           alpha=alpha_artist, shadow=True)
 
 
-def slide_7_voting_habits(surface, progress, fonts, stats, playlist):
+def slide_7_voting_habits(surface, progress, fonts, stats, playlist, draw_bg=True):
     bg = COLORS["bg_green"]
-    surface.fill(bg)
+    if draw_bg:
+        surface.fill(bg)
     alpha_title = get_text_alpha(progress, delay_start=0.0, fade_duration=0.5)
     draw_text_centered(surface, "Listening vs Voting" if not lang else lang["stats"]["title7"], fonts["title"],
-                       COLORS["bg_darkblue"], width // 2, 150,
-                       alpha=alpha_title)
+                       COLORS["bg_darkblue"], width // 2, 150, alpha=alpha_title, shadow=True)
     total_interaction = stats["timeListening"] + stats["timeVoting"]
     if total_interaction == 0:
         listen_percent = 0
@@ -449,14 +465,14 @@ def slide_7_voting_habits(surface, progress, fonts, stats, playlist):
             str(stats["tracksRated"])),
         f"Time Listening: {int(stats["timeListening"] / 60)} mins" if not lang else lang["stats"][
             "time_listening"].format(str(int(stats["timeListening"] / 60))),
-        f"Avg Listening Time: {format_time(stats["averageTimeListened"])}" if not lang else lang["stats"][
+        f"Avg Time Listening: {format_time(stats["averageTimeListened"])}" if not lang else lang["stats"][
             "average_time_listened"].format(str(format_time(stats["averageTimeListened"]))),
         f"Avg Track Length: {format_time(stats["averageTrackLength"])}" if not lang else lang["stats"][
             "average_track_length"].format(str(format_time(stats["averageTrackLength"]))),
         f"Tracks Replayed: {stats["replays"]}" if not lang else lang["stats"]["replayed"].format(str(stats["replays"])),
         f"Time Voting: {int(stats["timeVoting"] / 60)} mins" if not lang else lang["stats"]["time_voting"].format(
             str(int(stats["timeVoting"] / 60))),
-        f"Avg Voting Time: {format_time(stats["averageTimeVoting"])}" if not lang else lang["stats"][
+        f"Avg Time Voting: {format_time(stats["averageTimeVoting"])}" if not lang else lang["stats"][
             "average_time_voting"].format(str(format_time(stats["averageTimeVoting"])))
     ]
     for i, line in enumerate(stats_list):
@@ -475,9 +491,10 @@ def slide_7_voting_habits(surface, progress, fonts, stats, playlist):
                            alpha=alpha_text)
 
 
-def slide_8_winner(surface, progress, fonts, stats, playlist):
+def slide_8_winner(surface, progress, fonts, stats, playlist, draw_bg=True):
     bg = COLORS["bg_black"]
-    surface.fill(bg)
+    if draw_bg:
+        surface.fill(bg)
     positive_categories = {
         "bestBeat": "Best Beat" if not lang else lang["stats"]["best_produced"],
         "bestLyrics": "Best Lyrics" if not lang else lang["stats"]["best_lyrics2"],
@@ -511,8 +528,8 @@ def slide_8_winner(surface, progress, fonts, stats, playlist):
     else:
         subtitle_text = "Top Rated Track" if not lang else lang["stats"]["top_rated"]
     alpha_title = get_text_alpha(progress, delay_start=0.0, fade_duration=0.5)
-    draw_text_centered(surface, "The Golden Track" if not lang else lang["stats"]["title8"], fonts["title"],
-                       COLORS["bg_green"], width // 2, 150, alpha=alpha_title)
+    draw_text_centered(surface, "Your Golden Track" if not lang else lang["stats"]["title8"], fonts["title"],
+                       COLORS["bg_green"], width // 2, 150, alpha=alpha_title, shadow=True)
     center = (width // 2, 500)
     radius = 200 * ease_out_cubic(min(1, progress * 2))
     pygame.draw.circle(surface, (30, 30, 30), center, radius)
@@ -570,10 +587,20 @@ class WrappedPlayer:
         self.is_transitioning = False
         self.transition_timer = 0.0
         self.finished = False
-        self.surf_current = pygame.Surface((width, height))
-        self.surf_next = pygame.Surface((width, height))
+        self.surf_current = pygame.Surface((width, height), pygame.SRCALPHA)
+        self.surf_next = pygame.Surface((width, height), pygame.SRCALPHA)
         self.fourcc = cv2.VideoWriter_fourcc(*"mp4v")
         self.video = cv2.VideoWriter(f"wrapped_{playlist}.mp4", self.fourcc, fps, (width, height))
+        self.slide_colors = [
+            COLORS["bg_purple"],
+            COLORS["bg_darkblue"],
+            COLORS["bg_black"],
+            COLORS["bg_pink"],
+            COLORS["bg_orange"],
+            COLORS["bg_purple"],
+            COLORS["bg_green"],
+            COLORS["bg_black"]
+        ]
 
     def update(self, dt):
         """
@@ -612,11 +639,16 @@ class WrappedPlayer:
             next_slide_func = self.slides[self.current_slide_index + 1]
             trans_progress = self.transition_timer / transition_duration
             ease = ease_in_out_sin(trans_progress)
+            color_curr = self.slide_colors[self.current_slide_index]
+            color_next = self.slide_colors[self.current_slide_index + 1]
+            blended_bg = lerp_color(color_curr, color_next, ease)
+            screen.fill(blended_bg)
+            self.surf_current.fill((0, 0, 0, 0))
+            self.surf_next.fill((0, 0, 0, 0))
             # draw current slide at end state (frozen)
-            current_slide_func(self.surf_current, 2.0, self.fonts, self.stats, self.playlist)
+            current_slide_func(self.surf_current, 2.0, self.fonts, self.stats, self.playlist, draw_bg=False)
             # draw next slide at start state
-            next_slide_func(self.surf_next, 0.0, self.fonts, self.stats, self.playlist)
-            screen.fill((0, 0, 0))
+            next_slide_func(self.surf_next, 0.0, self.fonts, self.stats, self.playlist, draw_bg=False)
             screen.blit(self.surf_current, (-int(self.width * ease), 0))
             screen.blit(self.surf_next, (self.width - int(self.width * ease), 0))
             view = pygame.surfarray.array3d(screen).transpose([1, 0, 2])
