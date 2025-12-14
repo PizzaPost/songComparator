@@ -137,7 +137,8 @@ def calculateStats(playlist=None):
 
 
 width, height = 1920, 1080
-fps = 30
+settings_json = misc.load_settings()
+fps = max(min(settings_json["fps"], 240), 20)
 animation_base_speed = 6.0
 default_slide_duration = 6.0
 slide_durations = {
@@ -158,7 +159,7 @@ COLORS = {
     "text_black": (0, 0, 0), "text_white": (255, 255, 255),
     "accent_yellow": (255, 220, 50)
 }
-lang = misc.load_language(misc.load_settings())
+lang = misc.load_language(settings_json)
 
 
 def draw_text_centered(surface, text, font, color, center_x, center_y, alpha=255, shadow=False, return_pos=False):

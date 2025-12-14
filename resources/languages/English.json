@@ -47,7 +47,10 @@
     "font_specifier_info": "Select a specific version.",
     "advanced": "Advanced",
     "enabled": "Enabled",
-    "disabled": "Disabled"
+    "disabled": "Disabled",
+    "logger": "Logger",
+    "performance_mode": "Potato Mode",
+    "fps": "FPS"
   },
   "program": {
     "playlist": "Playlist",

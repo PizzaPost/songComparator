@@ -47,7 +47,10 @@
     "font_specifier_info": "Wähle eine bestimmte Version aus.",
     "advanced": "Erweitert",
     "enabled": "Aktiviert",
-    "disabled": "Deaktiviert"
+    "disabled": "Deaktiviert",
+    "logger": "Logger",
+    "performance_mode": "Kartoffelmodus",
+    "fps": "FPS"
   },
   "program": {
     "playlist": "Wiedergabeliste",

@@ -118,6 +118,8 @@ def run():
     track_volume_modifier = settings_json["track_volume"] * (global_volume_modifier / 100) / 100
     gui_volume_modifier = settings_json["gui_volume"] * (global_volume_modifier / 100) / 100
     effects_volume_modifier = settings_json["effects_volume"] * (global_volume_modifier / 100) / 100
+    performance_mode = settings_json["performance"]
+    fps = max(min(settings_json["fps"], 240), 20)
     add_new_date = True
     current_date = time.localtime()
     current_date = current_date.tm_mday, current_date.tm_mon, current_date.tm_year
@@ -139,7 +141,8 @@ def run():
     settings_window.attributes("-alpha", 1)
     pygame.event.set_grab(True)
     while running:
-        dt = clock.tick(120) / 1000
+        dt = clock.tick(fps) / 1000
+        dt_correction = dt * 120
         pg.fill(bg_color)
         width, height = pg.get_size()
         if not intro:
@@ -166,7 +169,7 @@ def run():
                     finally:
                         covers.clear()
             if currentMenu in ("main", "trackSelection", "playlistSelection",
-                               "data_calculation") and not wrapped_player:
+                               "data_calculation") and not wrapped_player and not performance_mode:
                 if bg_video:
                     bg_video_w, bg_video_h = bg_video.current_size
                     bg_video_x = (width - bg_video_w) // 2
@@ -179,7 +182,7 @@ def run():
                     rect = bg_cover.get_rect(center=(width // 2, height // 2))
                     pg.blit(bg_cover, rect)
                     pg.blit(bg_surface, (0, 0))
-                    bg_cover_timer += 1
+                    bg_cover_timer += int(1 * dt_correction)
                 if bg_cover_timer > 1200:
                     bg_cover = None
                     bg_cover_timer = 0
@@ -190,7 +193,7 @@ def run():
             text = note_font.render("Press SPACE to skip the intro." if not lang else lang["startup"]["skip"], True,
                                     (50, 50, 50))
             pg.blit(text, (width // 2 - text.get_width() // 2, height - text.get_height() * 3))
-            animation_state += 1
+            animation_state += int(1 * dt_correction)
             pg.blit(icon_white, (width // 2 - icon_white_width_half, height // 2 - icon_white_height_half))
             glow_range = 60
             vibration = (math.sin(animation_state * 0.03) + 1) / 2
@@ -203,7 +206,7 @@ def run():
                 text = main_font.render("Song Comparator"[:(animation_state - 50) // 10], True, (255, 255, 255))
                 text.set_alpha(animation_state + 50)
                 pg.blit(text, (width // 2 - text.get_width() // 2, height // 2 + icon_white.get_height() // 2))
-            y_intro -= 2
+            y_intro -= int(2 * dt_correction)
             if y_intro < init_y_intro - icon_white_height * 2:
                 fade_surface = pygame.Surface((width, height))
                 for x in range(75):
@@ -457,15 +460,15 @@ def run():
                 total_seconds = video.frame_count / video.frame_rate
                 progressbar_width_goal = width * video.frame / video.frame_count
                 progressbar_with_difference = progressbar_width_goal - current_progressbar_width
-                current_progressbar_width += progressbar_with_difference * 0.05
+                current_progressbar_width += progressbar_with_difference * 0.05 * dt_correction
             elif coverActive:
                 current_second = pygame.mixer.music.get_pos()
                 total_seconds = data.get_track_length(track)
                 progressbar_width_goal = width * current_second / total_seconds
                 progressbar_with_difference = progressbar_width_goal - current_progressbar_width
-                current_progressbar_width += progressbar_with_difference * 0.05
+                current_progressbar_width += progressbar_with_difference * 0.05 * dt_correction
             if mouse_move_timeout > 0 and currentMenu == "watching" and not start_mouse_move_timeout:
-                mouse_move_timeout -= 12
+                mouse_move_timeout -= int(12 * dt_correction)
             if mouse_move_timeout > 0 and currentMenu == "watching":
                 if not pygame.mouse.get_visible():
                     pygame.mouse.set_visible(True)
@@ -504,7 +507,7 @@ def run():
                     save_log("hiding mouse")
             if start_mouse_move_timeout or track_paused:
                 start_mouse_move_timeout = True
-                mouse_move_timeout += 12
+                mouse_move_timeout += int(12 * dt_correction)
                 if mouse_move_timeout >= 2400:
                     start_mouse_move_timeout = False
                     mouse_move_timeout = 2400
@@ -811,10 +814,10 @@ def run():
             # quit app logic
             if keys[pygame.K_ESCAPE]:
                 save_log("pressing escape")
-                esc += 1
+                esc += int(1 * dt_correction)
                 pg.fill((255, 0, 0), (0, height - 50, width // 200 * esc, 50))
             else:
-                esc = 0
+                esc = int(max(esc - 1 * dt_correction, 0))
             if esc == 215:
                 running = False
                 save_log("closing app through escape")
@@ -826,7 +829,7 @@ def run():
                 pg.blit(fade_surface, (0, 0))
                 pygame.display.update()
                 pygame.time.delay(17)
-                fadein += 3
+                fadein += int(3 * dt_correction)
                 if fadein == 255:
                     save_log("finished fade-in animation")
         pygame.display.update()

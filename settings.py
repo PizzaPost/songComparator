@@ -12,9 +12,7 @@ import misc
 
 
 def submit_settings(tk, lang, theme, appearance_mode, language, font_dropdown, font_specifier, font_list, master_volume,
-                    track_volume, gui_volume,
-                    effects_volume,
-                    enabled_audio, logging):
+                    track_volume, gui_volume, effects_volume, enabled_audio, logging, performance, fps):
     main.save_log("submitting settings")
     selected_font_name = font_dropdown.get()
     font = os.path.join("resurces", "fonts", "NotoSans.ttf")
@@ -33,7 +31,10 @@ def submit_settings(tk, lang, theme, appearance_mode, language, font_dropdown, f
                    "master_volume": int(master_volume), "track_volume": int(track_volume),
                    "gui_volume": int(gui_volume), "effects_volume": int(effects_volume),
                    "enabled_audio": enabled_audio,
-                   "logging": True if logging == ("Enabled" if not lang else lang["settings"]["enabled"]) else False},
+                   "logging": True if logging == ("Enabled" if not lang else lang["settings"]["enabled"]) else False,
+                   "performance": True if performance == (
+                       "Enabled" if not lang else lang["settings"]["enabled"]) else False,
+                   "fps": fps},
                   f, indent=4)
     f.close()
     misc.hide_file(os.path.join("resources", "settings.json"))
@@ -77,6 +78,7 @@ def open_settings():
     tk.attributes("-alpha", 0)
 
     logging_var = tkinter.StringVar(value="Enabled" if data["logging"] else "Disabled")
+    performance_var = tkinter.StringVar(value="Enabled" if data["performance"] else "Disabled")
 
     frame = customtkinter.CTkScrollableFrame(tk)
     frame2 = customtkinter.CTkFrame(frame)
@@ -191,11 +193,25 @@ def open_settings():
     seperator5 = customtkinter.CTkLabel(frame2, text="")
     advanced_heading = customtkinter.CTkLabel(frame2, text="Advanced" if not lang else lang["settings"]["advanced"],
                                               font=(font, 24, "bold"))
-    logging_label = customtkinter.CTkLabel(frame2, text="Logger")
+    logging_label = customtkinter.CTkLabel(frame2, text="Logger" if not lang else lang["settings"]["logger"])
     logging_button = customtkinter.CTkSegmentedButton(frame2,
                                                       values=["Enabled" if not lang else lang["settings"]["enabled"],
                                                               "Disabled" if not lang else lang["settings"]["disabled"]],
                                                       variable=logging_var)
+    performance_label = customtkinter.CTkLabel(frame2, text="Potato Mode" if not lang else lang["settings"]["performance_mode"])
+    performance_button = customtkinter.CTkSegmentedButton(frame2,
+                                                          values=[
+                                                              "Enabled" if not lang else lang["settings"]["enabled"],
+                                                              "Disabled" if not lang else lang["settings"]["disabled"]],
+                                                          variable=performance_var)
+    fps_label = customtkinter.CTkLabel(frame2, text="FPS" if not lang else lang["settings"]["fps"])
+    fps_slider = customtkinter.CTkSlider(frame2, from_=20, to=240,
+                                         command=lambda event: update_fps(fps_slider_percentage,
+                                                                          fps_slider.get()))
+    fps_slider.set(data["fps"])
+    value = max(int(fps_slider.get()), 20)
+    fps_slider_percentage = customtkinter.CTkLabel(frame2,
+                                                   text=f"{"   " if value < 100 else ""}{value}")
     seperator6 = customtkinter.CTkLabel(frame2, text="")
     submit = customtkinter.CTkButton(frame3, text="Submit" if not lang else lang["settings"]["submit"],
                                      command=lambda: submit_settings(tk, lang, themes_dropdown.get(), dark_mode.get(),
@@ -211,7 +227,8 @@ def open_settings():
                                                                           "state") == "disabled" else True,
                                                                       False if effects_volume.cget(
                                                                           "state") == "disabled" else True],
-                                                                     logging_button.get()))
+                                                                     logging_button.get(), performance_button.get(),
+                                                                     fps_slider.get()))
     close = customtkinter.CTkButton(frame3, text="Close" if not lang else lang["settings"]["close"],
                                     command=lambda: close_settings(tk, False))
 
@@ -254,10 +271,15 @@ def open_settings():
     seperator5.grid(row=16)
     advanced_heading.grid(row=17, column=0, pady=5, sticky="w")
     logging_label.grid(row=18, column=0, padx=5, sticky="w")
-    logging_button.grid(row=18, column=0, padx=5, sticky="e")
-    seperator6.grid(row=19)
-    submit.grid(row=20, column=0, columnspan=2, padx=15, pady=5, sticky="n")
-    close.grid(row=20, column=2, columnspan=2, padx=15, pady=5, sticky="n")
+    logging_button.grid(row=18, column=1, padx=5, sticky="e")
+    performance_label.grid(row=19, column=0, padx=5, pady=5, sticky="w")
+    performance_button.grid(row=19, column=1, padx=5, sticky="e")
+    fps_label.grid(row=20, column=0, padx=5, pady=5, sticky="w")
+    fps_slider.grid(row=20, column=1, padx=5, sticky="e")
+    fps_slider_percentage.grid(row=20, column=2, padx=5, sticky="w")
+    seperator6.grid(row=20)
+    submit.grid(row=21, column=0, columnspan=2, padx=15, pady=5, sticky="n")
+    close.grid(row=21, column=2, columnspan=2, padx=15, pady=5, sticky="n")
     update_slider_colors([master_volume, track_volume, gui_volume, effects_volume], theme_colors)
     tk.update()
     tk.withdraw()
@@ -289,6 +311,11 @@ def change_state(widget, theme_colors, state=None):
 def update_volume(percentage_widget, value):
     value = int(value)
     percentage_widget.configure(text=f"{"   " if value < 100 else ""}{"  " if value < 10 else ""}{value}%")
+
+
+def update_fps(percentage_widget, value):
+    value = int(value)
+    percentage_widget.configure(text=f"{"   " if value < 100 else ""}{value}")
 
 
 def update_slider_colors(widgets, theme_colors):

@@ -13,5 +13,7 @@
         true,
         true
     ],
-    "logging": false
+    "logging": false,
+    "performance": false,
+    "fps": 120
 }
