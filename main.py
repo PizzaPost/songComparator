@@ -145,12 +145,15 @@ def run():
         dt_correction = dt * 120
         pg.fill(bg_color)
         width, height = pg.get_size()
-        if not intro:
+        if not intro and not performance_mode:
             if len(os.listdir(os.path.join("resources", "tracks"))) > 0 and not (bg_video or bg_cover):
                 videos = os.listdir(os.path.join("resources", "tracks"))
                 while len(videos) > 0:
                     try:
                         random_video = videos[random.randint(0, len(videos) - 1)]
+                        if not os.path.exists(
+                                os.path.join("resources", "data", f"{data.removeExtension(random_video)}.scv")):
+                            raise pyvidplayer2.error.VideoStreamError
                         bg_video = pyvidplayer2.Video(os.path.join("resources", "tracks", random_video))
                         bg_video.set_volume(0)
                         bg_video.play()
@@ -163,13 +166,16 @@ def run():
                 while len(covers) > 0:
                     try:
                         random_cover = covers[random.randint(0, len(covers) - 1)]
+                        if not os.path.exists(
+                                os.path.join("resources", "data", f"{data.removeExtension(random_cover)}.scv")):
+                            raise pygame.error
                         bg_cover = pygame.image.load(os.path.join("resources", "covers", random_cover))
                     except pygame.error:
                         covers.remove(random_cover)
                     finally:
                         covers.clear()
             if currentMenu in ("main", "trackSelection", "playlistSelection",
-                               "data_calculation") and not wrapped_player and not performance_mode:
+                               "data_calculation") and not wrapped_player:
                 if bg_video:
                     bg_video_w, bg_video_h = bg_video.current_size
                     bg_video_x = (width - bg_video_w) // 2
