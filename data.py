@@ -235,14 +235,14 @@ def get_track_length(track):
 
     Fallback
     -------
-        0: int
+        1: int
     """
     filepath = os.path.join(trackfolder, track)
     if os.path.exists(filepath):
         audio = mutagen.File(filepath)  # type: ignore
         if audio is not None:
             return int(audio.info.length * 1000)
-    return 0  # fallback
+    return 1  # fallback
 
 
 def listTrackFolder():

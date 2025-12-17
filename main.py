@@ -44,12 +44,15 @@ def run():
     clock = pygame.time.Clock()
     track = None
     video = None
+    cover = None
     coverActive = False
     scaledCover = None
     coverRect = None
+    current_track_ms = 0
     button_font = pygame.font.Font(settings_json["font"], 48)
     emojiFont = pygame.font.Font(os.path.join("resources", "fonts", "NotoEmoji.ttf"), 48)
     main_font = pygame.font.Font(settings_json["font"], 42)
+    notes_font = pygame.font.Font(settings_json["font"], 26)
     # need to rate info font
     ntri_font = pygame.font.Font(settings_json["font"], 24)
     note_font = pygame.font.Font(settings_json["font"], 18)
@@ -375,9 +378,9 @@ def run():
                             save_log(f"adjusted volume in video mode to {video.get_volume()}")
                     elif coverActive:
                         if event.key == pygame.K_j:
-                            current_pos = pygame.mixer.music.get_pos()
-                            new_pos = max(0, current_pos - 10000)
+                            new_pos = max(0, current_track_ms - 10000)
                             pygame.mixer.music.set_pos(new_pos / 1000)
+                            current_track_ms = new_pos
                             save_log(f"seeking back 10 seconds in cover mode")
                         elif event.key == pygame.K_k or event.key == pygame.K_SPACE:
                             if pygame.mixer.music.get_busy():
@@ -389,9 +392,9 @@ def run():
                             save_log(
                                 f"toggled pause in cover mode to: {not pygame.mixer.music.get_busy()} through keyboard")
                         elif event.key == pygame.K_LEFT:
-                            current_pos = pygame.mixer.music.get_pos()
-                            new_pos = max(0, current_pos - 5000)
+                            new_pos = max(0, current_track_ms - 5000)
                             pygame.mixer.music.set_pos(new_pos / 1000)
+                            current_track_ms = new_pos
                             save_log(f"seeking back 5 seconds in cover mode")
                         elif event.key == pygame.K_UP:
                             pygame.mixer.music.set_volume(pygame.mixer.music.get_volume() + 0.1)
@@ -444,7 +447,10 @@ def run():
             # draw video under the escape bar
             if video:
                 if video.active:
-                    video.draw(pg, (0, 0))
+                    video_w, video_h = video.current_size
+                    video_x = (width - video_w) // 2
+                    video_y = (height - video_h) // 2
+                    video.draw(pg, (video_x, video_y))
                     if video.frame == video.frame_count:
                         currentMenu = "voting"
                         watchEnd = time.time()
@@ -452,7 +458,7 @@ def run():
                         rating_widgets = visuals.setup_voting_widgets(width, height, main_font, lang)
             elif coverActive and currentMenu == "watching":
                 pg.blit(scaledCover, coverRect)
-                current_pos = pygame.mixer.music.get_pos()
+                current_pos = current_track_ms
                 track_length = data.get_track_length(track)
                 if current_pos >= track_length - 50:
                     currentMenu = "voting"
@@ -468,9 +474,10 @@ def run():
                 progressbar_with_difference = progressbar_width_goal - current_progressbar_width
                 current_progressbar_width += progressbar_with_difference * 0.05 * dt_correction
             elif coverActive:
-                current_second = pygame.mixer.music.get_pos()
+                if coverActive and not track_paused and pygame.mixer.music.get_busy():
+                    current_track_ms += dt * 1000
                 total_seconds = data.get_track_length(track)
-                progressbar_width_goal = width * current_second / total_seconds
+                progressbar_width_goal = width * current_track_ms / total_seconds
                 progressbar_with_difference = progressbar_width_goal - current_progressbar_width
                 current_progressbar_width += progressbar_with_difference * 0.05 * dt_correction
             if mouse_move_timeout > 0 and currentMenu == "watching" and not start_mouse_move_timeout:
@@ -483,7 +490,7 @@ def run():
                     video_progressbar_fg = pygame.Surface((int(current_progressbar_width), 10))
                 elif coverActive:
                     video_progressbar_fg = pygame.Surface((int(current_progressbar_width), 10))
-                    current_second = current_second / 1000
+                    current_second = current_track_ms / 1000
                     total_seconds = total_seconds / 1000
                 video_progressbar_bg = pygame.Surface((width - video_progressbar_fg.get_width(), 10))
                 video_progressbar_bg.fill(video_progress_bar_bg_color)
@@ -493,7 +500,7 @@ def run():
                 if track_data.__contains__("pre_notes") or (track_data.get("notes") and len(track_data["notes"]) > 0):
                     notes = track_data.get("pre_notes") or track_data.get("notes")[0]
                     for x, line in enumerate(reversed(notes)):
-                        text = main_font.render(str(line), True, (255, 255, 255))
+                        text = notes_font.render(str(line), True, (255, 255, 255))
                         text.set_alpha(mouse_move_timeout)
                         pg.blit(text, (15, height - 15 - (x + 1) * text.get_height()))
                 pg.blit(video_progressbar_bg, (video_progressbar_fg.get_width(), 0))
@@ -548,7 +555,7 @@ def run():
                 if track_data.__contains__("after_notes") or (track_data.get("notes") and len(track_data["notes"]) > 1):
                     notes = track_data.get("after_notes") or track_data.get("notes")[1]
                     for x, line in enumerate(notes):
-                        text = main_font.render(str(line), True, (255, 255, 255))
+                        text = notes_font.render(str(line), True, (255, 255, 255))
                         pg.blit(text, (manager4.x + 30, 15 + x * text.get_height()))
                 id, text, bdetails = manager4.draw_and_handle(pg, mouse_1_up)
                 if text:
@@ -630,6 +637,7 @@ def run():
                 currentMenu = "watching"
                 watchStart = time.time()
                 manager.clear()
+                isVideo = track_data.get("isVideo")
                 if isVideo:
                     if not video or not video.active:
                         coverActive = False
@@ -637,11 +645,16 @@ def run():
                             video = pyvidplayer2.Video(track, youtube=True)
                         else:
                             video = pyvidplayer2.Video(os.path.join(data.trackfolder, track), youtube=False)
-                        video.resize((width, height))
+                        aspect_ratio = video.aspect_ratio
+                        screen_aspect_ratio = width / height
+                        if aspect_ratio > screen_aspect_ratio:
+                            video.resize((width, int(width / aspect_ratio)))
+                        else:
+                            video.resize((int(height * aspect_ratio), height))
                         video.set_volume(track_volume_modifier)
                         save_log("finished setting up video")
                 else:
-                    current_pos = pygame.mixer.music.get_pos()
+                    current_pos = current_track_ms
                     track_length = data.get_track_length(track)
                     if ((current_pos <= track_length - 50) and not playedSongOnce and not currentMenu == "voting"
                             and playlist and coverIndex):
@@ -649,6 +662,7 @@ def run():
                         pygame.mixer.music.set_volume(track_volume_modifier)
                         pygame.mixer.music.play()
                         coverActive = True
+                        current_track_ms = 0
                         cover = playlist[coverIndex]["cover"]
                         scaledCover, coverRect = visuals.calc_cover(cover, width, height)
                         playedSongOnce = True
@@ -658,6 +672,7 @@ def run():
                         pygame.mixer.music.set_volume(track_volume_modifier)
                         pygame.mixer.music.play()
                         coverActive = True
+                        current_track_ms = 0
                         details = data.details(track, True, True)
                         if "cover" in details and details["cover"]:
                             if os.path.exists(f"{os.path.join(data.coverfolder, details["cover"])}"):
@@ -707,7 +722,11 @@ def run():
                             coverActive = False
                             currentMenu = "main"
                         else:
-                            video = None
+                            if video:
+                                video.stop()
+                                video = None
+                            if cover:
+                                pygame.mixer.music.stop()
                             try:
                                 for x, i in enumerate(playlist):
                                     if track == i["track"]:
