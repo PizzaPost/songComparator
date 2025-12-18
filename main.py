@@ -282,8 +282,14 @@ def run():
                 manager.disable_all()
                 if id == "menu":
                     manager.clear()
+                    if text == ("Back" if not lang else lang["program"]["back"]):
+                        currentMenu = "main"
                     if text == ("Playlist" if not lang else lang["program"]["playlist"]):
                         if len(data.listPlaylistFolder()) > 1:
+                            manager.add_button("Back" if not lang else lang["program"]["back"], "menu",
+                                               base_color=base_color,
+                                               hover_color=hover_color, click_color=click_color,
+                                               disabled_color=disabled_color)
                             for playlist in data.listPlaylistFolder():
                                 manager.add_button(data.removeExtension(playlist), "playlist",
                                                    details=data.readPlaylist(playlist), base_color=base_color,
@@ -303,6 +309,10 @@ def run():
                             wasSingleTrack = False
                     elif text == ("Track" if not lang else lang["program"]["track"]):
                         if len(data.listTrackFolder()) > 1:
+                            manager.add_button("Back" if not lang else lang["program"]["back"], "menu",
+                                               base_color=base_color,
+                                               hover_color=hover_color, click_color=click_color,
+                                               disabled_color=disabled_color)
                             for iterated_track in data.listTrackFolder():
                                 trackDetails = data.details(iterated_track, True, True)
                                 manager.add_button(
@@ -797,6 +807,10 @@ def run():
                         currentMenu = "data_calculation"
                         manager5.clear()
                         manager5.set_viewport(full_screen_viewport)
+                        manager5.add_button("Back" if not lang else lang["program"]["back"], "menu",
+                                            base_color=base_color,
+                                            hover_color=hover_color, click_color=click_color,
+                                            disabled_color=disabled_color)
                         all_playlist = [playlist for playlist in os.listdir(data.playlistfolder) if
                                         playlist.endswith((".scp", ".scpl"))]
                         for playlist in all_playlist:
@@ -828,6 +842,9 @@ def run():
 
             if currentMenu == "data_calculation":
                 id, text, bdetails = manager5.draw_and_handle(pg, mouse_1_up)
+                if text == ("Back" if not lang else lang["program"]["back"]):
+                    currentMenu = "main"
+                    _just_created_data_calculation = True
                 if not _just_created_data_calculation:
                     if not (statistics := None) and text:
                         statistics = stats.calculateStats(text)
