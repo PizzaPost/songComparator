@@ -861,7 +861,7 @@ def run():
                 esc = int(max(esc - 3 * dt_correction, 0))
             if esc > 0 and not performance_mode:
                 pg.fill((255, 0, 0), (0, height - 50, width // 200 * esc, 50))
-            if esc == 215:
+            if esc >= 215:
                 running = False
                 save_log("closing app through escape")
             # intro fade-in
