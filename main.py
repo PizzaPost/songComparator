@@ -470,7 +470,7 @@ def run():
                 pg.blit(scaledCover, coverRect)
                 current_pos = current_track_ms
                 track_length = data.get_track_length(track)
-                if current_pos >= track_length - 50:
+                if current_pos >= track_length - 50 or (not pygame.mixer.music.get_busy() and not track_paused):
                     currentMenu = "voting"
                     watchEnd = time.time()
                     voteStart = watchEnd
