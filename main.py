@@ -1,3 +1,19 @@
+import logging
+import math
+import os
+import random
+import time
+import tkinter
+
+import pygame
+import pyvidplayer2
+
+import colors
+import data
+import misc
+import settings
+import visuals
+
 last_log = None
 logging = False
 
@@ -16,6 +32,7 @@ def save_log(msg, type: str = None):
 
 
 def run():
+    import stats
     settings_json = misc.load_settings()
     lang = misc.load_language(settings_json)
     running = True
@@ -907,23 +924,6 @@ def run():
 
 
 if __name__ == "__main__":
-    import logging
-    import math
-    import os
-    import random
-    import time
-    import tkinter
-
-    import pygame
-    import pyvidplayer2
-
-    import colors
-    import data
-    import misc
-    import settings
-    import stats
-    import visuals
-
     if misc.isLogEnabled():
         logging.basicConfig(level=logging.INFO, format="[%(asctime)s] %(message)s", datefmt="%H:%M:%S")
         log = logging.getLogger()
