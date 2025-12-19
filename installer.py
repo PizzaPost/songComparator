@@ -152,7 +152,7 @@ def installer():
                 json.dump({"theme": "default", "appearance_mode": "Dark", "language": "English",
                            "font": os.path.join("resources", "fonts", "NotoSans.ttf"), "master_volume": 100,
                            "track_volume": 100, "gui_volume": 100, "effects_volume": 100,
-                           "enabled_audio": [True, True, True, True], "logging": False, "performane": False,
+                           "enabled_audio": [True, True, True, True], "logging": False, "performance": False,
                            "fps": 120}, f, indent=4)
             f.close()
             hide_file(settings_path)
