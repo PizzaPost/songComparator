@@ -544,3 +544,43 @@ def show_voting_screen(surface, widgets):
         rating = widget.draw(surface)
         ratings.append(rating)
     return ratings
+
+
+def create_top_shadow(width, height, fade_px=20, alpha=180):
+    """
+    alpha: 0 (invisible) to 255 (solid black). 180 is a good dark semi-transparent.
+    """
+    surf = pygame.Surface((int(width), int(height)), pygame.SRCALPHA)
+    surf.fill((0, 0, 0, alpha), (0, 0, width, height - fade_px))
+    grad_src = pygame.Surface((1, 2), pygame.SRCALPHA)
+    pygame.draw.line(grad_src, (0, 0, 0, alpha), (0, 0), (0, 0))
+    pygame.draw.line(grad_src, (0, 0, 0, 0), (0, 1), (0, 1))
+    grad_dst = pygame.transform.smoothscale(grad_src, (int(width), int(fade_px)))
+    surf.blit(grad_dst, (0, height - fade_px))
+    return surf
+
+
+def create_bottom_corner_shadow(width, height, fade_px=20, alpha=180):
+    """
+    Creates the bottom-left corner shadow with base alpha transparency.
+    """
+    surf = pygame.Surface((int(width), int(height)), pygame.SRCALPHA)
+    solid_w = width - fade_px
+    solid_h = height - fade_px
+    surf.fill((0, 0, 0, alpha), (0, fade_px, solid_w, solid_h))
+    grad_top_src = pygame.Surface((1, 2), pygame.SRCALPHA)
+    pygame.draw.line(grad_top_src, (0, 0, 0, 0), (0, 0), (0, 0))
+    pygame.draw.line(grad_top_src, (0, 0, 0, alpha), (0, 1), (0, 1))
+    grad_top = pygame.transform.smoothscale(grad_top_src, (int(solid_w), int(fade_px)))
+    surf.blit(grad_top, (0, 0))
+    grad_right_src = pygame.Surface((2, 1), pygame.SRCALPHA)
+    pygame.draw.line(grad_right_src, (0, 0, 0, alpha), (0, 0), (0, 0))
+    pygame.draw.line(grad_right_src, (0, 0, 0, 0), (1, 0), (1, 0))
+    grad_right = pygame.transform.smoothscale(grad_right_src, (int(fade_px), int(solid_h)))
+    surf.blit(grad_right, (solid_w, fade_px))
+    corner_src = pygame.Surface((2, 2), pygame.SRCALPHA)
+    corner_src.fill((0, 0, 0, 0))
+    corner_src.set_at((0, 1), (0, 0, 0, alpha))
+    corner = pygame.transform.smoothscale(corner_src, (int(fade_px), int(fade_px)))
+    surf.blit(corner, (solid_w, 0))
+    return surf

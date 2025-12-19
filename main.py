@@ -508,22 +508,43 @@ def run():
                 video_progressbar_bg.set_alpha(mouse_move_timeout)
                 video_progressbar_fg.set_alpha(mouse_move_timeout)
                 if track_data.__contains__("pre_notes") or (track_data.get("notes") and len(track_data["notes"]) > 0):
-                    notes = track_data.get("pre_notes") or track_data.get("notes")[0]
-                    for x, line in enumerate(reversed(notes)):
-                        text = notes_font.render(str(line), True, (255, 255, 255))
-                        text.set_alpha(mouse_move_timeout)
-                        pg.blit(text, (15, height - 15 - (x + 1) * text.get_height()))
+                    notes_list = track_data.get("pre_notes") or track_data.get("notes")
+                    if isinstance(notes_list, str): notes_list = [notes_list]
+                    temp_surfaces = []
+                    max_text_width = 0
+                    total_text_height = 0
+                    for line in reversed(notes_list):
+                        txt_surf = notes_font.render(str(line), True, (255, 255, 255))
+                        temp_surfaces.append(txt_surf)
+                        if txt_surf.get_width() > max_text_width:
+                            max_text_width = txt_surf.get_width()
+                        total_text_height += txt_surf.get_height()
+                    shadow_w = max_text_width + 30 + 20
+                    shadow_h = total_text_height + 30 + 20
+                    bottom_shadow = visuals.create_bottom_corner_shadow(shadow_w, shadow_h, fade_px=20,
+                                                                        alpha=180)
+                    bottom_shadow.set_alpha(mouse_move_timeout)
+                    pg.blit(bottom_shadow, (0, height - shadow_h))
+                    current_y_offset = 15
+                    for txt_surf in temp_surfaces:
+                        txt_surf.set_alpha(mouse_move_timeout)
+                        pg.blit(txt_surf, (15, height - 15 - txt_surf.get_height()))
+                        current_y_offset += txt_surf.get_height()
+                time_text_curr = main_font.render(str(round(current_second)), True, (255, 255, 255))
+                time_text_total = main_font.render(str(round(total_seconds)), True, (255, 255, 255))
+                title_text = main_font.render(f"{track_data['title']} - {track_data['artist']}", True, (255, 255, 255))
+                top_shadow_h = max(time_text_curr.get_height(), title_text.get_height()) + 30 + 20
+                top_shadow = visuals.create_top_shadow(width, top_shadow_h, fade_px=20, alpha=180)
+                top_shadow.set_alpha(mouse_move_timeout)
+                pg.blit(top_shadow, (0, 0))
                 pg.blit(video_progressbar_bg, (video_progressbar_fg.get_width(), 0))
                 pg.blit(video_progressbar_fg, (0, 0))
-                text = main_font.render(str(round(current_second)), True, (255, 255, 255))
-                text.set_alpha(mouse_move_timeout)
-                pg.blit(text, (15, 15))
-                text = main_font.render(str(round(total_seconds)), True, (255, 255, 255))
-                text.set_alpha(mouse_move_timeout)
-                pg.blit(text, (width - text.get_width() - 15, 15))
-                text = main_font.render(f"{track_data["title"]} - {track_data["artist"]}", True, (255, 255, 255))
-                text.set_alpha(mouse_move_timeout)
-                pg.blit(text, (width / 2 - text.get_width() / 2, 15))
+                time_text_curr.set_alpha(mouse_move_timeout)
+                pg.blit(time_text_curr, (15, 15))
+                time_text_total.set_alpha(mouse_move_timeout)
+                pg.blit(time_text_total, (width - time_text_total.get_width() - 15, 15))
+                title_text.set_alpha(mouse_move_timeout)
+                pg.blit(title_text, (width / 2 - title_text.get_width() / 2, 15))
             else:
                 if currentMenu == "watching" and pygame.mouse.get_visible():
                     pygame.mouse.set_visible(False)
