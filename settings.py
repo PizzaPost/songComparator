@@ -205,11 +205,11 @@ def open_settings():
                                                               "Disabled" if not lang else lang["settings"]["disabled"]],
                                                           variable=performance_var)
     fps_label = customtkinter.CTkLabel(frame2, text="FPS" if not lang else lang["settings"]["fps"])
-    fps_slider = customtkinter.CTkSlider(frame2, from_=20, to=240,
+    fps_slider = customtkinter.CTkSlider(frame2, from_=10, to=240,
                                          command=lambda event: update_fps(fps_slider_percentage,
                                                                           fps_slider.get()))
     fps_slider.set(data["fps"])
-    value = max(int(fps_slider.get()), 20)
+    value = max(int(fps_slider.get()), 10)
     fps_slider_percentage = customtkinter.CTkLabel(frame2,
                                                    text=f"{"   " if value < 100 else ""}{value}")
     seperator6 = customtkinter.CTkLabel(frame2, text="")

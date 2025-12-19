@@ -138,7 +138,7 @@ def calculateStats(playlist=None):
 
 width, height = 1920, 1080
 settings_json = misc.load_settings()
-fps = max(min(settings_json["fps"], 240), 20)
+fps = max(min(settings_json["fps"], 240), 10)
 animation_base_speed = 6.0
 default_slide_duration = 6.0
 slide_durations = {

@@ -122,7 +122,7 @@ def run():
     gui_volume_modifier = settings_json["gui_volume"] * (global_volume_modifier / 100) / 100
     effects_volume_modifier = settings_json["effects_volume"] * (global_volume_modifier / 100) / 100
     performance_mode = settings_json["performance"]
-    fps = max(min(settings_json["fps"], 240), 20)
+    fps = max(min(settings_json["fps"], 240), 10)
     add_new_date = True
     current_date = time.localtime()
     current_date = current_date.tm_mday, current_date.tm_mon, current_date.tm_year
@@ -461,7 +461,7 @@ def run():
                     video_x = (width - video_w) // 2
                     video_y = (height - video_h) // 2
                     video.draw(pg, (video_x, video_y))
-                    if video.frame == video.frame_count:
+                    if video.frame >= video.frame_count:
                         currentMenu = "voting"
                         watchEnd = time.time()
                         voteStart = watchEnd
