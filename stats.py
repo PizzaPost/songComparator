@@ -136,30 +136,31 @@ def calculateStats(playlist=None):
     }
 
 
-width, height = 1920, 1080
-settings_json = misc.load_settings()
-fps = max(min(settings_json["fps"], 240), 10)
-animation_base_speed = 6.0
-default_slide_duration = 6.0
-slide_durations = {
-    0: 6.0,
-    1: 7.0,
-    2: 6.0,
-    3: 7.0,
-    4: 23.0,
-    5: 11.0,
-    6: 24.0,
-    7: 9.0,
-}
-transition_duration = 1.0
-COLORS = {
-    "bg_purple": (140, 100, 255), "bg_green": (100, 255, 100),
-    "bg_black": (18, 18, 18), "bg_pink": (255, 100, 180),
-    "bg_darkblue": (20, 20, 60), "bg_orange": (255, 140, 50),
-    "text_black": (0, 0, 0), "text_white": (255, 255, 255),
-    "accent_yellow": (255, 220, 50)
-}
-lang = misc.load_language(settings_json)
+if os.path.exists(os.path.join("resources", "settings.json")):
+    width, height = 1920, 1080
+    settings_json = misc.load_settings()
+    fps = max(min(settings_json["fps"], 240), 10)
+    animation_base_speed = 6.0
+    default_slide_duration = 6.0
+    slide_durations = {
+        0: 6.0,
+        1: 7.0,
+        2: 6.0,
+        3: 7.0,
+        4: 23.0,
+        5: 11.0,
+        6: 24.0,
+        7: 9.0,
+    }
+    transition_duration = 1.0
+    COLORS = {
+        "bg_purple": (140, 100, 255), "bg_green": (100, 255, 100),
+        "bg_black": (18, 18, 18), "bg_pink": (255, 100, 180),
+        "bg_darkblue": (20, 20, 60), "bg_orange": (255, 140, 50),
+        "text_black": (0, 0, 0), "text_white": (255, 255, 255),
+        "accent_yellow": (255, 220, 50)
+    }
+    lang = misc.load_language(settings_json)
 
 
 def draw_text_centered(surface, text, font, color, center_x, center_y, alpha=255, shadow=False, return_pos=False):

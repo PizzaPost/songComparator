@@ -110,7 +110,7 @@ def installer():
                     os.system(f"pip install yt-dlp")
                 elif e.name == "PIL":
                     os.system(f"pip install pillow")
-                elif e.name in ("win32com", "pywintypes", "winshell"):
+                elif e.name in ("win32com", "pywintypes"):
                     if not failed_to_install_pywin_things:
                         os.system(f"pip install pywin32")
                         failed_to_install_pywin_things = True
