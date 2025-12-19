@@ -56,6 +56,7 @@ def run():
     # need to rate info font
     ntri_font = pygame.font.Font(settings_json["font"], 24)
     note_font = pygame.font.Font(settings_json["font"], 18)
+    emoji_notes_font = pygame.font.Font(os.path.join("resources", "fonts", "NotoEmoji.ttf"), 26)
     color_palette = colors.get_colors(os.path.join("resources", "themes", f"{settings_json['theme']}.json"))
     base_color = colors.hex_to_rgb(
         color_palette["CTkButton"]["fg_color"][0 if settings_json["appearance_mode"] == "Light" else 1])
@@ -509,27 +510,40 @@ def run():
                 video_progressbar_fg.set_alpha(mouse_move_timeout)
                 if track_data.__contains__("pre_notes") or (track_data.get("notes") and len(track_data["notes"]) > 0):
                     notes_list = track_data.get("pre_notes") or track_data.get("notes")
-                    if isinstance(notes_list, str): notes_list = [notes_list]
+                    notes_list = misc.wrap_lines(str(notes_list), width // 2, notes_font)
+                    if isinstance(notes_list, str):
+                        notes_list = [notes_list]
                     temp_surfaces = []
                     max_text_width = 0
                     total_text_height = 0
                     for line in reversed(notes_list):
-                        txt_surf = notes_font.render(str(line), True, (255, 255, 255))
+                        surfaces = []
+                        surf_width = 0
+                        surf_height = 0
+                        for ch in str(line):
+                            font = emoji_notes_font if misc.is_emoji(ch) else notes_font
+                            surf = font.render(ch, True, (255, 255, 255))
+                            surfaces.append(surf)
+                            surf_width += surf.get_width()
+                            surf_height = max(surf_height, surf.get_height())
+                        txt_surf = pygame.Surface((surf_width, surf_height), pygame.SRCALPHA)
+                        x = 0
+                        for surf in surfaces:
+                            txt_surf.blit(surf, (x, 0))
+                            x += surf.get_width()
                         temp_surfaces.append(txt_surf)
-                        if txt_surf.get_width() > max_text_width:
-                            max_text_width = txt_surf.get_width()
+                        max_text_width = max(max_text_width, txt_surf.get_width())
                         total_text_height += txt_surf.get_height()
                     shadow_w = max_text_width + 30 + 20
                     shadow_h = total_text_height + 30 + 20
-                    bottom_shadow = visuals.create_bottom_corner_shadow(shadow_w, shadow_h, fade_px=20,
-                                                                        alpha=180)
+                    bottom_shadow = visuals.create_bottom_corner_shadow(shadow_w, shadow_h, fade_px=20, alpha=180)
                     bottom_shadow.set_alpha(mouse_move_timeout)
                     pg.blit(bottom_shadow, (0, height - shadow_h))
-                    current_y_offset = 15
+                    current_y = height - 15
                     for txt_surf in temp_surfaces:
                         txt_surf.set_alpha(mouse_move_timeout)
-                        pg.blit(txt_surf, (15, height - 15 - txt_surf.get_height()))
-                        current_y_offset += txt_surf.get_height()
+                        current_y -= txt_surf.get_height()
+                        pg.blit(txt_surf, (15, current_y))
                 time_text_curr = main_font.render(str(round(current_second)), True, (255, 255, 255))
                 time_text_total = main_font.render(str(round(total_seconds)), True, (255, 255, 255))
                 title_text = main_font.render(f"{track_data['title']} - {track_data['artist']}", True, (255, 255, 255))
@@ -585,9 +599,15 @@ def run():
                 ratings = visuals.show_voting_screen(pg, rating_widgets)
                 if track_data.__contains__("after_notes") or (track_data.get("notes") and len(track_data["notes"]) > 1):
                     notes = track_data.get("after_notes") or track_data.get("notes")[1]
+                    notes = misc.wrap_lines(str(notes), width - (manager4.x + 30), notes_font)
                     for x, line in enumerate(notes):
-                        text = notes_font.render(str(line), True, (255, 255, 255))
-                        pg.blit(text, (manager4.x + 30, 15 + x * text.get_height()))
+                        y = 15 + x * notes_font.get_height()
+                        cursor_x = manager4.x + 30
+                        for ch in str(line):
+                            font = emoji_notes_font if misc.is_emoji(ch) else notes_font
+                            surf = font.render(ch, True, (255, 255, 255))
+                            pg.blit(surf, (cursor_x, y))
+                            cursor_x += surf.get_width()
                 id, text, bdetails = manager4.draw_and_handle(pg, mouse_1_up)
                 if text:
                     save_log(f"clicked text: {text}, id: {id}")
