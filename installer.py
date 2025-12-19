@@ -61,13 +61,14 @@ official_modules = ["pyvidplayer2", "pygame", "customtkinter", "yt-dlp", "pillow
 trying = True
 palette = colors.load_palette(color_path)
 failed_to_install_pywin_things = False
+failed_to_install_winshell = False
 event_trigger = 0
 create_desktop_shortcut = None
 
 
 def installer():
     """installs the program"""
-    global finished_steps, trying, failed_to_install_pywin_things
+    global finished_steps, trying, failed_to_install_pywin_things, failed_to_install_winshell
     settings_path = os.path.join("resources", "settings.json")
     if not os.path.exists(settings_path):
         with open(settings_path, "w") as f:
@@ -97,7 +98,8 @@ def installer():
             if current_os == "Windows":
                 if not failed_to_install_pywin_things:
                     from win32com.client import Dispatch
-                import winshell
+                if not failed_to_install_winshell:
+                    import winshell
             finished_steps = 13
 
             # checks custom modules
@@ -125,6 +127,10 @@ def installer():
                     if not failed_to_install_pywin_things:
                         os.system(f"pip install pywin32")
                         failed_to_install_pywin_things = True
+                elif e.name == "winshell":
+                    if not failed_to_install_winshell:
+                        os.system(f"pip install winshell")
+                        failed_to_install_winshell = True
                 else:
                     os.system(f"pip install {e.name}")
             else:
