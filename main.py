@@ -470,7 +470,7 @@ def run():
                 pg.blit(scaledCover, coverRect)
                 current_pos = current_track_ms
                 track_length = data.get_track_length(track)
-                if current_pos >= track_length - 1:
+                if current_pos >= track_length - 50:
                     currentMenu = "voting"
                     watchEnd = time.time()
                     voteStart = watchEnd
@@ -497,9 +497,9 @@ def run():
                     pygame.mouse.set_visible(True)
                     save_log("showing mouse")
                 if video:
-                    video_progressbar_fg = pygame.Surface((int(current_progressbar_width), 10))
+                    video_progressbar_fg = pygame.Surface((max(1, int(current_progressbar_width)), 10))
                 elif coverActive:
-                    video_progressbar_fg = pygame.Surface((int(current_progressbar_width), 10))
+                    video_progressbar_fg = pygame.Surface((max(1, int(current_progressbar_width)), 10))
                     current_second = current_track_ms / 1000
                     total_seconds = total_seconds / 1000
                 video_progressbar_bg = pygame.Surface((width - video_progressbar_fg.get_width(), 10))
