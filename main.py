@@ -455,13 +455,13 @@ def run():
                     last_rect = widget.handle_event(event)
 
             # draw video under the escape bar
-            if video:
+            if video and currentMenu == "watching":
                 if video.active:
                     video_w, video_h = video.current_size
                     video_x = (width - video_w) // 2
                     video_y = (height - video_h) // 2
                     video.draw(pg, (video_x, video_y))
-                    if video.frame >= video.frame_count:
+                    if video.frame >= video.frame_count - 1:
                         currentMenu = "voting"
                         watchEnd = time.time()
                         voteStart = watchEnd
@@ -470,7 +470,7 @@ def run():
                 pg.blit(scaledCover, coverRect)
                 current_pos = current_track_ms
                 track_length = data.get_track_length(track)
-                if current_pos >= track_length - 50:
+                if current_pos >= track_length - 1:
                     currentMenu = "voting"
                     watchEnd = time.time()
                     voteStart = watchEnd
