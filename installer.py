@@ -68,40 +68,51 @@ create_desktop_shortcut = None
 def installer():
     """installs the program"""
     global finished_steps, trying, failed_to_install_pywin_things
+    settings_path = os.path.join("resources", "settings.json")
+    if not os.path.exists(settings_path):
+        with open(settings_path, "w") as f:
+            json.dump({"theme": "default", "appearance_mode": "Dark", "language": "English",
+                       "font": os.path.join("resources", "fonts", "NotoSans.ttf"), "master_volume": 100,
+                       "track_volume": 100, "gui_volume": 100, "effects_volume": 100,
+                       "enabled_audio": [True, True, True, True], "logging": False, "performance": False,
+                       "fps": 120}, f, indent=4)
+        f.close()
+        hide_file(settings_path)
+    finished_steps += 1
     while trying:
         try:
             # checks other modules
             import pyvidplayer2
-            finished_steps = 5
-            import pygame
             finished_steps = 6
-            import customtkinter
+            import pygame
             finished_steps = 7
-            import yt_dlp
+            import customtkinter
             finished_steps = 8
-            import PIL
+            import yt_dlp
             finished_steps = 9
-            import matplotlib
+            import PIL
             finished_steps = 10
+            import matplotlib
+            finished_steps = 11
             if current_os == "Windows":
                 if not failed_to_install_pywin_things:
                     from win32com.client import Dispatch
                 import winshell
-            finished_steps = 12
+            finished_steps = 13
 
             # checks custom modules
             import data
-            finished_steps = 13
-            import main
             finished_steps = 14
-            import misc
+            import main
             finished_steps = 15
-            import settings
+            import misc
             finished_steps = 16
-            import stats
+            import settings
             finished_steps = 17
-            import visuals
+            import stats
             finished_steps = 18
+            import visuals
+            finished_steps = 19
 
             trying = False
         except ImportError as e:
@@ -146,17 +157,6 @@ def installer():
         hide_file(os.path.join("resources", "fonts"))
         finished_steps += 1
 
-        settings_path = os.path.join("resources", "settings.json")
-        if not os.path.exists(settings_path):
-            with open(settings_path, "w") as f:
-                json.dump({"theme": "default", "appearance_mode": "Dark", "language": "English",
-                           "font": os.path.join("resources", "fonts", "NotoSans.ttf"), "master_volume": 100,
-                           "track_volume": 100, "gui_volume": 100, "effects_volume": 100,
-                           "enabled_audio": [True, True, True, True], "logging": False, "performance": False,
-                           "fps": 120}, f, indent=4)
-            f.close()
-            hide_file(settings_path)
-        finished_steps += 1
 
         for file in necessary_files:
             finished_steps += 1
