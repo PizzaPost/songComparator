@@ -34,7 +34,7 @@ def submit_settings(tk, lang, theme, appearance_mode, language, font_dropdown, f
                    "logging": True if logging == ("Enabled" if not lang else lang["settings"]["enabled"]) else False,
                    "performance": True if performance == (
                        "Enabled" if not lang else lang["settings"]["enabled"]) else False,
-                   "fps": fps},
+                   "fps": int(fps)},
                   f, indent=4)
     f.close()
     misc.hide_file(os.path.join("resources", "settings.json"))
@@ -198,14 +198,15 @@ def open_settings():
                                                       values=["Enabled" if not lang else lang["settings"]["enabled"],
                                                               "Disabled" if not lang else lang["settings"]["disabled"]],
                                                       variable=logging_var)
-    performance_label = customtkinter.CTkLabel(frame2, text="Potato Mode" if not lang else lang["settings"]["performance_mode"])
+    performance_label = customtkinter.CTkLabel(frame2,
+                                               text="Potato Mode" if not lang else lang["settings"]["performance_mode"])
     performance_button = customtkinter.CTkSegmentedButton(frame2,
                                                           values=[
                                                               "Enabled" if not lang else lang["settings"]["enabled"],
                                                               "Disabled" if not lang else lang["settings"]["disabled"]],
                                                           variable=performance_var)
     fps_label = customtkinter.CTkLabel(frame2, text="FPS" if not lang else lang["settings"]["fps"])
-    fps_slider = customtkinter.CTkSlider(frame2, from_=10, to=240,
+    fps_slider = customtkinter.CTkSlider(frame2, from_=10, to=240, number_of_steps=231,
                                          command=lambda event: update_fps(fps_slider_percentage,
                                                                           fps_slider.get()))
     fps_slider.set(data["fps"])
