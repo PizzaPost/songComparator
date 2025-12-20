@@ -509,7 +509,7 @@ def run():
                 video_progressbar_bg.set_alpha(mouse_move_timeout)
                 video_progressbar_fg.set_alpha(mouse_move_timeout)
                 if track_data.__contains__("pre_notes") or (track_data.get("notes") and len(track_data["notes"]) > 0):
-                    notes_list = track_data.get("pre_notes") or track_data.get("notes")
+                    notes_list = track_data.get("pre_notes") or (track_data.get("notes")[0] if track_data.get("notes") else None)
                     notes_list = misc.wrap_lines(str(notes_list), width // 2, notes_font)
                     if isinstance(notes_list, str):
                         notes_list = [notes_list]
@@ -598,7 +598,7 @@ def run():
 
                 ratings = visuals.show_voting_screen(pg, rating_widgets)
                 if track_data.__contains__("after_notes") or (track_data.get("notes") and len(track_data["notes"]) > 1):
-                    notes = track_data.get("after_notes") or track_data.get("notes")[1]
+                    notes = track_data.get("after_notes") or (track_data.get("notes")[1] if len(track_data.get("notes")) > 1 else "")
                     notes = misc.wrap_lines(str(notes), width - (manager4.x + 30), notes_font)
                     for x, line in enumerate(notes):
                         y = 15 + x * notes_font.get_height()
