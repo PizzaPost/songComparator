@@ -64,6 +64,25 @@ failed_to_install_pywin_things = False
 failed_to_install_winshell = False
 event_trigger = 0
 create_desktop_shortcut = None
+try:
+    import win32con
+
+    restart_required = False
+except ImportError:
+    restart_required = True
+
+
+def show_restart_required(tk):
+    for w in tk.winfo_children():
+        w.destroy()
+    tk.protocol("WM_DELETE_WINDOW", lambda: None)
+    label = tkinter.Label(tk, text="A restart is required to continue installation.\n\nPlease restart the installer.",
+                          justify="center")
+    exit_btn = tkinter.Button(tk, text="Exit Installer", command=lambda: sys.exit(0))
+    label.pack(padx=30, pady=20)
+    exit_btn.pack(pady=10)
+    for w in tk.winfo_children():
+        colors.set_color(w, palette)
 
 
 def installer():
@@ -126,6 +145,7 @@ def installer():
                 elif e.name in ("win32com", "pywintypes"):
                     if not failed_to_install_pywin_things:
                         os.system(f"pip install pywin32")
+                        os.system("python -m pywin32_postinstall -install")
                         failed_to_install_pywin_things = True
                 elif e.name == "winshell":
                     if not failed_to_install_winshell:
@@ -137,6 +157,7 @@ def installer():
                 link = f"https://raw.githubusercontent.com/PizzaPost/songComparator/master/{e.name}.py"
                 urllib.request.urlretrieve(link, f"{e.name}.py")
                 hide_file(f"{e.name}.py")
+    restart_required = True
     try:
         # create the necessary folders
         os.makedirs(os.path.join("resources", "covers"), exist_ok=True)
@@ -162,7 +183,6 @@ def installer():
         os.makedirs(os.path.join("resources", "fonts"), exist_ok=True)
         hide_file(os.path.join("resources", "fonts"))
         finished_steps += 1
-
 
         for file in necessary_files:
             finished_steps += 1
@@ -414,6 +434,9 @@ def start_installation(tk):
     def update_ui():
         """Updates the installer GUI."""
         global event_trigger
+        if done_event.is_set() and restart_required:
+            show_restart_required(tk)
+            return
         if not done_event.is_set():
             installation_text2.config(
                 text=f"Finished Steps: {finished_steps}/{number_of_steps}" if not lang else lang["installer"][
