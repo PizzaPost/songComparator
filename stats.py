@@ -33,6 +33,7 @@ def calculateStats(playlist=None):
     best = []
     worst = []
     artistStars = {}
+    artistCounts = {}
     replays = 0
     listeningTimes = []
     trackLengths = []
@@ -49,9 +50,11 @@ def calculateStats(playlist=None):
         for index, rating in enumerate(trackRating.get("ratings")):
             ratings.append(rating)
             artist = trackData.get("artist")
-            if trackData.get("artist") not in artistStars:
+            if artist not in artistStars:
                 artistStars[artist] = [0, 0, 0, 0]
+                artistCounts[artist] = 0
             artistStars[artist][index] += rating
+            artistCounts[artist] += 1
             saveTuple = (rating, data.displayName(trackData))
             if len(best) <= index:
                 best.append(saveTuple)
@@ -61,6 +64,7 @@ def calculateStats(playlist=None):
                 worst.append(saveTuple)
             elif worst[index][0] > rating:
                 worst[index] = saveTuple
+    artistAverages = {artist: [s / artistCounts[artist] for s in stars] for artist, stars in artistStars.items()}
 
     averageRating = sum(ratings) / len(ratings)
     averageRelatability = sum(ratings[::4]) / len(ratings[::4])
@@ -79,10 +83,10 @@ def calculateStats(playlist=None):
     mostDisgusting = worst[3][1]
 
     mostStarredArtists = sorted(artistStars.items(), key=lambda x: sum(x[1]), reverse=True)[0][0]
-    mostRelatableArtists = sorted(artistStars.items(), key=lambda x: x[1][0], reverse=True)[0][0]
-    bestLyricsArtists = sorted(artistStars.items(), key=lambda x: x[1][1], reverse=True)[0][0]
-    bestProducedArtists = sorted(artistStars.items(), key=lambda x: x[1][2], reverse=True)[0][0]
-    tastiestArtists = sorted(artistStars.items(), key=lambda x: x[1][3], reverse=True)[0][0]
+    mostRelatableArtists = max(artistAverages.items(), key=lambda x: x[1][0])[0]
+    bestLyricsArtists = max(artistAverages.items(), key=lambda x: x[1][1])[0]
+    bestProducedArtists = max(artistAverages.items(), key=lambda x: x[1][2])[0]
+    tastiestArtists = max(artistAverages.items(), key=lambda x: x[1][3])[0]
 
     tracksRated = len(trackRatings)
     fiveStars = sum(1 for rating in ratings if rating == 5)
@@ -143,7 +147,7 @@ if os.path.exists(os.path.join("resources", "settings.json")):
     animation_base_speed = 6.0
     default_slide_duration = 6.0
     slide_durations = {
-        0: 6.0,
+        0: 8.0,
         1: 7.0,
         2: 6.0,
         3: 7.0,
@@ -251,7 +255,7 @@ def slide_2_sessions(surface, progress, fonts, stats, playlist, draw_bg=True):
     scale1 = ease_out_cubic(min(1, progress * 1.5))
     center_x1 = width // 4
     center_y1 = 600
-    radius1 = 250
+    radius1 = 300
     pygame.draw.circle(surface, COLORS["bg_pink"], (center_x1, center_y1), radius1 * scale1)
     alpha1 = get_text_alpha(progress, delay_start=0.2, fade_duration=0.5)
     if progress > 0.2:
