@@ -1,0 +1,19 @@
+{
+  "theme": "default",
+  "appearance_mode": "Dark",
+  "language": "English",
+  "font": "resources\\fonts\\NotoSans.ttf",
+  "master_volume": 100,
+  "track_volume": 100,
+  "gui_volume": 100,
+  "effects_volume": 100,
+  "enabled_audio": [
+    true,
+    true,
+    true,
+    true
+  ],
+  "logging": false,
+  "performance": false,
+  "fps": 30
+}
