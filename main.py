@@ -897,25 +897,23 @@ def run():
             # quit app logic
             if keys[pygame.K_ESCAPE]:
                 save_log("pressing escape")
-                esc += int(1 * dt_correction)
+                esc += 1 * dt_correction
             else:
-                esc = int(max(esc - 3 * dt_correction, 0))
+                esc = max(esc - 3 * dt_correction, 0)
             if esc > 0 and not performance_mode:
                 pg.fill((255, 0, 0), (0, height - 50, width // 200 * esc, 50))
             if esc >= 215:
                 running = False
                 save_log("closing app through escape")
-            # intro fade-in
-            if fadein < 255:
-                fade_surface = pygame.Surface((width, height))
-                fade_surface.set_alpha(255 - fadein)
-                fade_surface.fill((0, 0, 0))
-                pg.blit(fade_surface, (0, 0))
-                pygame.display.update()
-                pygame.time.delay(17)
-                fadein += int(3 * dt_correction)
-                if fadein == 255:
-                    save_log("finished fade-in animation")
+        # intro fade-in
+        if fadein < 255:
+            fade_surface = pygame.Surface((width, height))
+            fade_surface.set_alpha(255 - fadein)
+            fade_surface.fill((0, 0, 0))
+            pg.blit(fade_surface, (0, 0))
+            fadein += 0.5 * dt_correction
+            if fadein == 255:
+                save_log("finished fade-in animation")
         pygame.display.update()
     sessionEnd = time.time()
     session_length = sessionEnd - sessionStart
